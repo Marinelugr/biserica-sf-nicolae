@@ -141,19 +141,31 @@ model Article {
 
 // ─── Biblioteca Ortodoxă ─────────────────────────────────────────────────────
 
+model BookCategory {
+  id        String        @id @default(cuid())
+  name      String
+  emoji     String        @default("📖")
+  color     String        @default("#C9A84C")
+  order     Int           @default(0)
+  books     LibraryBook[]
+  createdAt DateTime      @default(now())
+}
+
 model LibraryBook {
-  id        String   @id @default(cuid())
-  slug      String   @unique
-  titleRo   String
-  titleRu   String?
-  titleEn   String?
-  type      String
-  contentRo String   @db.Text
-  contentRu String?  @db.Text
-  contentEn String?  @db.Text
-  author    String?
-  source    String?
-  createdAt DateTime @default(now())
+  id         String        @id @default(cuid())
+  slug       String        @unique
+  titleRo    String
+  titleRu    String?
+  titleEn    String?
+  type       String
+  categoryId String?
+  category   BookCategory? @relation(fields: [categoryId], references: [id])
+  contentRo  String        @db.Text
+  contentRu  String?       @db.Text
+  contentEn  String?       @db.Text
+  author     String?
+  source     String?
+  createdAt  DateTime      @default(now())
 }
 
 // ─── Program Slujbe ──────────────────────────────────────────────────────────
