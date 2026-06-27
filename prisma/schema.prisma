@@ -198,6 +198,31 @@ model Product {
   createdAt     DateTime @default(now())
 }
 
+// ─── Video ───────────────────────────────────────────────────────────────────
+
+model VideoCategory {
+  id        String   @id @default(cuid())
+  name      String
+  order     Int      @default(0)
+  videos    Video[]
+  createdAt DateTime @default(now())
+}
+
+model Video {
+  id          String         @id @default(cuid())
+  title       String
+  url         String
+  platform    String         @default("youtube")
+  videoId     String
+  categoryId  String?
+  category    VideoCategory? @relation(fields: [categoryId], references: [id])
+  description String?        @db.Text
+  order       Int            @default(0)
+  createdAt   DateTime       @default(now())
+
+  @@index([categoryId])
+}
+
 // ─── Setări globale ──────────────────────────────────────────────────────────
 
 model Setting {
