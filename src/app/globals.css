@@ -1,26 +1,136 @@
+/* ─── Google Fonts — trebuie să fie primele ─────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=EB+Garamond:wght@400;500&display=swap');
+
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ─── Design System — Paleta de culori ─────────────────────────────────────── */
+@theme {
+  /* Fonturi */
+  --font-heading: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'EB Garamond', Georgia, serif;
+
+  /* Dark zone (header, footer, hero) */
+  --color-dark-primary:   #0D0905;
+  --color-gold-accent:    #C9A84C;
+  --color-gold-muted:     #9B8050;
+  --color-gold-dark:      #5A4020;
+  --color-burgundy:       #8B1A1A;
+  --color-burgundy-light: #C06050;
+
+  /* Parchment zone (carduri zilnice) */
+  --color-parchment-bg:     #F2EBD9;
+  --color-parchment-card:   #F5EFE0;
+  --color-parchment-border: #D4C8A0;
+  --color-dark-text:        #3A1A1A;
+  --color-muted-text:       #8A7050;
+
+  /* White editorial zone (conținut) */
+  --color-white-bg:       #FFFFFF;
+  --color-navy:           #1C1B3A;
+  --color-editorial-gray: #F8F7F5;
+  --color-light-border:   #E8E5E0;
+
+  /* Saints dot colors */
+  --color-dot-saints:   #8B6014;
+  --color-dot-gospel:   #8B1A1A;
+  --color-dot-prayer:   #6B4A2A;
+  --color-dot-schedule: #4A6A2A;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Base styles ────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #3A1A1A;
+  background-color: #FFFFFF;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  line-height: 1.2;
+}
+
+/* ─── Scrollbar custom ────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0D0905; }
+::-webkit-scrollbar-thumb { background: #5A4020; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #C9A84C; }
+
+/* ─── Selection ─────────────────────────────────────────────────────────────── */
+::selection {
+  background-color: #C9A84C;
+  color: #0D0905;
+}
+
+/* ─── Utility classes specifice proiectului ─────────────────────────────────── */
+.font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
+.font-body    { font-family: 'EB Garamond', Georgia, serif; }
+
+/* Zone Layout */
+.zone-dark {
+  background-color: #0D0905;
+  color: #F2EBD9;
+}
+
+.zone-parchment {
+  background-color: #F2EBD9;
+  color: #3A1A1A;
+}
+
+.zone-white {
+  background-color: #FFFFFF;
+  color: #3A1A1A;
+}
+
+/* Gold divider ornament */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #C9A84C;
+}
+
+.ornament::before,
+.ornament::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #C9A84C, transparent);
+}
+
+/* Cross icon */
+.orthodox-cross {
+  font-size: 1.5rem;
+  color: #C9A84C;
+  line-height: 1;
+}
+
+/* Card parchment */
+.card-parchment {
+  background-color: #F5EFE0;
+  border: 1px solid #D4C8A0;
+  border-radius: 6px;
+}
+
+/* Animație fade-in la scroll */
+.fade-in {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
 }

@@ -1,0 +1,203 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Auth (NextAuth v5) ───────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  role          String    @default("admin")
+  accounts      Account[]
+  sessions      Session[]
+  createdAt     DateTime  @default(now())
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+}
+
+// ─── Biblia Ortodoxă ─────────────────────────────────────────────────────────
+
+model BibleBook {
+  id       String         @id @default(cuid())
+  slug     String         @unique
+  nameRo   String
+  nameRu   String
+  nameEn   String
+  testament String
+  orderNum Int
+  chapters BibleChapter[]
+}
+
+model BibleChapter {
+  id         String       @id @default(cuid())
+  bookId     String
+  book       BibleBook    @relation(fields: [bookId], references: [id])
+  chapterNum Int
+  verses     BibleVerse[]
+}
+
+model BibleVerse {
+  id        String       @id @default(cuid())
+  chapterId String
+  chapter   BibleChapter @relation(fields: [chapterId], references: [id])
+  verseNum  Int
+  textRo    String       @db.Text
+  textRu    String?      @db.Text
+  textEn    String?      @db.Text
+}
+
+// ─── Sfinți ──────────────────────────────────────────────────────────────────
+
+model Saint {
+  id        String  @id @default(cuid())
+  month     Int
+  day       Int
+  nameRo    String
+  nameRu    String?
+  nameEn    String?
+  slug      String  @unique
+  lifeRo    String? @db.Text
+  lifeRu    String? @db.Text
+  lifeEn    String? @db.Text
+  iconUrl   String?
+  feastType String?
+
+  @@index([month, day])
+}
+
+// ─── Rugăciuni ────────────────────────────────────────────────────────────────
+
+model Prayer {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  titleRo   String
+  titleRu   String?
+  titleEn   String?
+  type      String
+  textRo    String   @db.Text
+  textRu    String?  @db.Text
+  textEn    String?  @db.Text
+  author    String?
+  createdAt DateTime @default(now())
+}
+
+// ─── Articole / Știri ────────────────────────────────────────────────────────
+
+model Article {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  titleRo     String
+  titleRu     String?
+  titleEn     String?
+  contentRo   String    @db.Text
+  contentRu   String?   @db.Text
+  contentEn   String?   @db.Text
+  category    String?
+  imageUrl    String?
+  metaDescRo  String?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime  @default(now())
+}
+
+// ─── Biblioteca Ortodoxă ─────────────────────────────────────────────────────
+
+model LibraryBook {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  titleRo   String
+  titleRu   String?
+  titleEn   String?
+  type      String
+  contentRo String   @db.Text
+  contentRu String?  @db.Text
+  contentEn String?  @db.Text
+  author    String?
+  source    String?
+  createdAt DateTime @default(now())
+}
+
+// ─── Program Slujbe ──────────────────────────────────────────────────────────
+
+model ServiceSchedule {
+  id        String  @id @default(cuid())
+  year      Int
+  month     Int
+  day       Int
+  time      String
+  serviceRo String
+  serviceRu String?
+  notes     String?
+
+  @@index([year, month, day])
+}
+
+// ─── Magazin ─────────────────────────────────────────────────────────────────
+
+model Product {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  nameRo        String
+  price         Decimal  @db.Decimal(10, 2)
+  descriptionRo String?  @db.Text
+  imageUrl      String?
+  stock         Int      @default(0)
+  category      String?
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+// ─── Setări globale ──────────────────────────────────────────────────────────
+
+model Setting {
+  key   String @id
+  value String @db.Text
+}
+
+// ─── Homepage Widgets ────────────────────────────────────────────────────────
+
+model HomepageWidget {
+  id      String  @id @default(cuid())
+  section String  @unique
+  enabled Boolean @default(true)
+  order   Int
+  config  Json?
+}

@@ -1,65 +1,111 @@
-import Image from "next/image";
+export const dynamic = 'force-dynamic'
 
-export default function Home() {
+import Hero from '@/components/homepage/Hero'
+import DailyCards from '@/components/homepage/DailyCards'
+import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
+import { getTodayDate } from '@/lib/utils'
+
+const FALLBACK_GOSPEL = {
+  reference: 'Ioan 1:1',
+  text: 'La început era Cuvântul și Cuvântul era la Dumnezeu și Dumnezeu era Cuvântul.',
+}
+
+const FALLBACK_PRAYER = {
+  title: 'Rugăciunea dimineții',
+  text: 'Doamne Iisuse Hristoase, Fiul lui Dumnezeu, miluiește-mă pe mine păcătosul.',
+}
+
+async function getDailyData() {
+  const { day, month } = getTodayDate()
+
+  try {
+    const { prisma } = await import('@/lib/prisma')
+
+    const [saints, prayer, schedule] = await Promise.all([
+      prisma.saint.findMany({
+        where: { month, day },
+        select: { nameRo: true },
+        take: 5,
+      }),
+      prisma.prayer.findFirst({
+        where: { type: 'RUGACIUNE_ZILEI' },
+        select: { titleRo: true, textRo: true },
+      }),
+      prisma.serviceSchedule.findMany({
+        where: { year: new Date().getFullYear(), month, day },
+        select: { time: true, serviceRo: true },
+        orderBy: { time: 'asc' },
+        take: 5,
+      }),
+    ])
+
+    return {
+      saints: saints.map(s => s.nameRo),
+      gospel: FALLBACK_GOSPEL,
+      prayer: prayer
+        ? { title: prayer.titleRo, text: prayer.textRo.slice(0, 220) + '…' }
+        : FALLBACK_PRAYER,
+      schedule: schedule.map(s => ({ time: s.time, service: s.serviceRo })),
+    }
+  } catch {
+    return {
+      saints: [],
+      gospel: FALLBACK_GOSPEL,
+      prayer: FALLBACK_PRAYER,
+      schedule: [],
+    }
+  }
+}
+
+async function getHomeContent() {
+  try {
+    const { prisma } = await import('@/lib/prisma')
+
+    const [articles, libraryBooks] = await Promise.all([
+      prisma.article.findMany({
+        where: { published: true },
+        select: { slug: true, titleRo: true, imageUrl: true, publishedAt: true, category: true },
+        orderBy: { publishedAt: 'desc' },
+        take: 4,
+      }),
+      prisma.libraryBook.findMany({
+        select: { slug: true, titleRo: true, type: true },
+        orderBy: { createdAt: 'desc' },
+        take: 8,
+      }),
+    ])
+
+    return { articles, libraryBooks }
+  } catch {
+    return { articles: [], libraryBooks: [] }
+  }
+}
+
+function getTodayLabel(): string {
+  const { day, month, year } = getTodayDate()
+  const date = new Date(year, month - 1, day)
+  return date.toLocaleDateString('ro-MD', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
+export default async function HomePage() {
+  const [dailyData, homeContent] = await Promise.all([
+    getDailyData(),
+    getHomeContent(),
+  ])
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+    <>
+      <Hero />
+      <DailyCards data={dailyData} todayLabel={getTodayLabel()} />
+      <NewsAndLibrary
+        articles={homeContent.articles}
+        libraryBooks={homeContent.libraryBooks}
+      />
+    </>
+  )
 }
