@@ -10,6 +10,8 @@ const links = [
   { href: '/admin/carti', label: '📖 Bibliotecă' },
   { href: '/admin/slujbe', label: '🗓️ Slujbe' },
   { href: '/admin/sfinti', label: '👤 Sfinți' },
+  { href: '/admin/istoria-bisericii', label: '🏛️ Istoria bisericii' },
+  { href: '/admin/sfantul-nicolae', label: '✦ Sfântul Nicolae' },
   { href: '/admin/video', label: '🎬 Video' },
   { href: '/admin/magazin', label: '🛒 Magazin' },
   { href: '/admin/donatii', label: '💰 Donații' },

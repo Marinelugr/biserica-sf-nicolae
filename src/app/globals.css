@@ -123,6 +123,32 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 6px;
 }
 
+/* TipTap rich-text prose — stiluri pentru conținut editat în admin */
+.tiptap-prose {
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 1.0625rem;
+  line-height: 1.8;
+  color: #3A2010;
+}
+.tiptap-prose p { margin-bottom: 1.25rem; }
+.tiptap-prose h1, .tiptap-prose h2, .tiptap-prose h3, .tiptap-prose h4 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  color: #1C1B3A;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.25;
+}
+.tiptap-prose h1 { font-size: 2rem; }
+.tiptap-prose h2 { font-size: 1.5rem; }
+.tiptap-prose h3 { font-size: 1.25rem; color: #4A2010; }
+.tiptap-prose ul, .tiptap-prose ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
+.tiptap-prose li { margin-bottom: 0.4rem; }
+.tiptap-prose strong { font-weight: 600; color: #2A1A0A; }
+.tiptap-prose em { font-style: italic; }
+.tiptap-prose blockquote { border-left: 3px solid #C9A84C; padding-left: 1rem; color: #5A3010; font-style: italic; margin: 1.5rem 0; }
+.tiptap-prose a { color: #8B6014; text-decoration: underline; }
+.tiptap-prose hr { border: none; border-top: 1px solid #E8E5E0; margin: 2rem 0; }
+
 /* Animație fade-in la scroll */
 .fade-in {
   opacity: 0;
