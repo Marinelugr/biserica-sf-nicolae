@@ -28,6 +28,10 @@ export default function AdminSfantulNicolaePage() {
   const [tropar, setTropar] = useState('')
   const [condac, setCondac] = useState('')
   const [iconUrl, setIconUrl] = useState('')
+  const [feast1, setFeast1] = useState('19 Decembrie — Adormirea Sfântului Nicolae')
+  const [feast1Desc, setFeast1Desc] = useState('Ziua principală de prăznuire. Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.')
+  const [feast2, setFeast2] = useState('22 Mai — Aducerea Sfintelor Moaște la Bari')
+  const [feast2Desc, setFeast2Desc] = useState('Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087.')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
@@ -43,6 +47,10 @@ export default function AdminSfantulNicolaePage() {
           setTropar(data.tropar || '')
           setCondac(data.condac || '')
           setIconUrl(data.iconUrl || '')
+          setFeast1(data.feast1 || '19 Decembrie — Adormirea Sfântului Nicolae')
+          setFeast1Desc(data.feast1Desc || 'Ziua principală de prăznuire. Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.')
+          setFeast2(data.feast2 || '22 Mai — Aducerea Sfintelor Moaște la Bari')
+          setFeast2Desc(data.feast2Desc || 'Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087.')
         }
         setLoading(false)
       })
@@ -55,7 +63,7 @@ export default function AdminSfantulNicolaePage() {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'saint_nicholas_content', value: { life, tropar, condac, iconUrl } }),
+        body: JSON.stringify({ key: 'saint_nicholas_content', value: { life, tropar, condac, iconUrl, feast1, feast1Desc, feast2, feast2Desc } }),
       })
       if (!res.ok) throw new Error('Eroare la salvare')
       showToast('Conținut salvat cu succes ✓', 'success')
@@ -122,31 +130,44 @@ export default function AdminSfantulNicolaePage() {
                 </div>
               </div>
 
-              {/* ─── Date prăznuire (static) ─── */}
+              {/* ─── Date prăznuire (editabile) ─── */}
               <div style={sectionBox}>
                 <div style={sectionTitle}>📅 Date prăznuire</div>
-                <p style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginBottom: '1rem' }}>
-                  Datele de prăznuire sunt fixe și nu pot fi modificate.
-                </p>
-                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                  <div style={{ backgroundColor: '#0A0704', border: '1px solid #1A1008', borderRadius: '6px', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', borderRadius: '4px', width: '48px', height: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 600, lineHeight: 1 }}>
-                      <span>19</span>
-                      <span style={{ fontSize: '0.55rem', marginTop: '2px' }}>DEC</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
+                  <div style={{ backgroundColor: '#0A0704', border: '1px solid #1A1008', borderRadius: '6px', padding: '1rem 1.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                      <div style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', borderRadius: '4px', width: '44px', height: '44px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: 600, lineHeight: 1, flexShrink: 0 }}>
+                        <span>19</span><span style={{ fontSize: '0.5rem', marginTop: '2px' }}>DEC</span>
+                      </div>
+                      <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Prima prăznuire</span>
                     </div>
-                    <div>
-                      <div style={{ color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.9rem' }}>19 Decembrie (stil vechi)</div>
-                      <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem' }}>Adormirea Sfântului Nicolae</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <div>
+                        <label style={lbl}>Titlu</label>
+                        <input value={feast1} onChange={e => setFeast1(e.target.value)} style={inp} />
+                      </div>
+                      <div>
+                        <label style={lbl}>Descriere</label>
+                        <input value={feast1Desc} onChange={e => setFeast1Desc(e.target.value)} style={inp} />
+                      </div>
                     </div>
                   </div>
-                  <div style={{ backgroundColor: '#0A0704', border: '1px solid #1A1008', borderRadius: '6px', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ backgroundColor: '#C9A84C', color: '#0D0905', borderRadius: '4px', width: '48px', height: '48px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 600, lineHeight: 1 }}>
-                      <span>9</span>
-                      <span style={{ fontSize: '0.55rem', marginTop: '2px' }}>MAI</span>
+                  <div style={{ backgroundColor: '#0A0704', border: '1px solid #1A1008', borderRadius: '6px', padding: '1rem 1.25rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                      <div style={{ backgroundColor: '#C9A84C', color: '#0D0905', borderRadius: '4px', width: '44px', height: '44px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: 600, lineHeight: 1, flexShrink: 0 }}>
+                        <span>22</span><span style={{ fontSize: '0.5rem', marginTop: '2px' }}>MAI</span>
+                      </div>
+                      <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>A doua prăznuire</span>
                     </div>
-                    <div>
-                      <div style={{ color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.9rem' }}>9 Mai (stil vechi)</div>
-                      <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem' }}>Aducerea Sfintelor Moaște la Bari</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <div>
+                        <label style={lbl}>Titlu</label>
+                        <input value={feast2} onChange={e => setFeast2(e.target.value)} style={inp} />
+                      </div>
+                      <div>
+                        <label style={lbl}>Descriere</label>
+                        <input value={feast2Desc} onChange={e => setFeast2Desc(e.target.value)} style={inp} />
+                      </div>
                     </div>
                   </div>
                 </div>

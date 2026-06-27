@@ -18,7 +18,7 @@ const FALLBACK_VIATA = [
   { titlu: 'Nașterea și tinerețea', text: `Sfântul Ierarh Nicolae s-a născut în jurul anului 270 d.Hr. în orașul Patara din Licia (Asia Mică, actuala Turcie). Părinții săi, Epifanie și Ana, erau oameni evlavioși și înstăriți, care l-au crescut în frica de Dumnezeu. Rămas orfan de timpuriu, Nicolae a moștenit averea părinților, pe care a împărțit-o celor săraci.` },
   { titlu: 'Arhiepiscopul Mirelor Lichiei', text: `Ales în chip minunat ca arhiepiscop al Mirelor Lichiei, Sfântul Nicolae a păstorit cu înțelepciune și smerenie turma sa. Era cunoscut pentru blândețea sa, pentru dragostea față de cei săraci și pentru darul făcerii de minuni. A participat la Sinodul I Ecumenic de la Niceea (325 d.Hr.), apărând cu fervoare dreapta credință împotriva ereziei lui Arie.` },
   { titlu: 'Faptele milostiviei', text: `Dintre nenumăratele sale fapte de milostenie, cea mai renumită este ajutorarea unui om sărac cu trei fete. Neputând să le înzestreze pentru căsătorie, tatăl era în mare strâmtorare. Sfântul Nicolae, auzind de aceasta, a aruncat noaptea, pe fereastră, câte un sac cu aur pentru fiecare fată.` },
-  { titlu: 'Adormirea și prăznuirea', text: `Sfântul Nicolae a adormit întru Domnul în jurul anului 345 d.Hr., la o vârstă înaintată. Sfintele sale moaște au rămas la Mireele Lichiei până în anul 1087, când, din cauza amenințărilor islamice, au fost aduse la Bari (Italia), unde se găsesc și astăzi în Bazilica San Nicola. Sfântul este prăznuit de două ori pe an: pe 19 Decembrie și pe 9 Mai (stil vechi).` },
+  { titlu: 'Adormirea și prăznuirea', text: `Sfântul Nicolae a adormit întru Domnul în jurul anului 345 d.Hr., la o vârstă înaintată. Sfintele sale moaște au rămas la Mireele Lichiei până în anul 1087, când, din cauza amenințărilor islamice, au fost aduse la Bari (Italia), unde se găsesc și astăzi în Bazilica San Nicola. Sfântul este prăznuit de două ori pe an: pe 19 Decembrie și pe 22 Mai.` },
 ]
 
 function renderPoem(text: string) {
@@ -32,6 +32,10 @@ export default async function SfantulNicolaePage() {
   let dynTropar: string | null = null
   let dynCondac: string | null = null
   let iconUrl: string | null = null
+  let feast1 = '19 Decembrie — Adormirea Sfântului Nicolae'
+  let feast1Desc = 'Ziua principală de prăznuire. Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.'
+  let feast2 = '22 Mai — Aducerea Sfintelor Moaște la Bari'
+  let feast2Desc = 'Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087.'
 
   try {
     const setting = await prisma.setting.findUnique({ where: { key: 'saint_nicholas_content' } })
@@ -41,6 +45,10 @@ export default async function SfantulNicolaePage() {
       dynTropar = data.tropar || null
       dynCondac = data.condac || null
       iconUrl = data.iconUrl || null
+      if (data.feast1) feast1 = data.feast1
+      if (data.feast1Desc) feast1Desc = data.feast1Desc
+      if (data.feast2) feast2 = data.feast2
+      if (data.feast2Desc) feast2Desc = data.feast2Desc
     }
   } catch { /* use fallback */ }
 
@@ -102,10 +110,10 @@ export default async function SfantulNicolaePage() {
                 </div>
                 <div>
                   <p className="font-heading text-base" style={{ color: '#1C1B3A' }}>
-                    19 Decembrie — Adormirea Sfântului Nicolae
+                    {feast1}
                   </p>
                   <p className="font-body text-sm mt-1" style={{ color: '#8A7050' }}>
-                    Ziua principală de prăznuire (stil vechi). Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.
+                    {feast1Desc}
                   </p>
                 </div>
               </div>
@@ -113,16 +121,16 @@ export default async function SfantulNicolaePage() {
               <div className="flex items-start gap-4 p-4 rounded-lg" style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
                 <div className="w-12 h-12 rounded flex items-center justify-center shrink-0 font-heading font-semibold" style={{ backgroundColor: '#C9A84C', color: '#1C1B3A', fontSize: '16px' }}>
                   <div className="text-center leading-tight">
-                    <div>9</div>
+                    <div>22</div>
                     <div style={{ fontSize: '9px' }}>MAI</div>
                   </div>
                 </div>
                 <div>
                   <p className="font-heading text-base" style={{ color: '#1C1B3A' }}>
-                    9 Mai — Aducerea Sfintelor Moaște la Bari
+                    {feast2}
                   </p>
                   <p className="font-body text-sm mt-1" style={{ color: '#8A7050' }}>
-                    Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087 (stil vechi).
+                    {feast2Desc}
                   </p>
                 </div>
               </div>
