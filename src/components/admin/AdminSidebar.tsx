@@ -8,7 +8,7 @@ const links = [
   { href: '/admin', label: '📊 Dashboard', exact: true },
   { href: '/admin/stiri', label: '📰 Știri și articole' },
   { href: '/admin/carti', label: '📖 Bibliotecă' },
-  { href: '/admin/calendar', label: '🗓️ Slujbe' },
+  { href: '/admin/slujbe', label: '🗓️ Slujbe' },
   { href: '/admin/sfinti', label: '👤 Sfinți' },
   { href: '/admin/video', label: '🎬 Video' },
   { href: '/admin/magazin', label: '🛒 Magazin' },
