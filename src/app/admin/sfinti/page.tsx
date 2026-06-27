@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
+import ImageUploadButton from '@/components/admin/ImageUploadButton'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -263,8 +264,9 @@ export default function AdminSfintiPage() {
               {/* Icon */}
               <div>
                 <label style={lbl}>URL icoană</label>
-                <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                   <input value={form.iconUrl} onChange={e => setForm(f => ({ ...f, iconUrl: e.target.value }))} placeholder="https://..." style={{ ...inp, flex: 1 }} />
+                  <ImageUploadButton onUpload={url => setForm(f => ({ ...f, iconUrl: url }))} />
                   {form.iconUrl && (
                     <img src={form.iconUrl} alt="" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #2A1A0A', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                   )}

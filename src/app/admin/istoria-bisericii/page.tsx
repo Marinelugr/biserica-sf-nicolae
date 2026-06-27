@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
+import ImageUploadButton from '@/components/admin/ImageUploadButton'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -156,13 +157,16 @@ export default function AdminIstoriaBisericiiPage() {
                 <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
                   <div style={{ flex: '1 1 280px' }}>
                     <label style={lbl}>URL imagine</label>
-                    <input
-                      value={newImgUrl}
-                      onChange={e => setNewImgUrl(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && addImage()}
-                      placeholder="https://..."
-                      style={inp}
-                    />
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <input
+                        value={newImgUrl}
+                        onChange={e => setNewImgUrl(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && addImage()}
+                        placeholder="https://... sau încarcă"
+                        style={{ ...inp, flex: 1 }}
+                      />
+                      <ImageUploadButton onUpload={url => setNewImgUrl(url)} />
+                    </div>
                   </div>
                   <div style={{ flex: '1 1 200px' }}>
                     <label style={lbl}>Descriere (opțional)</label>

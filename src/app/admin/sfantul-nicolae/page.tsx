@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
+import ImageUploadButton from '@/components/admin/ImageUploadButton'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -112,14 +113,17 @@ export default function AdminSfantulNicolaePage() {
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1 }}>
                     <label style={lbl}>URL icoană</label>
-                    <input
-                      value={iconUrl}
-                      onChange={e => setIconUrl(e.target.value)}
-                      placeholder="https://..."
-                      style={inp}
-                    />
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                      <input
+                        value={iconUrl}
+                        onChange={e => setIconUrl(e.target.value)}
+                        placeholder="https://... sau încarcă mai jos"
+                        style={{ ...inp, flex: 1 }}
+                      />
+                      <ImageUploadButton onUpload={url => setIconUrl(url)} />
+                    </div>
                     <p style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.4rem' }}>
-                      URL-ul imaginii icoanei Sfântului Ierarh Nicolae care apare pe pagina publică.
+                      Introduceți un URL sau încărcați direct din calculator.
                     </p>
                   </div>
                   {iconUrl && (
