@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import Hero from '@/components/homepage/Hero'
+import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
 import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
 import { getTodayDate } from '@/lib/utils'
@@ -101,6 +102,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero />
+      <LiveStreamCard />
       <DailyCards data={dailyData} todayLabel={getTodayLabel()} />
       <NewsAndLibrary
         articles={homeContent.articles}

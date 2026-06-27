@@ -123,6 +123,13 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 6px;
 }
 
+/* Live stream badge pulse */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.15); }
+}
+.live-dot { display: inline-block; animation: live-pulse 1.4s ease-in-out infinite; }
+
 /* TipTap rich-text prose — stiluri pentru conținut editat în admin */
 .tiptap-prose {
   font-family: 'EB Garamond', Georgia, serif;
