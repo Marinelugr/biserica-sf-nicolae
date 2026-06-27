@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const links = [
-  { href: '/', label: '🏠 Pagina principală', exact: true },
+  { href: '/admin/homepage', label: '🏠 Configurare homepage' },
   { href: '/admin', label: '📊 Dashboard', exact: true },
   { href: '/admin/stiri', label: '📰 Știri și articole' },
   { href: '/admin/carti', label: '📖 Bibliotecă' },
