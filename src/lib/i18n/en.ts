@@ -3,7 +3,7 @@ import type { Translations } from './ro'
 const en: Translations = {
   nav: {
     home: 'Home', bible: 'Bible', calendar: 'Calendar', books: 'Books',
-    churchHistory: 'Church History', saintNicholas: 'Saint Nicholas', priest: 'Our Priest',
+    churchHistory: 'Church History', saintNicholas: 'Saint Nicholas', priest: 'Our Parish Priest',
     video: 'Video', shop: 'Shop', donate: 'Donate',
   },
   home: {

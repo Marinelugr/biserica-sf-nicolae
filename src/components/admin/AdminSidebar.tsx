@@ -12,7 +12,7 @@ const links = [
   { href: '/admin/sfinti', label: '👤 Sfinți' },
   { href: '/admin/istoria-bisericii', label: '🏛️ Istoria bisericii' },
   { href: '/admin/sfantul-nicolae', label: '✦ Sfântul Nicolae' },
-  { href: '/admin/paroh', label: '⛪ Paroh' },
+  { href: '/admin/paroh', label: '⛪ Parohul Bisericii' },
   { href: '/admin/video', label: '🎬 Video' },
   { href: '/admin/magazin', label: '🛒 Magazin' },
   { href: '/admin/donatii', label: '💰 Donații' },

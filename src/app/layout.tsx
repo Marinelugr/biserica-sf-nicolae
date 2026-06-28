@@ -30,10 +30,11 @@ export const metadata: Metadata = {
     'Website oficial al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova. Biblie ortodoxă, calendar liturgic, transmisiuni live.',
   keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online', 'transmisiune live'],
   icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    apple: '/favicon.svg',
   },
+  manifest: '/manifest.json',
+  appleWebApp: { capable: true, title: 'Sf. Nicolae', statusBarStyle: 'black-translucent' },
   openGraph: {
     type: 'website',
     locale: 'ro_RO',

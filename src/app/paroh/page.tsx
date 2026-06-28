@@ -4,9 +4,15 @@ import PublicGallery from '@/components/PublicGallery'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Preotul Paroh',
-  description: 'Preotul Paroh al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni.',
+export async function generateMetadata(): Promise<Metadata> {
+  const priest = await prisma.priest.findFirst({ select: { nameRo: true, photoUrl: true } })
+  return {
+    title: 'Parohul Bisericii',
+    description: `${priest?.nameRo ?? 'Preotul Paroh'} — Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni.`,
+    openGraph: priest?.photoUrl ? {
+      images: [{ url: priest.photoUrl, width: 800, height: 1067, alt: priest.nameRo }],
+    } : undefined,
+  }
 }
 
 export default async function ParohPage() {
@@ -34,7 +40,7 @@ export default async function ParohPage() {
           Parohia Sfântul Ierarh Nicolae
         </p>
         <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(28px, 4vw, 46px)', fontWeight: 400 }}>
-          Preotul Paroh
+          Parohul Bisericii
         </h1>
         <div className="flex items-center justify-center gap-3">
           <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
@@ -48,14 +54,14 @@ export default async function ParohPage() {
         {/* Hero: fotografie + date principale */}
         <div className="flex flex-col md:flex-row gap-10 items-start mb-16">
           {/* Fotografie */}
-          <div className="flex-shrink-0 flex justify-center w-full md:w-auto">
+          <div className="flex-shrink-0 w-full md:w-auto flex justify-center md:block">
             {priest.photoUrl ? (
-              <div style={{ width: '200px', height: '200px', borderRadius: '50%', overflow: 'hidden', border: '4px solid #C9A84C', boxShadow: '0 0 0 6px #1E1208' }}>
-                <img src={priest.photoUrl} alt={priest.nameRo} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <div style={{ width: '280px', aspectRatio: '3/4', borderRadius: '8px', overflow: 'hidden', border: '3px solid #C9A84C', boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}>
+                <img src={priest.photoUrl} alt={priest.nameRo} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
               </div>
             ) : (
-              <div style={{ width: '200px', height: '200px', borderRadius: '50%', backgroundColor: '#1A1008', border: '4px solid #C9A84C', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <span style={{ color: '#3A2A0A', fontSize: '4rem' }}>☦</span>
+              <div style={{ width: '280px', aspectRatio: '3/4', borderRadius: '8px', backgroundColor: '#F7F3EC', border: '2px solid #E8DFC8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ color: '#C9A84C', fontSize: '5rem', opacity: 0.4 }}>☦</span>
               </div>
             )}
           </div>

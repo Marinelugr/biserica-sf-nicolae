@@ -1,80 +1,52 @@
 import { MetadataRoute } from 'next'
+import { prisma } from '@/lib/prisma'
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://biserica-sf-nicolae.org'
+const BASE = 'https://biserica-sf-nicolae.org'
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/despre`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/biblie`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/calendar`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/carti`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/sfantul-nicolae`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/istoria-bisericii`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/video`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/stiri`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/donatii`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/magazin`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly',
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 0.6,
-    },
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const staticRoutes: MetadataRoute.Sitemap = [
+    { url: BASE, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
+    { url: `${BASE}/despre`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/paroh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/biblie`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE}/calendar`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${BASE}/carti`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${BASE}/sfantul-nicolae`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE}/istoria-bisericii`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${BASE}/video`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
+    { url: `${BASE}/stiri`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
+    { url: `${BASE}/donatii`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
+    { url: `${BASE}/magazin`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${BASE}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
   ]
+
+  let articleRoutes: MetadataRoute.Sitemap = []
+  try {
+    const articles = await prisma.article.findMany({
+      where: { published: true },
+      select: { slug: true, publishedAt: true, createdAt: true },
+      orderBy: { publishedAt: 'desc' },
+    })
+    articleRoutes = articles.map(a => ({
+      url: `${BASE}/stiri/${a.slug}`,
+      lastModified: a.publishedAt ?? a.createdAt,
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }))
+  } catch { /* skip */ }
+
+  let bookRoutes: MetadataRoute.Sitemap = []
+  try {
+    const books = await prisma.libraryBook.findMany({
+      select: { slug: true, createdAt: true },
+    })
+    bookRoutes = books.map(b => ({
+      url: `${BASE}/carti/${b.slug}`,
+      lastModified: b.createdAt,
+      changeFrequency: 'yearly' as const,
+      priority: 0.6,
+    }))
+  } catch { /* skip */ }
+
+  return [...staticRoutes, ...articleRoutes, ...bookRoutes]
 }

@@ -1,10 +1,12 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { optimizeImage, blobToFile, formatBytes } from '@/lib/imageOptimizer'
 
 interface MediaItem {
   id: string
   url: string
+  thumbnailUrl?: string
   caption: string | null
   order: number
 }
@@ -25,10 +27,21 @@ function Spinner() {
   )
 }
 
+async function uploadFile(file: File, isThumbnail = false): Promise<string> {
+  const fd = new FormData()
+  fd.append('file', file)
+  if (isThumbnail) fd.append('thumbnail', 'true')
+  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error || 'Eroare upload')
+  return data.url
+}
+
 export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: Props) {
   const [items, setItems] = useState<MediaItem[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
+  const [uploadStatus, setUploadStatus] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadTotal, setUploadTotal] = useState(0)
   const [error, setError] = useState('')
@@ -56,23 +69,34 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
     setUploadProgress(0)
     setUploadTotal(toUpload.length)
     setError('')
+    setUploadStatus('')
 
     let done = 0
     const newItems: MediaItem[] = []
 
     for (const file of toUpload) {
       try {
-        const fd = new FormData()
-        fd.append('file', file)
-        const upRes = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-        const upData = await upRes.json()
-        if (!upRes.ok) throw new Error(upData.error || 'Eroare upload')
+        setUploadStatus(`Se optimizează ${file.name}...`)
+
+        // Optimize + thumbnail in parallel
+        const { blob, thumbnailBlob, originalSize, optimizedSize } = await optimizeImage(file)
+        const optimizedFile = blobToFile(blob, file.name)
+        const thumbFile = blobToFile(thumbnailBlob, `thumb_${file.name}`)
+
+        const reduction = Math.round((1 - optimizedSize / originalSize) * 100)
+        setUploadStatus(`${formatBytes(originalSize)} → ${formatBytes(optimizedSize)} (−${reduction}%) · Se încarcă...`)
+
+        // Upload main + thumbnail in parallel
+        const [url, thumbnailUrl] = await Promise.all([
+          uploadFile(optimizedFile),
+          uploadFile(thumbFile, true),
+        ])
 
         const nextOrder = items.length + newItems.length
         const res = await fetch('/api/admin/media', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: upData.url, entityType, entityId, order: nextOrder }),
+          body: JSON.stringify({ url, thumbnailUrl, entityType, entityId, order: nextOrder }),
         })
         if (res.ok) newItems.push(await res.json())
       } catch (err) {
@@ -84,6 +108,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
 
     setItems(prev => [...prev, ...newItems])
     setUploading(false)
+    setUploadStatus('')
     if (inputRef.current) inputRef.current.value = ''
   }
 
@@ -122,7 +147,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
 
   return (
     <div>
-      {/* Counter */}
+      {/* Counter + actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>
           {items.length} din {maxPhotos} poze
@@ -142,7 +167,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
             disabled={uploading || items.length >= maxPhotos}
             style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', border: 'none', borderRadius: '4px', padding: '0.4rem 0.875rem', fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: (uploading || items.length >= maxPhotos) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: items.length >= maxPhotos ? 0.5 : 1 }}
           >
-            {uploading ? <><Spinner /> Se încarcă...</> : '📎 Adaugă poze'}
+            {uploading ? <><Spinner /> Se optimizează...</> : '📎 Adaugă poze'}
           </button>
         </div>
       </div>
@@ -150,21 +175,30 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
       <input
         ref={inputRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         multiple
         style={{ display: 'none' }}
         onChange={e => e.target.files && handleFiles(e.target.files)}
       />
 
-      {/* Progress bar */}
-      {uploading && uploadTotal > 1 && (
+      {/* Progress */}
+      {uploading && (
         <div style={{ marginBottom: '1rem' }}>
-          <div style={{ backgroundColor: '#1A1008', borderRadius: '4px', height: '6px', overflow: 'hidden' }}>
-            <div style={{ backgroundColor: '#C9A84C', height: '100%', width: `${(uploadProgress / uploadTotal) * 100}%`, transition: 'width 0.3s' }} />
-          </div>
-          <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.3rem', display: 'block' }}>
-            {uploadProgress} / {uploadTotal} poze încărcate
-          </span>
+          {uploadTotal > 1 && (
+            <div style={{ marginBottom: '0.4rem' }}>
+              <div style={{ backgroundColor: '#1A1008', borderRadius: '4px', height: '5px', overflow: 'hidden' }}>
+                <div style={{ backgroundColor: '#C9A84C', height: '100%', width: `${(uploadProgress / uploadTotal) * 100}%`, transition: 'width 0.3s' }} />
+              </div>
+              <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.72rem', marginTop: '0.25rem', display: 'block' }}>
+                {uploadProgress} / {uploadTotal} poze
+              </span>
+            </div>
+          )}
+          {uploadStatus && (
+            <div style={{ color: '#8B6014', fontFamily: 'Georgia, serif', fontSize: '0.78rem', padding: '0.5rem 0.75rem', backgroundColor: '#0A0704', borderRadius: '4px', border: '1px solid #1A1008' }}>
+              ⚡ {uploadStatus}
+            </div>
+          )}
         </div>
       )}
 
@@ -177,7 +211,10 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
           onClick={() => inputRef.current?.click()}
           style={{ padding: '3rem 1rem', textAlign: 'center', color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.875rem', border: '1px dashed #2A1A0A', borderRadius: '6px', cursor: 'pointer' }}
         >
-          Nicio imagine. Click pentru a adăuga poze.
+          Nicio imagine. Click pentru a adăuga poze.<br />
+          <span style={{ fontSize: '0.75rem', color: '#2A1A0A', marginTop: '0.4rem', display: 'block' }}>
+            JPG, PNG, WebP, HEIC — compresie automată WebP
+          </span>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.875rem' }}>
@@ -185,10 +222,13 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
             <div key={item.id} style={{ backgroundColor: '#0A0704', border: '1px solid #2A1A0A', borderRadius: '6px', overflow: 'hidden' }}>
               <div style={{ position: 'relative', aspectRatio: '4/3' }}>
                 <img
-                  src={item.url}
+                  src={(item as MediaItem & { thumbnailUrl?: string }).thumbnailUrl || item.url}
                   alt={item.caption || ''}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  onError={e => { (e.target as HTMLImageElement).style.backgroundColor = '#1A1008' }}
+                  onError={e => {
+                    const el = e.target as HTMLImageElement
+                    if (el.src !== item.url) el.src = item.url
+                  }}
                 />
                 <button
                   onClick={() => handleDelete(item.id)}

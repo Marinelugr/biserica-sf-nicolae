@@ -3,7 +3,7 @@ import type { Translations } from './ro'
 const ru: Translations = {
   nav: {
     home: 'Главная', bible: 'Библия', calendar: 'Календарь', books: 'Книги',
-    churchHistory: 'История Церкви', saintNicholas: 'Святой Николай', priest: 'Наш священник',
+    churchHistory: 'История Церкви', saintNicholas: 'Святой Николай', priest: 'Священник прихода',
     video: 'Видео', shop: 'Магазин', donate: 'Пожертвовать',
   },
   home: {

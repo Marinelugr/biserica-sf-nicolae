@@ -1,0 +1,20 @@
+{
+  "name": "Biserica Sfântul Ierarh Nicolae",
+  "short_name": "Sf. Nicolae",
+  "description": "Parohia Ortodoxă Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0905",
+  "theme_color": "#0D0905",
+  "lang": "ro",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["religion", "lifestyle"],
+  "screenshots": []
+}

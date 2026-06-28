@@ -25,13 +25,13 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
-  const { url, caption, order, entityType, entityId } = await req.json()
+  const { url, thumbnailUrl, caption, order, entityType, entityId } = await req.json()
   if (!url || !entityType || !entityId) {
     return NextResponse.json({ error: 'url, entityType și entityId sunt obligatorii' }, { status: 400 })
   }
 
   const item = await prisma.mediaItem.create({
-    data: { url, caption: caption || null, order: order ?? 0, entityType, entityId },
+    data: { url, thumbnailUrl: thumbnailUrl || null, caption: caption || null, order: order ?? 0, entityType, entityId },
   })
   return NextResponse.json(item, { status: 201 })
 }
