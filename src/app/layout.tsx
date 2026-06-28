@@ -27,8 +27,8 @@ export const metadata: Metadata = {
     template: '%s | Biserica Sfântul Ierarh Nicolae',
   },
   description:
-    'Parohia Ortodoxă Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova. Biblie online, calendar liturgic, sfinții zilei, program slujbe.',
-  keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online'],
+    'Website oficial al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova. Biblie ortodoxă, calendar liturgic, transmisiuni live.',
+  keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online', 'transmisiune live'],
   icons: {
     icon: [
       { url: '/favicon.svg', type: 'image/svg+xml' },
@@ -36,12 +36,12 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'ro_MD',
+    locale: 'ro_RO',
     url: 'https://biserica-sf-nicolae.org',
     siteName: 'Biserica Sfântul Ierarh Nicolae',
     title: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Moldova',
     description: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Republica Moldova.',
-    images: [{ url: '/images/church-og.jpg', width: 1200, height: 630, alt: 'Biserica Sfântul Ierarh Nicolae' }],
+    images: [{ url: '/images/12.jpg', width: 1200, height: 800, alt: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Criuleni, Moldova' }],
   },
   twitter: {
     card: 'summary_large_image',
