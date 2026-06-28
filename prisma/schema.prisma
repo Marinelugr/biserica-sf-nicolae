@@ -218,6 +218,11 @@ model Video {
   category    VideoCategory? @relation(fields: [categoryId], references: [id])
   description String?        @db.Text
   order       Int            @default(0)
+  startTime   Int?
+  endTime     Int?
+  isLive      Boolean        @default(false)
+  archivedAt  DateTime?
+  serviceType String?
   createdAt   DateTime       @default(now())
 
   @@index([categoryId])
@@ -238,4 +243,39 @@ model HomepageWidget {
   enabled Boolean @default(true)
   order   Int
   config  Json?
+}
+
+// ─── Galerie media ────────────────────────────────────────────────────────────
+
+model MediaItem {
+  id         String   @id @default(cuid())
+  url        String
+  caption    String?
+  order      Int      @default(0)
+  entityType String
+  entityId   String
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+}
+
+// ─── Preot paroh ─────────────────────────────────────────────────────────────
+
+model Priest {
+  id        String  @id @default(cuid())
+  nameRo    String
+  nameRu    String?
+  nameEn    String?
+  titleRo   String
+  photoUrl  String?
+  bioRo     String? @db.Text
+  bioRu     String? @db.Text
+  bioEn     String? @db.Text
+  ordained  String?
+  parish    String?
+  education String? @db.Text
+  phone     String?
+  email     String?
+  facebook  String?
+  createdAt DateTime @default(now())
 }

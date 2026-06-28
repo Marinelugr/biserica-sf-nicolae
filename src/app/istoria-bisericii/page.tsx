@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
+import PublicGallery from '@/components/PublicGallery'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,7 +41,6 @@ function extractYouTubeId(url: string): string | null {
 
 export default async function IstoriaBisericiiPage() {
   let dynContent: string | null = null
-  let gallery: { url: string; alt: string }[] = []
   let videos: { url: string; title: string }[] = []
 
   try {
@@ -48,10 +48,14 @@ export default async function IstoriaBisericiiPage() {
     if (setting) {
       const data = JSON.parse(setting.value)
       dynContent = data.content || null
-      gallery = data.gallery || []
       videos = data.videos || []
     }
   } catch { /* use fallback */ }
+
+  const gallery = await prisma.mediaItem.findMany({
+    where: { entityType: 'history', entityId: 'church-history' },
+    orderBy: { order: 'asc' },
+  })
 
   return (
     <div>
@@ -135,18 +139,7 @@ export default async function IstoriaBisericiiPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {gallery.map((img, i) => (
-                <div key={i} className="rounded-lg overflow-hidden" style={{ aspectRatio: '4/3', position: 'relative' }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={img.url}
-                    alt={img.alt || 'Fotografie Biserică'}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                  />
-                </div>
-              ))}
-            </div>
+            <PublicGallery items={gallery} />
           )}
         </div>
       </section>

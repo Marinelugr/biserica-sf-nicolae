@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
+import ImageUploadButton from '@/components/admin/ImageUploadButton'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -45,7 +46,8 @@ export default function NouArticolPage() {
         const data = await res.json()
         throw new Error(data.error || 'Eroare la salvare')
       }
-      router.push('/admin/stiri')
+      const created = await res.json()
+      router.push(`/admin/stiri/${created.id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Eroare necunoscută')
       setSaving(false)
@@ -104,10 +106,13 @@ export default function NouArticolPage() {
                     placeholder="ex: Sfinți, Evenimente..." style={inp} />
                 </div>
                 <div>
-                  <label style={lbl}>URL imagine</label>
-                  <input type="text" value={form.imageUrl}
-                    onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
-                    placeholder="https://..." style={inp} />
+                  <label style={lbl}>Imagine principală</label>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <input type="text" value={form.imageUrl}
+                      onChange={e => setForm(f => ({ ...f, imageUrl: e.target.value }))}
+                      placeholder="https://..." style={{ ...inp, flex: 1 }} />
+                    <ImageUploadButton onUpload={url => setForm(f => ({ ...f, imageUrl: url }))} />
+                  </div>
                 </div>
               </div>
 

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
 import ImageUploadButton from '@/components/admin/ImageUploadButton'
+import MediaGallery from '@/components/admin/MediaGallery'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -215,6 +216,12 @@ export default function AdminSfantulNicolaePage() {
                   placeholder="În Mireele Lichiei, sfinte, sfințitor te-ai arătat..."
                   style={{ ...inp, resize: 'vertical', lineHeight: '1.8' }}
                 />
+              </div>
+
+              {/* ─── Galerie imagini ─── */}
+              <div style={sectionBox}>
+                <div style={sectionTitle}>📷 Galerie imagini</div>
+                <MediaGallery entityType="saint" entityId="sfantul-nicolae" maxPhotos={50} />
               </div>
 
               {/* Bottom save */}

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
 import ImageUploadButton from '@/components/admin/ImageUploadButton'
+import MediaGallery from '@/components/admin/MediaGallery'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -277,6 +278,18 @@ export default function AdminSfintiPage() {
               <div style={{ flex: 1 }}>
                 <label style={lbl}>Viața sfântului (conținut)</label>
                 <TipTapEditor value={form.lifeRo} onChange={val => setForm(f => ({ ...f, lifeRo: val }))} placeholder="Viața și faptele sfântului..." />
+              </div>
+
+              {/* Gallery */}
+              <div style={{ borderTop: '1px solid #1E1208', paddingTop: '1.1rem' }}>
+                <div style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '0.875rem', marginBottom: '0.875rem' }}>📷 Galerie imagini</div>
+                {editSaint ? (
+                  <MediaGallery entityType="saint" entityId={editSaint.id} maxPhotos={30} />
+                ) : (
+                  <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', padding: '1rem', border: '1px dashed #2A1A0A', borderRadius: '6px', textAlign: 'center' }}>
+                    Salvați sfântul mai întâi, apoi puteți adăuga fotografii.
+                  </div>
+                )}
               </div>
             </div>
 

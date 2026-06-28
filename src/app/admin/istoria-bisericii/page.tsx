@@ -1,14 +1,13 @@
 'use client'
 
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
-import ImageUploadButton from '@/components/admin/ImageUploadButton'
+import MediaGallery from '@/components/admin/MediaGallery'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
-interface GalleryItem { url: string; alt: string }
 interface VideoItem { url: string; title: string }
 
 function extractYouTubeId(url: string): string | null {
@@ -35,14 +34,11 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 export default function AdminIstoriaBisericiiPage() {
   const [content, setContent] = useState('')
-  const [gallery, setGallery] = useState<GalleryItem[]>([])
   const [videos, setVideos] = useState<VideoItem[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
-  const [newImgUrl, setNewImgUrl] = useState('')
-  const [newImgAlt, setNewImgAlt] = useState('')
   const [newVideoUrl, setNewVideoUrl] = useState('')
   const [newVideoTitle, setNewVideoTitle] = useState('')
 
@@ -54,7 +50,6 @@ export default function AdminIstoriaBisericiiPage() {
       .then(data => {
         if (data) {
           setContent(data.content || '')
-          setGallery(data.gallery || [])
           setVideos(data.videos || [])
         }
         setLoading(false)
@@ -68,23 +63,12 @@ export default function AdminIstoriaBisericiiPage() {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'church_history_content', value: { content, gallery, videos } }),
+        body: JSON.stringify({ key: 'church_history_content', value: { content, videos } }),
       })
       if (!res.ok) throw new Error('Eroare la salvare')
       showToast('Conținut salvat cu succes ✓', 'success')
     } catch { showToast('Eroare la salvare', 'error') }
     finally { setSaving(false) }
-  }
-
-  function addImage() {
-    if (!newImgUrl.trim()) return
-    setGallery(g => [...g, { url: newImgUrl.trim(), alt: newImgAlt.trim() }])
-    setNewImgUrl('')
-    setNewImgAlt('')
-  }
-
-  function removeImage(i: number) {
-    setGallery(g => g.filter((_, idx) => idx !== i))
   }
 
   function addVideo() {
@@ -152,65 +136,8 @@ export default function AdminIstoriaBisericiiPage() {
 
               {/* ─── Galerie foto ─── */}
               <div style={sectionBox}>
-                <div style={sectionTitle}>📷 Galerie foto</div>
-                {/* Add form */}
-                <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-                  <div style={{ flex: '1 1 280px' }}>
-                    <label style={lbl}>URL imagine</label>
-                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                      <input
-                        value={newImgUrl}
-                        onChange={e => setNewImgUrl(e.target.value)}
-                        onKeyDown={e => e.key === 'Enter' && addImage()}
-                        placeholder="https://... sau încarcă"
-                        style={{ ...inp, flex: 1 }}
-                      />
-                      <ImageUploadButton onUpload={url => setNewImgUrl(url)} />
-                    </div>
-                  </div>
-                  <div style={{ flex: '1 1 200px' }}>
-                    <label style={lbl}>Descriere (opțional)</label>
-                    <input
-                      value={newImgAlt}
-                      onChange={e => setNewImgAlt(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && addImage()}
-                      placeholder="Altarul Bisericii..."
-                      style={inp}
-                    />
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                    <button onClick={addImage} style={btnPrimary}>+ Adaugă</button>
-                  </div>
-                </div>
-
-                {gallery.length === 0 ? (
-                  <div style={{ padding: '2rem', textAlign: 'center', color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.875rem', border: '1px dashed #2A1A0A', borderRadius: '6px' }}>
-                    Nicio imagine adăugată. Adăugați URL-uri de imagini mai sus.
-                  </div>
-                ) : (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '0.75rem' }}>
-                    {gallery.map((img, i) => (
-                      <div key={i} style={{ position: 'relative', aspectRatio: '4/3', borderRadius: '6px', overflow: 'hidden', border: '1px solid #2A1A0A' }}>
-                        <img
-                          src={img.url}
-                          alt={img.alt || ''}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          onError={e => { (e.target as HTMLImageElement).style.backgroundColor = '#1A1008' }}
-                        />
-                        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%)', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '0.5rem' }}>
-                          {img.alt && <span style={{ color: '#D4C4A0', fontSize: '0.65rem', fontFamily: 'Georgia, serif', lineHeight: 1.3 }}>{img.alt}</span>}
-                          <button
-                            onClick={() => removeImage(i)}
-                            style={{ position: 'absolute', top: '0.4rem', right: '0.4rem', backgroundColor: 'rgba(90,10,10,0.85)', border: 'none', borderRadius: '3px', color: '#F2EBD9', cursor: 'pointer', padding: '0.2rem 0.4rem', fontSize: '0.75rem' }}
-                          >✕</button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <p style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.75rem' }}>
-                  {gallery.length} {gallery.length === 1 ? 'imagine' : 'imagini'}
-                </p>
+                <div style={sectionTitle}>📷 Galerie foto (până la 100 poze)</div>
+                <MediaGallery entityType="history" entityId="church-history" maxPhotos={100} />
               </div>
 
               {/* ─── Video ─── */}

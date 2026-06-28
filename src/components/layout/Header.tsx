@@ -17,6 +17,7 @@ export default function Header() {
     { href: '/carti', label: t.nav.books },
     { href: '/istoria-bisericii', label: t.nav.churchHistory },
     { href: '/sfantul-nicolae', label: t.nav.saintNicholas },
+    { href: '/paroh', label: t.nav.priest },
     { href: '/video', label: t.nav.video },
     { href: '/magazin', label: t.nav.shop },
   ]

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import PublicGallery from '@/components/PublicGallery'
 
 export const dynamic = 'force-dynamic'
 
@@ -54,6 +55,11 @@ export default async function SfantulNicolaePage() {
 
   const tropar = dynTropar || FALLBACK_TROPAR
   const condac = dynCondac || FALLBACK_CONDAC
+
+  const saintGallery = await prisma.mediaItem.findMany({
+    where: { entityType: 'saint', entityId: 'sfantul-nicolae' },
+    orderBy: { order: 'asc' },
+  })
 
   return (
     <div>
@@ -199,6 +205,18 @@ export default async function SfantulNicolaePage() {
           </blockquote>
           <p className="font-body text-xs text-center mt-2" style={{ color: '#8A7050' }}>Glasul al 3-lea</p>
         </section>
+
+        {/* Galerie imagini */}
+        {saintGallery.length > 0 && (
+          <section className="mb-16">
+            <div className="flex items-center gap-3 mb-6">
+              <span className="h-px flex-1 block" style={{ backgroundColor: '#3A2010' }} />
+              <h2 className="font-heading text-xl" style={{ color: '#C9A84C' }}>Galerie imagini</h2>
+              <span className="h-px flex-1 block" style={{ backgroundColor: '#3A2010' }} />
+            </div>
+            <PublicGallery items={saintGallery} />
+          </section>
+        )}
 
         {/* Link Acatist */}
         <div className="rounded-lg p-8 text-center" style={{ backgroundColor: '#0D0905', border: '1px solid #1E1208' }}>
