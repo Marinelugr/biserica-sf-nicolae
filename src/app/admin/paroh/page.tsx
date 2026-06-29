@@ -45,14 +45,66 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 const empty: PriestForm = { id: null, nameRo: '', nameRu: '', nameEn: '', titleRo: 'Preot Paroh', photoUrl: '', bioRo: '', bioRu: '', bioEn: '', ordained: '', parish: '', education: '', phone: '', email: '', facebook: '' }
 
+const DRAFT_KEY = 'draft_paroh'
+
 export default function AdminParohPage() {
   const [form, setForm] = useState<PriestForm>(empty)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
+  const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
 
+  // Auto-save la 30 secunde
   useEffect(() => {
+    if (!isDirty || loading) return
+    const t = setInterval(() => {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ ...form, _savedAt: new Date().toISOString() }))
+      setLastSaved(new Date())
+      setIsDirty(false)
+    }, 30000)
+    return () => clearInterval(t)
+  }, [isDirty, form, loading])
+
+  async function translateField(sourceText: string, field: string) {
+    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
+    setTranslating(t => ({ ...t, [field]: true }))
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sourceText, field }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      if (field === 'nameRu') set('nameRu', data.translations.ru)
+      if (field === 'nameEn') set('nameEn', data.translations.en)
+      if (field === 'bioRu') set('bioRu', data.translations.ru)
+      if (field === 'bioEn') set('bioEn', data.translations.en)
+      showToast('Tradus cu DeepL ✓', 'success')
+    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    finally { setTranslating(t => ({ ...t, [field]: false })) }
+  }
+
+  useEffect(() => {
+    // Verifică draft nesalvat
+    const draftRaw = localStorage.getItem(DRAFT_KEY)
+    if (draftRaw) {
+      try {
+        const parsed = JSON.parse(draftRaw) as PriestForm & { _savedAt: string }
+        const time = new Date(parsed._savedAt).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })
+        if (confirm(`Există un draft nesalvat din ${time}. Restaurezi?`)) {
+          const { _savedAt: _, ...rest } = parsed as PriestForm & { _savedAt: string }
+          setForm(rest)
+          setLoading(false)
+          return
+        }
+        localStorage.removeItem(DRAFT_KEY)
+      } catch { localStorage.removeItem(DRAFT_KEY) }
+    }
+
     fetch('/api/admin/paroh')
       .then(r => r.json())
       .then(data => {
@@ -95,12 +147,17 @@ export default function AdminParohPage() {
       if (!res.ok) throw new Error('Eroare la salvare')
       const data = await res.json()
       setForm(f => ({ ...f, id: data.id }))
+      localStorage.removeItem(DRAFT_KEY)
+      setIsDirty(false)
       showToast('Date salvate cu succes ✓', 'success')
     } catch { showToast('Eroare la salvare', 'error') }
     finally { setSaving(false) }
   }
 
-  const set = (key: keyof PriestForm, val: string) => setForm(f => ({ ...f, [key]: val }))
+  const set = (key: keyof PriestForm, val: string) => {
+    setForm(f => ({ ...f, [key]: val }))
+    setIsDirty(true)
+  }
 
   return (
     <div style={{ display: 'flex', flex: 1 }}>
@@ -122,7 +179,14 @@ export default function AdminParohPage() {
 
         <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-            <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>⛪ Preotul Paroh</h1>
+            <div>
+              <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>⛪ Preotul Paroh</h1>
+              {lastSaved && (
+                <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.2rem', display: 'block' }}>
+                  💾 Draft salvat la {lastSaved.toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              )}
+            </div>
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
               <a href="/paroh" target="_blank" style={{ ...btnGhost }}>↗ Vizualizează pagina</a>
               <button onClick={handleSave} disabled={saving || loading} style={{ ...btnGold, opacity: saving ? 0.7 : 1 }}>
@@ -151,11 +215,29 @@ export default function AdminParohPage() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
-                      <label style={lbl}>Numele (Rusă)</label>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Numele (Rusă)</label>
+                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                          {!form.nameRu && <span style={{ fontSize: '0.7rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
+                          {form.nameRu && <span style={{ fontSize: '0.7rem', color: '#5A9050' }}>🤖 DeepL</span>}
+                          <button onClick={() => translateField(form.nameRo, 'nameRu')} disabled={translating['nameRu']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                            {translating['nameRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
+                          </button>
+                        </div>
+                      </div>
                       <input value={form.nameRu} onChange={e => set('nameRu', e.target.value)} placeholder="..." style={inp} />
                     </div>
                     <div>
-                      <label style={lbl}>Numele (Engleză)</label>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Numele (Engleză)</label>
+                        <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                          {!form.nameEn && <span style={{ fontSize: '0.7rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
+                          {form.nameEn && <span style={{ fontSize: '0.7rem', color: '#5A9050' }}>🤖 DeepL</span>}
+                          <button onClick={() => translateField(form.nameRo, 'nameEn')} disabled={translating['nameEn']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                            {translating['nameEn'] ? 'Se traduce...' : '🔄 Traduce EN'}
+                          </button>
+                        </div>
+                      </div>
                       <input value={form.nameEn} onChange={e => set('nameEn', e.target.value)} placeholder="..." style={inp} />
                     </div>
                   </div>
@@ -198,7 +280,16 @@ export default function AdminParohPage() {
               </div>
 
               <div style={sectionBox}>
-                <div style={sectionTitle}>📖 Biografie (Rusă)</div>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>📖 Biografie (Rusă)</span>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    {!form.bioRu && <span style={{ fontSize: '0.75rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
+                    {form.bioRu && <span style={{ fontSize: '0.75rem', color: '#5A9050' }}>🤖 DeepL</span>}
+                    <button onClick={() => translateField(form.bioRo, 'bioRu')} disabled={translating['bioRu']} style={{ ...btnGhost, padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
+                      {translating['bioRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
+                    </button>
+                  </div>
+                </div>
                 <TipTapEditor value={form.bioRu} onChange={v => set('bioRu', v)} placeholder="Биография священника..." />
               </div>
 

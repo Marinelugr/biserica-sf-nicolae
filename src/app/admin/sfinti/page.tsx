@@ -64,11 +64,30 @@ export default function AdminSfintiPage() {
   const [editSaint, setEditSaint] = useState<Saint | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
+
+  async function translateField(field: 'nameRu' | 'nameEn') {
+    if (!form.nameRo.trim()) { showToast('Completați mai întâi numele în română', 'error'); return }
+    setTranslating(t => ({ ...t, [field]: true }))
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: form.nameRo, field }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const val = field === 'nameRu' ? data.translations.ru : data.translations.en
+      setForm(f => ({ ...f, [field]: val }))
+      showToast('Tradus cu DeepL ✓', 'success')
+    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    finally { setTranslating(t => ({ ...t, [field]: false })) }
+  }
 
   const fetchSaints = useCallback(async () => {
     const res = await fetch('/api/admin/sfinti')
@@ -253,11 +272,29 @@ export default function AdminSfintiPage() {
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
                 <div>
-                  <label style={lbl}>Nume (Rusă)</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <label style={{ ...lbl, marginBottom: 0 }}>Nume (Rusă)</label>
+                    <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                      {!form.nameRu && <span style={{ fontSize: '0.65rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
+                      {form.nameRu && <span style={{ fontSize: '0.65rem', color: '#5A9050' }}>🤖 DeepL</span>}
+                      <button onClick={() => translateField('nameRu')} disabled={!!translating['nameRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
+                        {translating['nameRu'] ? '...' : '🔄 RU'}
+                      </button>
+                    </div>
+                  </div>
                   <input value={form.nameRu} onChange={e => setForm(f => ({ ...f, nameRu: e.target.value }))} placeholder="Святитель Николай..." style={inp} />
                 </div>
                 <div>
-                  <label style={lbl}>Nume (Engleză)</label>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <label style={{ ...lbl, marginBottom: 0 }}>Nume (Engleză)</label>
+                    <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                      {!form.nameEn && <span style={{ fontSize: '0.65rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
+                      {form.nameEn && <span style={{ fontSize: '0.65rem', color: '#5A9050' }}>🤖 DeepL</span>}
+                      <button onClick={() => translateField('nameEn')} disabled={!!translating['nameEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
+                        {translating['nameEn'] ? '...' : '🔄 EN'}
+                      </button>
+                    </div>
+                  </div>
                   <input value={form.nameEn} onChange={e => setForm(f => ({ ...f, nameEn: e.target.value }))} placeholder="Saint Nicholas..." style={inp} />
                 </div>
               </div>
