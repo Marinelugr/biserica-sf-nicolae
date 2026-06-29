@@ -1,9 +1,21 @@
 'use client'
 
-import { useEditor, EditorContent } from '@tiptap/react'
+import { useEditor, EditorContent, Extension } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Placeholder from '@tiptap/extension-placeholder'
 import { useEffect } from 'react'
+
+const TabExtension = Extension.create({
+  name: 'tab',
+  addKeyboardShortcuts() {
+    return {
+      Tab: () => {
+        this.editor.chain().focus().insertContent('    ').run()
+        return true
+      },
+    }
+  },
+})
 
 interface Props {
   value: string
@@ -26,6 +38,7 @@ export default function TipTapEditor({ value, onChange, placeholder = 'Scrieți 
     extensions: [
       StarterKit,
       Placeholder.configure({ placeholder }),
+      TabExtension,
     ],
     content: value,
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
@@ -39,7 +52,7 @@ export default function TipTapEditor({ value, onChange, placeholder = 'Scrieți 
 
   return (
     <div style={{ border: '1px solid #2A1A0A', borderRadius: '4px', backgroundColor: '#1A1008' }}>
-      <div style={{ borderBottom: '1px solid #2A1A0A', padding: '0.5rem', display: 'flex', gap: '0.25rem', flexWrap: 'wrap' }}>
+      <div style={{ borderBottom: '1px solid #2A1A0A', padding: '0.5rem', display: 'flex', gap: '0.25rem', flexWrap: 'wrap', position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#1A1008' }}>
         {toolbarButtons.map(btn => {
           const active = btn.isActive(editor)
           return (
