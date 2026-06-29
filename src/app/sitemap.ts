@@ -48,5 +48,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch { /* skip */ }
 
-  return [...staticRoutes, ...articleRoutes, ...bookRoutes]
+  let bibleRoutes: MetadataRoute.Sitemap = []
+  try {
+    const bibleBooks = await prisma.bibleBook.findMany({
+      select: { slug: true },
+    })
+    bibleRoutes = bibleBooks.map(b => ({
+      url: `${BASE}/biblie/${b.slug}/1`,
+      changeFrequency: 'yearly' as const,
+      priority: 0.6,
+    }))
+  } catch { /* skip */ }
+
+  return [...staticRoutes, ...articleRoutes, ...bookRoutes, ...bibleRoutes]
 }
