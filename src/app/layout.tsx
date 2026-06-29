@@ -50,6 +50,7 @@ export const metadata: Metadata = {
     description: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Moldova.',
   },
   robots: { index: true, follow: true },
+  themeColor: '#0D0905',
   alternates: {
     canonical: 'https://biserica-sf-nicolae.org',
     languages: {
