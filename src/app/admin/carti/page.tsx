@@ -12,9 +12,10 @@ const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { 
 
 interface BookCategory { id: string; name: string; emoji: string; color: string; order: number }
 interface LibraryBook {
-  id: string; titleRo: string; slug: string; type: string
+  id: string; titleRo: string; titleRu: string | null; titleEn: string | null; slug: string; type: string
   categoryId: string | null; category: BookCategory | null
-  contentRo: string; author: string | null; source: string | null
+  contentRo: string; contentRu: string | null; contentEn: string | null
+  author: string | null; source: string | null
   imageUrl: string | null; galleryUrls: string[]; videoUrl: string | null; videoTitle: string | null
   createdAt: string
 }
@@ -110,8 +111,9 @@ export default function AdminCartiPage() {
   // Book form
   const [showBookForm, setShowBookForm] = useState(false)
   const [editBook, setEditBook] = useState<LibraryBook | null>(null)
-  const [bookForm, setBookForm] = useState({ titleRo: '', type: 'ACATIST', categoryId: '', contentRo: '', author: '', source: '', imageUrl: '', galleryUrls: [] as string[], videoUrl: '', videoTitle: '' })
+  const [bookForm, setBookForm] = useState({ titleRo: '', titleRu: '', titleEn: '', type: 'ACATIST', categoryId: '', contentRo: '', contentRu: '', contentEn: '', author: '', source: '', imageUrl: '', galleryUrls: [] as string[], videoUrl: '', videoTitle: '' })
   const [savingBook, setSavingBook] = useState(false)
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
 
   // Category form
   const [showCatForm, setShowCatForm] = useState(false)
@@ -149,14 +151,46 @@ export default function AdminCartiPage() {
 
   function openNewBook() {
     setEditBook(null)
-    setBookForm({ titleRo: '', type: 'ACATIST', categoryId: activeCategory || '', contentRo: '', author: '', source: '', imageUrl: '', galleryUrls: [], videoUrl: '', videoTitle: '' })
+    setBookForm({ titleRo: '', titleRu: '', titleEn: '', type: 'ACATIST', categoryId: activeCategory || '', contentRo: '', contentRu: '', contentEn: '', author: '', source: '', imageUrl: '', galleryUrls: [], videoUrl: '', videoTitle: '' })
     setShowBookForm(true)
   }
 
   function openEditBook(book: LibraryBook) {
     setEditBook(book)
-    setBookForm({ titleRo: book.titleRo, type: book.type, categoryId: book.categoryId || '', contentRo: book.contentRo, author: book.author || '', source: book.source || '', imageUrl: book.imageUrl || '', galleryUrls: book.galleryUrls || [], videoUrl: book.videoUrl || '', videoTitle: book.videoTitle || '' })
+    setBookForm({ titleRo: book.titleRo, titleRu: book.titleRu || '', titleEn: book.titleEn || '', type: book.type, categoryId: book.categoryId || '', contentRo: book.contentRo, contentRu: book.contentRu || '', contentEn: book.contentEn || '', author: book.author || '', source: book.source || '', imageUrl: book.imageUrl || '', galleryUrls: book.galleryUrls || [], videoUrl: book.videoUrl || '', videoTitle: book.videoTitle || '' })
     setShowBookForm(true)
+  }
+
+  async function translate(field: string) {
+    const sourceText = field.startsWith('title') ? bookForm.titleRo : bookForm.contentRo
+    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
+    setTranslating(t => ({ ...t, [field]: true }))
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sourceText, field }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
+      setBookForm(f => ({ ...f, [field]: val }))
+      showToast('Tradus cu DeepL ✓', 'success')
+    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    finally { setTranslating(t => ({ ...t, [field]: false })) }
+  }
+
+  function TranslateBtn({ field, hasValue }: { field: string; hasValue: boolean }) {
+    const lang = field.endsWith('Ru') ? 'RU' : 'EN'
+    return (
+      <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
+        {!hasValue && <span style={{ fontSize: '0.68rem', color: '#8B6014' }}>⚠️</span>}
+        {hasValue && <span style={{ fontSize: '0.68rem', color: '#5A9050' }}>🤖</span>}
+        <button onClick={() => translate(field)} disabled={!!translating[field]} style={btnGhost}>
+          {translating[field] ? '...' : `🔄 ${lang}`}
+        </button>
+      </div>
+    )
   }
 
   async function saveBook() {
@@ -386,8 +420,25 @@ export default function AdminCartiPage() {
             {/* Form */}
             <div style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1.1rem', flex: 1 }}>
               <div>
-                <label style={lbl}>Titlu *</label>
+                <label style={lbl}>Titlu (Română) *</label>
                 <input value={bookForm.titleRo} onChange={e => setBookForm(f => ({ ...f, titleRo: e.target.value }))} placeholder="Titlul cărții" style={inp} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
+                    <TranslateBtn field="titleRu" hasValue={!!bookForm.titleRu} />
+                  </div>
+                  <input value={bookForm.titleRu} onChange={e => setBookForm(f => ({ ...f, titleRu: e.target.value }))} placeholder="Название..." style={inp} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                    <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Engleză)</label>
+                    <TranslateBtn field="titleEn" hasValue={!!bookForm.titleEn} />
+                  </div>
+                  <input value={bookForm.titleEn} onChange={e => setBookForm(f => ({ ...f, titleEn: e.target.value }))} placeholder="Title..." style={inp} />
+                </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -417,12 +468,36 @@ export default function AdminCartiPage() {
                 </div>
               </div>
 
-              <div style={{ flex: 1 }}>
-                <label style={lbl}>Conținut</label>
+              <div>
+                <label style={lbl}>Conținut (Română)</label>
                 <TipTapEditor
                   value={bookForm.contentRo}
                   onChange={val => setBookForm(f => ({ ...f, contentRo: val }))}
                   placeholder="Scrieți conținutul cărții..."
+                />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <label style={{ ...lbl, marginBottom: 0 }}>Conținut (Rusă)</label>
+                  <TranslateBtn field="contentRu" hasValue={!!bookForm.contentRu} />
+                </div>
+                <TipTapEditor
+                  value={bookForm.contentRu}
+                  onChange={val => setBookForm(f => ({ ...f, contentRu: val }))}
+                  placeholder="Содержание на русском языке..."
+                />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <label style={{ ...lbl, marginBottom: 0 }}>Conținut (Engleză)</label>
+                  <TranslateBtn field="contentEn" hasValue={!!bookForm.contentEn} />
+                </div>
+                <TipTapEditor
+                  value={bookForm.contentEn}
+                  onChange={val => setBookForm(f => ({ ...f, contentEn: val }))}
+                  placeholder="Content in English..."
                 />
               </div>
 

@@ -48,7 +48,9 @@ const en: Translations = {
       birthJohnBaptist: 'Nativity of Saint John the Baptist',
       circumcision: 'Circumcision of the Lord · St. Basil the Great',
       archangels: 'Synaxis of Archangels Michael and Gabriel',
-      palmSunday: 'Palm Sunday (Entry into Jerusalem)', easter: 'Holy Pascha',
+      palmSunday: 'Palm Sunday (Entry into Jerusalem)',
+      holyThursday: 'Holy Thursday (Maundy Thursday)', holyFriday: 'Holy Friday (Good Friday)',
+      easter: 'Holy Pascha', thomasSunday: 'Thomas Sunday (Antipascha)',
       ascension: 'Ascension of the Lord', pentecost: 'Pentecost — Descent of the Holy Spirit',
       allSaints: 'Sunday of All Saints',
     },
@@ -57,6 +59,7 @@ const en: Translations = {
       dormitionFast: 'Dormition Fast', christmasFast: 'Nativity Fast',
       inFast: 'Fasting day',
     },
+    weeklyTone: 'Weekly tone', julianDate: 'Old Style', todayWidget: 'Today in the calendar',
   },
   books: {
     subtitle: 'Sacred texts', title: 'Orthodox Library',

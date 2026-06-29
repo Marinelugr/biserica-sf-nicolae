@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -25,6 +25,13 @@ interface Article {
   published: boolean
 }
 
+interface ArticleForm {
+  titleRo: string; titleRu: string; titleEn: string
+  slug: string; category: string; imageUrl: string
+  contentRo: string; contentRu: string; contentEn: string
+  published: boolean
+}
+
 const inp: React.CSSProperties = { width: '100%', backgroundColor: '#1A1008', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.625rem 0.875rem', color: '#F2EBD9', fontSize: '1rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' }
 const lbl: React.CSSProperties = { display: 'block', color: '#9B8050', fontSize: '0.875rem', marginBottom: '0.375rem', fontFamily: 'Georgia, serif' }
 const btnGhost: React.CSSProperties = { backgroundColor: 'transparent', color: '#9B8050', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.2rem 0.5rem', fontFamily: 'Georgia, serif', fontSize: '0.7rem', cursor: 'pointer' }
@@ -42,7 +49,9 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 export default function EditArticolClient({ article }: { article: Article }) {
   const router = useRouter()
-  const [form, setForm] = useState({
+  const DRAFT_KEY = `draft_stire_${article.id}`
+
+  const defaultForm: ArticleForm = {
     titleRo: article.titleRo,
     titleRu: article.titleRu || '',
     titleEn: article.titleEn || '',
@@ -53,11 +62,41 @@ export default function EditArticolClient({ article }: { article: Article }) {
     contentRu: article.contentRu || '',
     contentEn: article.contentEn || '',
     published: article.published,
+  }
+
+  const [form, setForm] = useState<ArticleForm>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(DRAFT_KEY)
+      if (saved) {
+        try {
+          return JSON.parse(saved) as ArticleForm
+        } catch { /* ignore */ }
+      }
+    }
+    return defaultForm
   })
   const [saving, setSaving] = useState(false)
   const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
+  const [lastSaved, setLastSaved] = useState<string | null>(null)
+  const formRef = useRef(form)
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
+
+  // Keep ref in sync with state for use in interval
+  useEffect(() => { formRef.current = form }, [form])
+
+  // Auto-save draft to localStorage every 30s
+  useEffect(() => {
+    const t = setInterval(() => {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(formRef.current))
+        const now = new Date()
+        setLastSaved(`${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`)
+      } catch { /* ignore */ }
+    }, 30000)
+    return () => clearInterval(t)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function translate(field: string) {
     const sourceText = field.startsWith('title') ? form.titleRo : form.contentRo
@@ -87,6 +126,8 @@ export default function EditArticolClient({ article }: { article: Article }) {
         body: JSON.stringify(form),
       })
       if (!res.ok) throw new Error('Eroare la salvare')
+      localStorage.removeItem(DRAFT_KEY)
+      setLastSaved(null)
       showToast('Articol salvat ✓', 'success')
     } catch { showToast('Eroare la salvare', 'error') }
     finally { setSaving(false) }
@@ -127,7 +168,12 @@ export default function EditArticolClient({ article }: { article: Article }) {
         <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.4rem', margin: 0 }}>📰 Editare articol</h1>
-            <div style={{ display: 'flex', gap: '0.75rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              {lastSaved && (
+                <span style={{ color: '#5A8050', fontFamily: 'Georgia, serif', fontSize: '0.75rem' }}>
+                  💾 Draft salvat la {lastSaved}
+                </span>
+              )}
               <button onClick={handleDelete} style={{ backgroundColor: 'transparent', color: '#CA4A4A', border: '1px solid #5A1A1A', borderRadius: '4px', padding: '0.5rem 1rem', fontFamily: 'Georgia, serif', fontSize: '0.825rem', cursor: 'pointer' }}>
                 🗑 Șterge
               </button>

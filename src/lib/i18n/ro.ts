@@ -29,13 +29,17 @@ export interface Translations {
       dormition: string; nativityMary: string; exaltationCross: string
       entryTemple: string; saintNicholas: string; meetingLord: string
       peterPaul: string; birthJohnBaptist: string; circumcision: string
-      archangels: string; palmSunday: string; easter: string; ascension: string
+      archangels: string; palmSunday: string; holyThursday: string; holyFriday: string
+      easter: string; thomasSunday: string; ascension: string
       pentecost: string; allSaints: string
     }
     fastNames: {
       greatLent: string; apostlesFast: string; dormitionFast: string; christmasFast: string
       inFast: string
     }
+    weeklyTone: string
+    julianDate: string
+    todayWidget: string
   }
   books: {
     subtitle: string; title: string; searchPlaceholder: string; searchBtn: string
@@ -130,15 +134,17 @@ const ro: Translations = {
       birthJohnBaptist: 'Nașterea Sfântului Ioan Botezătorul',
       circumcision: 'Tăierea împrejur a Domnului · Sf. Vasile cel Mare',
       archangels: 'Soborul Sfinților Arhangheli Mihail și Gavriil',
-      palmSunday: 'Duminica Floriilor', easter: 'Sfintele Paști',
-      ascension: 'Înălțarea Domnului', pentecost: 'Rusaliile — Pogorârea Sfântului Duh',
-      allSaints: 'Duminica Tuturor Sfinților',
+      palmSunday: 'Duminica Floriilor', holyThursday: 'Joia Mare (Joia Patimirilor)',
+      holyFriday: 'Vinerea Mare (Vinerea Patimirilor)', easter: 'Sfintele Paști',
+      thomasSunday: 'Duminica Tomii (Antipascha)', ascension: 'Înălțarea Domnului',
+      pentecost: 'Rusaliile — Pogorârea Sfântului Duh', allSaints: 'Duminica Tuturor Sfinților',
     },
     fastNames: {
       greatLent: 'Postul Mare', apostlesFast: 'Postul Sfinților Apostoli',
       dormitionFast: 'Postul Adormirii Maicii Domnului',
       christmasFast: 'Postul Crăciunului', inFast: 'Zi de post',
     },
+    weeklyTone: 'Glasul săptămânii', julianDate: 'Stil vechi', todayWidget: 'Astăzi în calendar',
   },
   books: {
     subtitle: 'Texte sacre', title: 'Bibliotecă Ortodoxă',

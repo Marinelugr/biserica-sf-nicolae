@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { getLiturgicalDates, formatDate } from '@/lib/utils'
 import { getServerT } from '@/lib/i18n/server'
 import { getFixedFeasts, FIXED_FASTS, isApostlesFast } from '@/lib/constants/oldCalendarFeasts'
@@ -62,10 +63,16 @@ export default async function CalendarPage({
     return dd.getTime() === tt.getTime()
   }
 
-  if (matchDate(liturgicalDates.easter))
-    movableFeasts.push({ label: t.calendar.feastNames.easter, color: '#8B1A1A', special: true })
   if (matchDate(liturgicalDates.palmSunday))
     movableFeasts.push({ label: t.calendar.feastNames.palmSunday, color: '#4A6A2A', special: true })
+  if (matchDate(liturgicalDates.holyThursday))
+    movableFeasts.push({ label: t.calendar.feastNames.holyThursday, color: '#6B1A1A', special: true })
+  if (matchDate(liturgicalDates.holyFriday))
+    movableFeasts.push({ label: t.calendar.feastNames.holyFriday, color: '#4A0A0A', special: true })
+  if (matchDate(liturgicalDates.easter))
+    movableFeasts.push({ label: t.calendar.feastNames.easter, color: '#8B1A1A', special: true })
+  if (matchDate(liturgicalDates.thomasSunday))
+    movableFeasts.push({ label: t.calendar.feastNames.thomasSunday, color: '#8B6014', special: false })
   if (matchDate(liturgicalDates.ascension))
     movableFeasts.push({ label: t.calendar.feastNames.ascension, color: '#8B6014', special: true })
   if (matchDate(liturgicalDates.pentecost))
@@ -98,6 +105,14 @@ export default async function CalendarPage({
   const selectedDateStr = new Date(selYear, selMonth - 1, safeDay).toLocaleDateString('ro-MD', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
+
+  // Month navigation helpers
+  const prevMonth = selMonth === 1 ? 12 : selMonth - 1
+  const prevYear  = selMonth === 1 ? selYear - 1 : selYear
+  const nextMonth = selMonth === 12 ? 1 : selMonth + 1
+  const nextYear  = selMonth === 12 ? selYear + 1 : selYear
+  const prevDay   = Math.min(safeDay, daysInMonth(prevMonth, prevYear))
+  const nextDay   = Math.min(safeDay, daysInMonth(nextMonth, nextYear))
 
   // ── Ziua pică cu sărbătoare mare? ─────────────────────────────────────────
   const hasGreatFeast = fixedFeasts.some(f => f.type === 'GREAT') || movableFeasts.some(f => f.special)
@@ -191,6 +206,27 @@ export default async function CalendarPage({
           {t.calendar.show}
         </button>
       </form>
+
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-8">
+        <Link
+          href={`/calendar?zi=${prevDay}&luna=${prevMonth}&an=${prevYear}`}
+          className="font-body inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-opacity hover:opacity-80"
+          style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', color: '#8A7050', fontSize: '0.9rem' }}
+        >
+          ← {t.calendar.months[prevMonth - 1]}
+        </Link>
+        <span className="font-heading text-lg" style={{ color: '#1C1B3A' }}>
+          {t.calendar.months[selMonth - 1]} {selYear}
+        </span>
+        <Link
+          href={`/calendar?zi=${nextDay}&luna=${nextMonth}&an=${nextYear}`}
+          className="font-body inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-opacity hover:opacity-80"
+          style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', color: '#8A7050', fontSize: '0.9rem' }}
+        >
+          {t.calendar.months[nextMonth - 1]} →
+        </Link>
+      </div>
 
       {/* Data selectată + indicatoare */}
       <div

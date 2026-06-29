@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
-  const { titleRo, type, categoryId, contentRo, author, source, imageUrl, galleryUrls, videoUrl, videoTitle } = await req.json()
+  const { titleRo, titleRu, titleEn, type, categoryId, contentRo, contentRu, contentEn, author, source, imageUrl, galleryUrls, videoUrl, videoTitle } = await req.json()
   if (!titleRo || !type) return NextResponse.json({ error: 'Titlul și tipul sunt obligatorii' }, { status: 400 })
 
   let slug = slugify(titleRo)
@@ -30,9 +30,11 @@ export async function POST(req: NextRequest) {
   try {
     const book = await prisma.libraryBook.create({
       data: {
-        titleRo, slug, type,
+        titleRo, titleRu: titleRu || null, titleEn: titleEn || null, slug, type,
         categoryId: categoryId || null,
         contentRo: contentRo || '',
+        contentRu: contentRu || null,
+        contentEn: contentEn || null,
         author: author || null,
         source: source || null,
         imageUrl: imageUrl || null,

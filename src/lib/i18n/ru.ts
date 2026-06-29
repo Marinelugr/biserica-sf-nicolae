@@ -48,7 +48,9 @@ const ru: Translations = {
       birthJohnBaptist: 'Рождество Святого Иоанна Предтечи',
       circumcision: 'Обрезание Господне · Св. Василий Великий',
       archangels: 'Собор Архангелов Михаила и Гавриила',
-      palmSunday: 'Вход Господень в Иерусалим (Вербное воскресенье)', easter: 'Пасха Христова',
+      palmSunday: 'Вход Господень в Иерусалим (Вербное воскресенье)',
+      holyThursday: 'Великий Четверг', holyFriday: 'Великая Пятница',
+      easter: 'Пасха Христова', thomasSunday: 'Антипасха (Неделя апостола Фомы)',
       ascension: 'Вознесение Господне', pentecost: 'Пятидесятница — Сошествие Святого Духа',
       allSaints: 'Неделя Всех Святых',
     },
@@ -57,6 +59,7 @@ const ru: Translations = {
       dormitionFast: 'Успенский пост', christmasFast: 'Рождественский пост',
       inFast: 'Постный день',
     },
+    weeklyTone: 'Глас недели', julianDate: 'Старый стиль', todayWidget: 'Сегодня в календаре',
   },
   books: {
     subtitle: 'Священные тексты', title: 'Православная библиотека',

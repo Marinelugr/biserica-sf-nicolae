@@ -4,6 +4,7 @@ import Hero from '@/components/homepage/Hero'
 import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
 import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
+import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
 import { getTodayDate } from '@/lib/utils'
 
 const FALLBACK_GOSPEL = {
@@ -103,6 +104,7 @@ export default async function HomePage() {
     <>
       <Hero />
       <LiveStreamCard />
+      <LiturgicalTodayWidget />
       <DailyCards data={dailyData} todayLabel={getTodayLabel()} />
       <NewsAndLibrary
         articles={homeContent.articles}

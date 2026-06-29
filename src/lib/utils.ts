@@ -55,6 +55,9 @@ export function getLiturgicalDates(year: number) {
   return {
     easter,
     palmSunday: addDays(easter, -7),       // Floriile
+    holyThursday: addDays(easter, -3),     // Joia Mare
+    holyFriday: addDays(easter, -2),       // Vinerea Mare (Vinerea Pătimirilor)
+    thomasSunday: addDays(easter, 7),      // Duminica Tomii (Antipascha)
     ascension: addDays(easter, 39),        // Înălțarea
     pentecost: addDays(easter, 49),        // Rusaliile
     allSaintsDay: addDays(easter, 56),     // Duminica Tuturor Sfinților
@@ -63,6 +66,35 @@ export function getLiturgicalDates(year: number) {
     dormitionFast: { start: new Date(year, 7, 1), end: new Date(year, 7, 28) },
     christmasFast: { start: new Date(year, 10, 15), end: new Date(year, 11, 25) },
   }
+}
+
+// Glasul (tonul) săptămânii liturgice ortodoxe (1–8), calculat față de Duminica Tomii
+export function getWeeklyTone(date: Date, year: number): number {
+  const dates = getLiturgicalDates(year)
+  const thomasSunday = new Date(dates.thomasSunday)
+  thomasSunday.setHours(0, 0, 0, 0)
+  const target = new Date(date)
+  target.setHours(0, 0, 0, 0)
+  const diffMs = target.getTime() - thomasSunday.getTime()
+  const diffDays = Math.floor(diffMs / 86400000)
+  const weekIndex = Math.floor(diffDays / 7)
+  // Tone 1 starts from Thomas Sunday; negative values wrap around from previous year
+  if (diffDays < 0) {
+    const prevDates = getLiturgicalDates(year - 1)
+    const prevThomas = new Date(prevDates.thomasSunday)
+    prevThomas.setHours(0, 0, 0, 0)
+    const diff2 = Math.floor((target.getTime() - prevThomas.getTime()) / 86400000)
+    const week2 = Math.floor(diff2 / 7)
+    return ((week2 % 8) + 8) % 8 + 1
+  }
+  return (weekIndex % 8) + 1
+}
+
+// Data iuliană (stil vechi) a unei date gregoriene (sec. XXI: -13 zile)
+export function toJulianDate(gregorianDate: Date): { day: number; month: number; year: number } {
+  const d = new Date(gregorianDate)
+  d.setDate(d.getDate() - 13)
+  return { day: d.getDate(), month: d.getMonth() + 1, year: d.getFullYear() }
 }
 
 // Extrage sfinții zilei (day/month — pentru seed și carduri)
