@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
-  const { title, url, platform, videoId, categoryId, description } = await req.json()
+  const { title, url, platform, videoId, categoryId, description, startTime, endTime, isLive, archivedAt, serviceType } = await req.json()
   if (!title?.trim() || !url?.trim() || !videoId?.trim()) {
     return NextResponse.json({ error: 'Titlul, URL-ul și videoId sunt obligatorii' }, { status: 400 })
   }
@@ -30,6 +30,11 @@ export async function POST(req: NextRequest) {
       categoryId: categoryId || null,
       description: description || null,
       order: (last?.order ?? -1) + 1,
+      startTime: startTime ?? null,
+      endTime: endTime ?? null,
+      isLive: isLive ?? false,
+      archivedAt: archivedAt ? new Date(archivedAt) : null,
+      serviceType: serviceType || null,
     },
     include: { category: { select: { id: true, name: true } } },
   })

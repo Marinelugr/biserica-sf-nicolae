@@ -6,7 +6,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
   const { id } = await params
-  const { title, url, platform, videoId, categoryId, description } = await req.json()
+  const { title, url, platform, videoId, categoryId, description, startTime, endTime, isLive, archivedAt, serviceType } = await req.json()
   const video = await prisma.video.update({
     where: { id },
     data: {
@@ -14,6 +14,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       platform: platform || 'youtube', videoId: videoId?.trim(),
       categoryId: categoryId || null,
       description: description || null,
+      startTime: startTime !== undefined ? startTime : undefined,
+      endTime: endTime !== undefined ? endTime : undefined,
+      isLive: isLive !== undefined ? isLive : undefined,
+      archivedAt: archivedAt !== undefined ? (archivedAt ? new Date(archivedAt) : null) : undefined,
+      serviceType: serviceType !== undefined ? serviceType : undefined,
     },
     include: { category: { select: { id: true, name: true } } },
   })

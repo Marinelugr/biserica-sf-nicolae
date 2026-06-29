@@ -35,24 +35,68 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
   )
 }
 
+function ArchiveDialog({
+  onYes, onNo, loading, title
+}: { onYes: () => void; onNo: () => void; loading: boolean; title: string }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+      <div style={{ backgroundColor: '#110C07', border: '2px solid #2A1A0A', borderRadius: '10px', padding: '2rem', maxWidth: '420px', width: '100%' }}>
+        <div style={{ fontSize: '2rem', textAlign: 'center', marginBottom: '1rem' }}>📼</div>
+        <h3 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.1rem', margin: '0 0 0.75rem', textAlign: 'center' }}>
+          Salvați transmisiunea în arhivă?
+        </h3>
+        <p style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.9rem', lineHeight: 1.6, margin: '0 0 0.5rem', textAlign: 'center' }}>
+          Doriți să salvați această transmisiune în arhiva video?
+        </p>
+        {title && (
+          <p style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '0.85rem', textAlign: 'center', margin: '0 0 1.5rem', fontStyle: 'italic' }}>
+            „{title}"
+          </p>
+        )}
+        <p style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', textAlign: 'center', margin: '0 0 1.75rem' }}>
+          Va fi adăugată automat în categoria „Sfânta Liturghie Live"
+        </p>
+        <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+          <button
+            onClick={onNo}
+            disabled={loading}
+            style={{ backgroundColor: 'transparent', color: '#9B8050', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.6rem 1.75rem', fontFamily: 'Georgia, serif', fontSize: '0.9rem', cursor: 'pointer' }}
+          >
+            Nu, șterge
+          </button>
+          <button
+            onClick={onYes}
+            disabled={loading}
+            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', border: 'none', borderRadius: '4px', padding: '0.6rem 1.75rem', fontFamily: 'Georgia, serif', fontSize: '0.9rem', cursor: 'pointer', fontWeight: 600 }}
+          >
+            {loading ? 'Se salvează...' : '📼 Da, arhivează'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminHomepagePage() {
-  // ── Widget state ──────────────────────────────────────────────────────────
   const [widgets, setWidgets] = useState<Widget[]>([])
   const [widgetLoading, setWidgetLoading] = useState(true)
   const [widgetSaving, setWidgetSaving] = useState(false)
   const [widgetDirty, setWidgetDirty] = useState(false)
 
-  // ── Live stream state ─────────────────────────────────────────────────────
   const [liveActive, setLiveActive] = useState(false)
   const [liveUrl, setLiveUrl] = useState('')
+  const [liveTitle, setLiveTitle] = useState('')
   const [liveLoading, setLiveLoading] = useState(true)
   const [liveSaving, setLiveSaving] = useState(false)
   const [liveDirty, setLiveDirty] = useState(false)
 
+  const [showArchiveDialog, setShowArchiveDialog] = useState(false)
+  const [archiving, setArchiving] = useState(false)
+  const [pendingDeactivate, setPendingDeactivate] = useState(false)
+
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
 
-  // ── Load on mount ─────────────────────────────────────────────────────────
   useEffect(() => {
     fetch('/api/admin/homepage')
       .then(r => r.json())
@@ -62,14 +106,15 @@ export default function AdminHomepagePage() {
     Promise.all([
       fetch('/api/admin/settings?key=live_stream_active').then(r => r.json()),
       fetch('/api/admin/settings?key=live_stream_url').then(r => r.json()),
-    ]).then(([active, url]) => {
+      fetch('/api/admin/settings?key=live_stream_title').then(r => r.json()),
+    ]).then(([active, url, title]) => {
       setLiveActive(active === true || active === 'true')
       setLiveUrl(url || '')
+      setLiveTitle(title || '')
       setLiveLoading(false)
     }).catch(() => setLiveLoading(false))
   }, [])
 
-  // ── Widget actions ────────────────────────────────────────────────────────
   function toggle(section: string) {
     setWidgets(ws => ws.map(w => w.section === section ? { ...w, enabled: !w.enabled } : w))
     setWidgetDirty(true)
@@ -100,18 +145,78 @@ export default function AdminHomepagePage() {
     finally { setWidgetSaving(false) }
   }
 
-  // ── Live actions ──────────────────────────────────────────────────────────
+  async function saveToggledLive(active: boolean) {
+    await Promise.all([
+      fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'live_stream_active', value: active }) }),
+      fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'live_stream_url', value: liveUrl }) }),
+      fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'live_stream_title', value: liveTitle }) }),
+    ])
+  }
+
   async function handleSaveLive() {
+    // If toggling from active → inactive, ask about archiving
+    if (liveActive && !pendingDeactivate) {
+      // Save first, then ask
+    }
     setLiveSaving(true)
     try {
-      await Promise.all([
-        fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'live_stream_active', value: liveActive }) }),
-        fetch('/api/admin/settings', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'live_stream_url', value: liveUrl }) }),
-      ])
-      showToast(liveActive ? '🔴 LIVE activat pe homepage ✓' : 'LIVE dezactivat ✓', 'success')
+      await saveToggledLive(liveActive)
+      showToast(liveActive ? '🔴 LIVE activat pe site ✓' : 'LIVE dezactivat ✓', 'success')
       setLiveDirty(false)
     } catch { showToast('Eroare la salvare', 'error') }
     finally { setLiveSaving(false) }
+  }
+
+  function handleToggleLive() {
+    const newActive = !liveActive
+    if (!newActive && liveActive) {
+      // Going from active to inactive — ask about archiving
+      setPendingDeactivate(true)
+      setShowArchiveDialog(true)
+    } else {
+      setLiveActive(newActive)
+      setLiveDirty(true)
+    }
+  }
+
+  async function handleArchiveYes() {
+    setArchiving(true)
+    try {
+      const ytId = extractYouTubeId(liveUrl)
+      if (ytId) {
+        await fetch('/api/admin/live-archive', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            title: liveTitle || 'Sfânta Liturghie Live',
+            url: liveUrl,
+            videoId: ytId,
+            platform: 'youtube',
+          }),
+        })
+        showToast('Transmisiune arhivată în „Sfânta Liturghie Live" ✓', 'success')
+      }
+      // Deactivate and save
+      setLiveActive(false)
+      setShowArchiveDialog(false)
+      setPendingDeactivate(false)
+      await saveToggledLive(false)
+      setLiveDirty(false)
+    } catch { showToast('Eroare la arhivare', 'error') }
+    finally { setArchiving(false) }
+  }
+
+  async function handleArchiveNo() {
+    setShowArchiveDialog(false)
+    setPendingDeactivate(false)
+    setLiveActive(false)
+    setLiveDirty(true)
+    // Auto-save deactivation
+    try {
+      await saveToggledLive(false)
+      showToast('LIVE dezactivat ✓', 'success')
+      setLiveDirty(false)
+    } catch { showToast('Eroare la salvare', 'error') }
   }
 
   const ytId = extractYouTubeId(liveUrl)
@@ -142,49 +247,58 @@ export default function AdminHomepagePage() {
             <a href="/" target="_blank" style={{ ...btnGhost, textDecoration: 'none' }}>↗ Vizualizează site</a>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════════════ */}
-          {/* LIVE STREAM SECTION                                                */}
-          {/* ═══════════════════════════════════════════════════════════════════ */}
+          {/* LIVE STREAM SECTION */}
           <div style={{ backgroundColor: '#110C07', border: `2px solid ${liveActive ? '#8B1A1A' : '#2A1A0A'}`, borderRadius: '10px', padding: '1.5rem', marginBottom: '2rem', maxWidth: '680px', transition: 'border-color 0.3s' }}>
-            {/* Section header */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span style={{ fontSize: '1.25rem' }}>📡</span>
                 <div>
                   <div style={{ color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '1rem' }}>Transmisiune Live</div>
                   <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.1rem' }}>
-                    Activați pentru a afișa embed-ul live pe homepage
+                    Activați pentru a afișa embed-ul live pe homepage și pagina /video
                   </div>
                 </div>
               </div>
               {liveActive && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', backgroundColor: '#2A0505', border: '1px solid #5A1A1A', borderRadius: '20px', padding: '0.3rem 0.875rem' }}>
-                  <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.7rem' }}>●</span>
+                  <span style={{ color: '#EF4444', fontSize: '0.7rem' }}>●</span>
                   <span style={{ color: '#EF4444', fontFamily: 'Georgia, serif', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em' }}>LIVE ACTIV</span>
                 </div>
               )}
             </div>
 
-            {/* Big toggle */}
+            {/* Toggle */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', marginBottom: '1.25rem', padding: '1rem 1.25rem', backgroundColor: '#0A0704', borderRadius: '8px', border: '1px solid #1A1008' }}>
               <button
-                onClick={() => { setLiveActive(v => !v); setLiveDirty(true) }}
+                onClick={handleToggleLive}
                 disabled={liveLoading}
-                style={{
-                  width: '64px', height: '34px', borderRadius: '17px', border: 'none',
-                  backgroundColor: liveActive ? '#EF4444' : '#2A1A0A',
-                  cursor: 'pointer', position: 'relative', transition: 'background-color 0.25s', flexShrink: 0,
-                }}
+                style={{ width: '64px', height: '34px', borderRadius: '17px', border: 'none', backgroundColor: liveActive ? '#EF4444' : '#2A1A0A', cursor: 'pointer', position: 'relative', transition: 'background-color 0.25s', flexShrink: 0 }}
               >
                 <span style={{ position: 'absolute', top: '4px', left: liveActive ? '33px' : '4px', width: '26px', height: '26px', borderRadius: '50%', backgroundColor: liveActive ? '#fff' : '#5A4020', transition: 'left 0.25s', display: 'block' }} />
               </button>
               <div>
                 <div style={{ color: liveActive ? '#F2EBD9' : '#9B8050', fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: liveActive ? 600 : 400, transition: 'color 0.2s' }}>
-                  {liveActive ? '🔴 LIVE ACTIV — cardul apare pe homepage' : 'LIVE INACTIV — cardul este ascuns'}
+                  {liveActive ? '🔴 LIVE ACTIV — cardul apare pe homepage și /video' : 'LIVE INACTIV — cardul este ascuns'}
                 </div>
                 <div style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.15rem' }}>
-                  Activați înainte de a începe transmisiunea
+                  {liveActive ? 'La dezactivare veți fi întrebat dacă arhivați transmisiunea' : 'Activați înainte de a începe transmisiunea'}
                 </div>
+              </div>
+            </div>
+
+            {/* Title input */}
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', color: '#9B8050', fontSize: '0.8rem', marginBottom: '0.4rem', fontFamily: 'Georgia, serif' }}>
+                Titlul slujbei
+              </label>
+              <input
+                value={liveTitle}
+                onChange={e => { setLiveTitle(e.target.value); setLiveDirty(true) }}
+                placeholder="ex: Sfânta Liturghie — Duminica Floriilor 2025"
+                style={inp}
+              />
+              <div style={{ marginTop: '0.35rem', fontFamily: 'Georgia, serif', fontSize: '0.75rem', color: '#3A2A0A' }}>
+                Va apărea pe cardul live și la arhivare ca titlul înregistrării
               </div>
             </div>
 
@@ -200,7 +314,7 @@ export default function AdminHomepagePage() {
                 style={inp}
               />
               <div style={{ marginTop: '0.5rem', fontFamily: 'Georgia, serif', fontSize: '0.75rem', color: '#3A2A0A' }}>
-                Acceptat: youtube.com/live/ID · youtube.com/watch?v=ID · youtu.be/ID · ID direct (11 caractere)
+                Acceptat: youtube.com/live/ID · youtube.com/watch?v=ID · youtu.be/ID · ID direct
               </div>
             </div>
 
@@ -224,7 +338,7 @@ export default function AdminHomepagePage() {
               </div>
             )}
 
-            {/* Save live */}
+            {/* Save */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <button
                 onClick={handleSaveLive}
@@ -237,9 +351,7 @@ export default function AdminHomepagePage() {
             </div>
           </div>
 
-          {/* ═══════════════════════════════════════════════════════════════════ */}
-          {/* WIDGET SECTIONS                                                    */}
-          {/* ═══════════════════════════════════════════════════════════════════ */}
+          {/* WIDGET SECTIONS */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', maxWidth: '680px' }}>
             <div>
               <h2 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.1rem', margin: 0 }}>Secțiuni homepage</h2>
@@ -301,6 +413,15 @@ export default function AdminHomepagePage() {
           )}
         </main>
       </div>
+
+      {showArchiveDialog && (
+        <ArchiveDialog
+          title={liveTitle}
+          onYes={handleArchiveYes}
+          onNo={handleArchiveNo}
+          loading={archiving}
+        />
+      )}
 
       {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
     </div>
