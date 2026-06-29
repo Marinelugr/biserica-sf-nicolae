@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import PublicGallery from '@/components/PublicGallery'
 
 export const dynamic = 'force-dynamic'
 
@@ -14,6 +16,11 @@ const CATEGORY_META = [
   { key: 'ALTELE',    slug: 'altele',    icon: '◆', color: '#5A5050', label: 'Altele' },
 ] as const
 
+function extractYouTubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|live\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
 type Props = { params: Promise<{ slug: string }> }
 
 async function getBook(slug: string) {
@@ -23,6 +30,7 @@ async function getBook(slug: string) {
     select: {
       slug: true, titleRo: true, type: true,
       contentRo: true, author: true, source: true,
+      imageUrl: true, galleryUrls: true, videoUrl: true, videoTitle: true,
     },
   })
 }
@@ -35,7 +43,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${book.titleRo} | Bibliotecă Ortodoxă`,
     description: plain,
-    openGraph: { title: book.titleRo, description: plain, type: 'article' },
+    openGraph: {
+      title: book.titleRo, description: plain, type: 'article',
+      images: book.imageUrl ? [{ url: book.imageUrl }] : [],
+    },
   }
 }
 
@@ -45,6 +56,10 @@ export default async function CartePage({ params }: Props) {
   if (!book) notFound()
 
   const cat = CATEGORY_META.find(c => c.key === book.type) ?? CATEGORY_META[CATEGORY_META.length - 1]
+  const ytId = book.videoUrl ? extractYouTubeId(book.videoUrl) : null
+  const galleryItems = (book.galleryUrls || []).map((url, i) => ({
+    id: String(i), url, thumbnailUrl: url, caption: null,
+  }))
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -91,18 +106,59 @@ export default async function CartePage({ params }: Props) {
         </div>
       </div>
 
+      {/* Imagine principală (cover) */}
+      {book.imageUrl && (
+        <div className="relative w-full mb-10 rounded-xl overflow-hidden shadow-md" style={{ aspectRatio: '16/7' }}>
+          <Image
+            src={book.imageUrl}
+            alt={book.titleRo}
+            fill
+            className="object-cover"
+            priority
+          />
+        </div>
+      )}
+
+      {/* Video */}
+      {ytId && (
+        <div className="mb-10">
+          {book.videoTitle && (
+            <p className="font-body text-sm font-semibold mb-3" style={{ color: '#5A4A3A' }}>
+              🎬 {book.videoTitle}
+            </p>
+          )}
+          <div className="rounded-xl overflow-hidden shadow-md" style={{ aspectRatio: '16/9' }}>
+            <iframe
+              src={`https://www.youtube.com/embed/${ytId}`}
+              title={book.videoTitle || book.titleRo}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+            />
+          </div>
+        </div>
+      )}
+
       {/* Conținut */}
       <div
         className="font-body prose prose-lg max-w-none"
-        style={{
-          color: '#2A1A0A',
-          lineHeight: 1.9,
-          fontSize: '1.05rem',
-        }}
+        style={{ color: '#2A1A0A', lineHeight: 1.9, fontSize: '1.05rem' }}
         dangerouslySetInnerHTML={{ __html: book.contentRo }}
       />
 
-      {/* Footer text */}
+      {/* Galerie imagini */}
+      {galleryItems.length > 0 && (
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
+            <span className="font-body text-xs uppercase tracking-[0.3em]" style={{ color: '#8A7050' }}>Galerie foto</span>
+            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
+          </div>
+          <PublicGallery items={galleryItems} />
+        </div>
+      )}
+
+      {/* Footer */}
       <div className="mt-14 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid #E8E5E0' }}>
         <Link
           href={`/carti/categorie/${cat.slug}`}
@@ -120,7 +176,6 @@ export default async function CartePage({ params }: Props) {
         </Link>
       </div>
 
-      {/* Stiluri conținut rich text */}
       <style>{`
         .prose h2 { color: #1C1B3A; font-size: 1.3rem; margin: 2rem 0 0.75rem; font-family: 'Cormorant Garamond', Georgia, serif; }
         .prose h3 { color: #3A2A1A; font-size: 1.1rem; margin: 1.5rem 0 0.5rem; font-family: 'Cormorant Garamond', Georgia, serif; }

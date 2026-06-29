@@ -163,9 +163,13 @@ model LibraryBook {
   contentRo  String        @db.Text
   contentRu  String?       @db.Text
   contentEn  String?       @db.Text
-  author     String?
-  source     String?
-  createdAt  DateTime      @default(now())
+  author       String?
+  source       String?
+  imageUrl     String?
+  galleryUrls  String[]
+  videoUrl     String?
+  videoTitle   String?
+  createdAt    DateTime      @default(now())
 }
 
 // ─── Program Slujbe ──────────────────────────────────────────────────────────

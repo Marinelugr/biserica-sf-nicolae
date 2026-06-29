@@ -20,7 +20,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
-  const { titleRo, type, categoryId, contentRo, author, source } = await req.json()
+  const { titleRo, type, categoryId, contentRo, author, source, imageUrl, galleryUrls, videoUrl, videoTitle } = await req.json()
   if (!titleRo || !type) return NextResponse.json({ error: 'Titlul și tipul sunt obligatorii' }, { status: 400 })
 
   let slug = slugify(titleRo)
@@ -35,6 +35,10 @@ export async function POST(req: NextRequest) {
         contentRo: contentRo || '',
         author: author || null,
         source: source || null,
+        imageUrl: imageUrl || null,
+        galleryUrls: galleryUrls || [],
+        videoUrl: videoUrl || null,
+        videoTitle: videoTitle || null,
       },
       include: { category: { select: { id: true, name: true, emoji: true, color: true } } },
     })

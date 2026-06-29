@@ -9,7 +9,7 @@ export async function PATCH(
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
   const { id } = await params
-  const { titleRo, type, categoryId, contentRo, author, source } = await req.json()
+  const { titleRo, type, categoryId, contentRo, author, source, imageUrl, galleryUrls, videoUrl, videoTitle } = await req.json()
   const book = await prisma.libraryBook.update({
     where: { id },
     data: {
@@ -18,6 +18,10 @@ export async function PATCH(
       contentRo: contentRo || '',
       author: author || null,
       source: source || null,
+      imageUrl: imageUrl || null,
+      galleryUrls: galleryUrls || [],
+      videoUrl: videoUrl || null,
+      videoTitle: videoTitle || null,
     },
     include: { category: { select: { id: true, name: true, emoji: true, color: true } } },
   })

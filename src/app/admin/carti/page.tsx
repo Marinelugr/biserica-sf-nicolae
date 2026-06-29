@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
+import ImageUploadButton from '@/components/admin/ImageUploadButton'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -13,7 +14,9 @@ interface BookCategory { id: string; name: string; emoji: string; color: string;
 interface LibraryBook {
   id: string; titleRo: string; slug: string; type: string
   categoryId: string | null; category: BookCategory | null
-  contentRo: string; author: string | null; source: string | null; createdAt: string
+  contentRo: string; author: string | null; source: string | null
+  imageUrl: string | null; galleryUrls: string[]; videoUrl: string | null; videoTitle: string | null
+  createdAt: string
 }
 
 const BOOK_TYPES = [
@@ -85,6 +88,13 @@ function ConfirmModal({ message, onConfirm, onCancel, loading }: {
   )
 }
 
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function extractYouTubeId(url: string): string | null {
+  const m = url.match(/(?:youtube\.com\/(?:watch\?v=|live\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
+  return m ? m[1] : null
+}
+
 // ── Main component ─────────────────────────────────────────────────────────
 
 export default function AdminCartiPage() {
@@ -100,7 +110,7 @@ export default function AdminCartiPage() {
   // Book form
   const [showBookForm, setShowBookForm] = useState(false)
   const [editBook, setEditBook] = useState<LibraryBook | null>(null)
-  const [bookForm, setBookForm] = useState({ titleRo: '', type: 'ACATIST', categoryId: '', contentRo: '', author: '', source: '' })
+  const [bookForm, setBookForm] = useState({ titleRo: '', type: 'ACATIST', categoryId: '', contentRo: '', author: '', source: '', imageUrl: '', galleryUrls: [] as string[], videoUrl: '', videoTitle: '' })
   const [savingBook, setSavingBook] = useState(false)
 
   // Category form
@@ -139,13 +149,13 @@ export default function AdminCartiPage() {
 
   function openNewBook() {
     setEditBook(null)
-    setBookForm({ titleRo: '', type: 'ACATIST', categoryId: activeCategory || '', contentRo: '', author: '', source: '' })
+    setBookForm({ titleRo: '', type: 'ACATIST', categoryId: activeCategory || '', contentRo: '', author: '', source: '', imageUrl: '', galleryUrls: [], videoUrl: '', videoTitle: '' })
     setShowBookForm(true)
   }
 
   function openEditBook(book: LibraryBook) {
     setEditBook(book)
-    setBookForm({ titleRo: book.titleRo, type: book.type, categoryId: book.categoryId || '', contentRo: book.contentRo, author: book.author || '', source: book.source || '' })
+    setBookForm({ titleRo: book.titleRo, type: book.type, categoryId: book.categoryId || '', contentRo: book.contentRo, author: book.author || '', source: book.source || '', imageUrl: book.imageUrl || '', galleryUrls: book.galleryUrls || [], videoUrl: book.videoUrl || '', videoTitle: book.videoTitle || '' })
     setShowBookForm(true)
   }
 
@@ -414,6 +424,72 @@ export default function AdminCartiPage() {
                   onChange={val => setBookForm(f => ({ ...f, contentRo: val }))}
                   placeholder="Scrieți conținutul cărții..."
                 />
+              </div>
+
+              {/* ── Imagine principală ──────────────────────────────────── */}
+              <div style={{ borderTop: '1px solid #1E1208', paddingTop: '1.1rem' }}>
+                <div style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '0.875rem', marginBottom: '0.875rem' }}>🖼️ Imagine principală (cover)</div>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <input
+                    value={bookForm.imageUrl}
+                    onChange={e => setBookForm(f => ({ ...f, imageUrl: e.target.value }))}
+                    placeholder="https://..."
+                    style={{ ...inp, flex: 1 }}
+                  />
+                  <ImageUploadButton onUpload={url => setBookForm(f => ({ ...f, imageUrl: url }))} label="Încarcă" />
+                </div>
+                {bookForm.imageUrl && (
+                  <div style={{ marginTop: '0.75rem', position: 'relative', display: 'inline-block' }}>
+                    <img src={bookForm.imageUrl} alt="" style={{ width: '120px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #2A1A0A', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                    <button onClick={() => setBookForm(f => ({ ...f, imageUrl: '' }))} style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#5A0A0A', border: 'none', color: '#F2EBD9', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+                  </div>
+                )}
+              </div>
+
+              {/* ── Galerie imagini ─────────────────────────────────────── */}
+              <div style={{ borderTop: '1px solid #1E1208', paddingTop: '1.1rem' }}>
+                <div style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '0.875rem', marginBottom: '0.875rem' }}>📷 Galerie imagini</div>
+                <ImageUploadButton
+                  onUpload={url => setBookForm(f => ({ ...f, galleryUrls: [...f.galleryUrls, url] }))}
+                  label="+ Adaugă imagine"
+                />
+                {bookForm.galleryUrls.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.75rem' }}>
+                    {bookForm.galleryUrls.map((url, i) => (
+                      <div key={i} style={{ position: 'relative' }}>
+                        <img src={url} alt="" style={{ width: '72px', height: '56px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #2A1A0A', display: 'block' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                        <button
+                          onClick={() => setBookForm(f => ({ ...f, galleryUrls: f.galleryUrls.filter((_, j) => j !== i) }))}
+                          style={{ position: 'absolute', top: '-6px', right: '-6px', background: '#5A0A0A', border: 'none', color: '#F2EBD9', borderRadius: '50%', width: '18px', height: '18px', cursor: 'pointer', fontSize: '0.65rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                        >✕</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ── Video ───────────────────────────────────────────────── */}
+              <div style={{ borderTop: '1px solid #1E1208', paddingTop: '1.1rem' }}>
+                <div style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '0.875rem', marginBottom: '0.875rem' }}>🎬 Video (YouTube / Vimeo)</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <div>
+                    <label style={lbl}>Titlul video-ului</label>
+                    <input value={bookForm.videoTitle} onChange={e => setBookForm(f => ({ ...f, videoTitle: e.target.value }))} placeholder="ex: Acatistul Sfântului Nicolae — Cântare" style={inp} />
+                  </div>
+                  <div>
+                    <label style={lbl}>URL YouTube / Vimeo</label>
+                    <input value={bookForm.videoUrl} onChange={e => setBookForm(f => ({ ...f, videoUrl: e.target.value }))} placeholder="https://youtube.com/watch?v=..." style={inp} />
+                  </div>
+                  {bookForm.videoUrl && extractYouTubeId(bookForm.videoUrl) && (
+                    <div style={{ aspectRatio: '16/9', borderRadius: '6px', overflow: 'hidden', border: '1px solid #2A1A0A', maxWidth: '380px' }}>
+                      <iframe
+                        src={`https://www.youtube.com/embed/${extractYouTubeId(bookForm.videoUrl)}`}
+                        style={{ width: '100%', height: '100%', border: 'none' }}
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

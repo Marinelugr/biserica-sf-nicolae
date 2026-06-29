@@ -84,7 +84,7 @@ export interface Translations {
 
 const ro: Translations = {
   nav: {
-    home: 'Acasă', bible: 'Biblie', calendar: 'Calendar', books: 'Cărți',
+    home: 'Acasă', bible: 'Biblie', calendar: 'Calendar', books: 'Bibliotecă',
     churchHistory: 'Istoria Bisericii', saintNicholas: 'Sfântul Nicolae', priest: 'Parohul Bisericii',
     video: 'Video', shop: 'Magazin', donate: 'Donații',
   },
