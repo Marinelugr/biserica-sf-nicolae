@@ -5,13 +5,17 @@ import PublicGallery from '@/components/PublicGallery'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const priest = await prisma.priest.findFirst({ select: { nameRo: true, photoUrl: true } })
+  const priest = await prisma.priest.findFirst({ select: { nameRo: true, photoUrl: true, bioRo: true } })
+  const plainBio = priest?.bioRo?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Părintele paroh al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova.'
   return {
-    title: 'Parohul Bisericii',
-    description: `${priest?.nameRo ?? 'Preotul Paroh'} — Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni.`,
-    openGraph: priest?.photoUrl ? {
-      images: [{ url: priest.photoUrl, width: 800, height: 1067, alt: priest.nameRo }],
-    } : undefined,
+    title: `Parohul Bisericii — ${priest?.nameRo ?? 'Preot Paroh'} | Sf. Nicolae Hîrtopul Mic`,
+    description: plainBio,
+    openGraph: {
+      title: `${priest?.nameRo ?? 'Preot Paroh'} — Parohul Bisericii`,
+      description: plainBio,
+      type: 'profile',
+      images: [{ url: priest?.photoUrl || '/og-default.jpg', width: 800, height: 600, alt: priest?.nameRo ?? 'Parohul Bisericii' }],
+    },
   }
 }
 
