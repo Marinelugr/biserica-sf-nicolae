@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 
 interface Props {
   onUpload: (url: string) => void
@@ -13,20 +13,28 @@ export default function ImageUploadButton({ onUpload, label = 'Încarcă imagine
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const abortRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => { abortRef.current?.abort() }
+  }, [])
 
   async function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    abortRef.current?.abort()
+    abortRef.current = new AbortController()
     setUploading(true)
     setError('')
     try {
       const fd = new FormData()
       fd.append('file', file)
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd, signal: abortRef.current.signal })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Eroare la upload')
       onUpload(data.url)
     } catch (err) {
+      if ((err as { name?: string }).name === 'AbortError') return
       setError(err instanceof Error ? err.message : 'Eroare la upload')
     } finally {
       setUploading(false)

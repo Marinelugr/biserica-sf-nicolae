@@ -20,8 +20,8 @@ async function getBooks(type: string) {
   const { prisma } = await import('@/lib/prisma')
   return prisma.libraryBook.findMany({
     where: { type },
-    select: { slug: true, titleRo: true, author: true, source: true },
-    orderBy: { titleRo: 'asc' },
+    select: { slug: true, titleRo: true, author: true, source: true, ordine: true },
+    orderBy: [{ ordine: 'asc' }, { titleRo: 'asc' }],
   })
 }
 

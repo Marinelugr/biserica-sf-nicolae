@@ -1,10 +1,25 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
 import ImageUploadButton from '@/components/admin/ImageUploadButton'
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -17,6 +32,7 @@ interface LibraryBook {
   contentRo: string; contentRu: string | null; contentEn: string | null
   author: string | null; source: string | null
   imageUrl: string | null; galleryUrls: string[]; videoUrl: string | null; videoTitle: string | null
+  ordine: number
   createdAt: string
 }
 
@@ -96,6 +112,106 @@ function extractYouTubeId(url: string): string | null {
   return m ? m[1] : null
 }
 
+// ── Sortable book row ──────────────────────────────────────────────────────
+
+function SortableBookRow({ book, isDragging, onEdit, onDelete }: {
+  book: LibraryBook
+  isDragging: boolean
+  onEdit: (book: LibraryBook) => void
+  onDelete: (id: string) => void
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: book.id })
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    backgroundColor: isDragging ? '#1A1008' : undefined,
+    display: 'flex',
+    alignItems: 'center',
+    gap: '0',
+    borderBottom: '1px solid #1E1208',
+  }
+  return (
+    <div ref={setNodeRef} style={style}>
+      {/* Drag handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        style={{
+          padding: '0.875rem 0.75rem',
+          color: '#3A2A0A',
+          cursor: 'grab',
+          fontSize: '1rem',
+          flexShrink: 0,
+          userSelect: 'none',
+          touchAction: 'none',
+        }}
+        title="Trage pentru a reordona"
+      >
+        ⠿
+      </div>
+      <div style={{ padding: '0.875rem 0.5rem', color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.9rem', flex: '0 0 280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {book.titleRo}
+      </div>
+      <div style={{ padding: '0.875rem 1rem', flex: '0 0 120px' }}>
+        <span style={{ display: 'inline-block', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'Georgia, serif', backgroundColor: '#1A1008', color: '#9B8050', border: '1px solid #2A1A0A' }}>
+          {BOOK_TYPES.find(t => t.value === book.type)?.label || book.type}
+        </span>
+      </div>
+      <div style={{ padding: '0.875rem 1rem', flex: '0 0 140px' }}>
+        {book.category ? (
+          <span style={{ color: book.category.color, fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
+            {book.category.emoji} {book.category.name}
+          </span>
+        ) : (
+          <span style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>—</span>
+        )}
+      </div>
+      <div style={{ padding: '0.875rem 1rem', flex: '0 0 120px', color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.85rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        {book.author || '—'}
+      </div>
+      <div style={{ padding: '0.875rem 1rem', flex: 1, display: 'flex', gap: '0.75rem', alignItems: 'center', justifyContent: 'flex-end' }}>
+        <button onClick={() => onEdit(book)} style={{ background: 'none', border: 'none', color: '#C9A84C', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>Editează</button>
+        <button onClick={() => onDelete(book.id)} style={{ background: 'none', border: 'none', color: '#C06050', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>Șterge</button>
+      </div>
+    </div>
+  )
+}
+
+// ── Static book row (for "all categories" view) ────────────────────────────
+
+function StaticBookRow({ book, isLast, onEdit, onDelete }: {
+  book: LibraryBook
+  isLast: boolean
+  onEdit: (book: LibraryBook) => void
+  onDelete: (id: string) => void
+}) {
+  return (
+    <tr style={{ borderBottom: isLast ? 'none' : '1px solid #1E1208' }}>
+      <td style={{ padding: '0.875rem 1rem', color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.9rem', maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{book.titleRo}</td>
+      <td style={{ padding: '0.875rem 1rem' }}>
+        <span style={{ display: 'inline-block', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'Georgia, serif', backgroundColor: '#1A1008', color: '#9B8050', border: '1px solid #2A1A0A' }}>
+          {BOOK_TYPES.find(t => t.value === book.type)?.label || book.type}
+        </span>
+      </td>
+      <td style={{ padding: '0.875rem 1rem' }}>
+        {book.category ? (
+          <span style={{ color: book.category.color, fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
+            {book.category.emoji} {book.category.name}
+          </span>
+        ) : (
+          <span style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>—</span>
+        )}
+      </td>
+      <td style={{ padding: '0.875rem 1rem', color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>{book.author || '—'}</td>
+      <td style={{ padding: '0.875rem 1rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+        <button onClick={() => onEdit(book)} style={{ background: 'none', border: 'none', color: '#C9A84C', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>Editează</button>
+        <button onClick={() => onDelete(book.id)} style={{ background: 'none', border: 'none', color: '#C06050', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>Șterge</button>
+      </td>
+    </tr>
+  )
+}
+
 // ── Main component ─────────────────────────────────────────────────────────
 
 export default function AdminCartiPage() {
@@ -126,12 +242,19 @@ export default function AdminCartiPage() {
   const [deleteCatId, setDeleteCatId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  // DnD
+  const [draggingId, setDraggingId] = useState<string | null>(null)
+  const [savingOrder, setSavingOrder] = useState(false)
+
   // Toast
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => {
     setToast({ message, type })
   }, [])
+
+  // DnD sensors
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }))
 
   // ── Fetch ──────────────────────────────────────────────────────────────
 
@@ -160,6 +283,22 @@ export default function AdminCartiPage() {
     setBookForm({ titleRo: book.titleRo, titleRu: book.titleRu || '', titleEn: book.titleEn || '', type: book.type, categoryId: book.categoryId || '', contentRo: book.contentRo, contentRu: book.contentRu || '', contentEn: book.contentEn || '', author: book.author || '', source: book.source || '', imageUrl: book.imageUrl || '', galleryUrls: book.galleryUrls || [], videoUrl: book.videoUrl || '', videoTitle: book.videoTitle || '' })
     setShowBookForm(true)
   }
+
+  // Reset câmpuri imagine/video când se schimbă cartea editată (protecție anti-stale-upload)
+  const prevEditIdRef = useRef<string | null | undefined>(undefined)
+  useEffect(() => {
+    const currentId = editBook?.id ?? null
+    if (prevEditIdRef.current === undefined) { prevEditIdRef.current = currentId; return }
+    if (prevEditIdRef.current === currentId) return
+    prevEditIdRef.current = currentId
+    setBookForm(f => ({
+      ...f,
+      imageUrl: editBook?.imageUrl || '',
+      galleryUrls: editBook?.galleryUrls || [],
+      videoUrl: editBook?.videoUrl || '',
+      videoTitle: editBook?.videoTitle || '',
+    }))
+  }, [editBook?.id])
 
   async function translate(field: string) {
     const sourceText = field.startsWith('title') ? bookForm.titleRo : bookForm.contentRo
@@ -263,11 +402,43 @@ export default function AdminCartiPage() {
     finally { setDeleting(false) }
   }
 
-  // ── Filtered books ─────────────────────────────────────────────────────
+  // ── Drag and drop ──────────────────────────────────────────────────────
 
   const filteredBooks = activeCategory
-    ? books.filter(b => b.categoryId === activeCategory)
+    ? books.filter(b => b.categoryId === activeCategory).sort((a, b) => a.ordine - b.ordine || a.titleRo.localeCompare(b.titleRo))
     : books
+
+  async function handleDragEnd(event: DragEndEvent) {
+    setDraggingId(null)
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+
+    const oldIndex = filteredBooks.findIndex(b => b.id === active.id)
+    const newIndex = filteredBooks.findIndex(b => b.id === over.id)
+    const reordered = arrayMove(filteredBooks, oldIndex, newIndex)
+
+    // Optimistic update
+    const updatedBooks = books.map(b => {
+      const newPos = reordered.findIndex(r => r.id === b.id)
+      return newPos >= 0 ? { ...b, ordine: newPos } : b
+    })
+    setBooks(updatedBooks)
+
+    setSavingOrder(true)
+    try {
+      const items = reordered.map((b, i) => ({ id: b.id, ordine: i }))
+      await fetch('/api/admin/carti/reorder', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      })
+    } catch {
+      showToast('Eroare la salvarea ordinii', 'error')
+      fetchAll()
+    } finally {
+      setSavingOrder(false)
+    }
+  }
 
   // ── Render ─────────────────────────────────────────────────────────────
 
@@ -356,7 +527,7 @@ export default function AdminCartiPage() {
             })}
           </div>
 
-          {/* Books table */}
+          {/* Books list */}
           <div style={{ backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px', overflow: 'hidden' }}>
             {loading ? (
               <div style={{ padding: '3rem', textAlign: 'center', color: '#5A4020', fontFamily: 'Georgia, serif' }}>Se încarcă...</div>
@@ -364,7 +535,51 @@ export default function AdminCartiPage() {
               <div style={{ padding: '3rem', textAlign: 'center', color: '#5A4020', fontFamily: 'Georgia, serif' }}>
                 Nicio carte. {!activeCategory ? 'Adaugă prima carte.' : 'Nicio carte în această categorie.'}
               </div>
+            ) : activeCategory ? (
+              // ── DnD mode (per category) ─────────────────────────────────
+              <div>
+                {/* Header row */}
+                <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #2A1A0A', padding: '0 0' }}>
+                  <div style={{ padding: '0.75rem 0.75rem', width: '40px', flexShrink: 0 }} />
+                  {['Titlu', 'Tip', 'Categorie', 'Autor', 'Acțiuni'].map((h, i) => (
+                    <div key={h} style={{
+                      padding: '0.75rem 1rem',
+                      color: '#5A4020', fontSize: '0.75rem', fontFamily: 'Georgia, serif', fontWeight: 600,
+                      textTransform: 'uppercase', letterSpacing: '0.05em',
+                      flex: i === 0 ? '0 0 280px' : i === 1 ? '0 0 120px' : i === 2 ? '0 0 140px' : i === 3 ? '0 0 120px' : 1,
+                    }}>{h}</div>
+                  ))}
+                </div>
+                {savingOrder && (
+                  <div style={{ padding: '0.4rem 1rem', backgroundColor: '#0A1A0A', color: '#4ACA4A', fontFamily: 'Georgia, serif', fontSize: '0.75rem', borderBottom: '1px solid #1E1208' }}>
+                    ↕ Se salvează ordinea...
+                  </div>
+                )}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={e => setDraggingId(String(e.active.id))}
+                  onDragEnd={handleDragEnd}
+                  onDragCancel={() => setDraggingId(null)}
+                >
+                  <SortableContext items={filteredBooks.map(b => b.id)} strategy={verticalListSortingStrategy}>
+                    {filteredBooks.map(book => (
+                      <SortableBookRow
+                        key={book.id}
+                        book={book}
+                        isDragging={draggingId === book.id}
+                        onEdit={openEditBook}
+                        onDelete={setDeleteBookId}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+                <div style={{ padding: '0.5rem 1rem', borderTop: '1px solid #1E1208', color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.75rem' }}>
+                  ⠿ Trage rândurile pentru a reordona · Ordinea se salvează automat
+                </div>
+              </div>
             ) : (
+              // ── Static table (all categories) ──────────────────────────
               <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #2A1A0A' }}>
@@ -375,28 +590,13 @@ export default function AdminCartiPage() {
                 </thead>
                 <tbody>
                   {filteredBooks.map((book, i) => (
-                    <tr key={book.id} style={{ borderBottom: i < filteredBooks.length - 1 ? '1px solid #1E1208' : 'none' }}>
-                      <td style={{ padding: '0.875rem 1rem', color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.9rem', maxWidth: '280px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{book.titleRo}</td>
-                      <td style={{ padding: '0.875rem 1rem' }}>
-                        <span style={{ display: 'inline-block', padding: '0.15rem 0.5rem', borderRadius: '4px', fontSize: '0.75rem', fontFamily: 'Georgia, serif', backgroundColor: '#1A1008', color: '#9B8050', border: '1px solid #2A1A0A' }}>
-                          {BOOK_TYPES.find(t => t.value === book.type)?.label || book.type}
-                        </span>
-                      </td>
-                      <td style={{ padding: '0.875rem 1rem' }}>
-                        {book.category ? (
-                          <span style={{ color: book.category.color, fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
-                            {book.category.emoji} {book.category.name}
-                          </span>
-                        ) : (
-                          <span style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>—</span>
-                        )}
-                      </td>
-                      <td style={{ padding: '0.875rem 1rem', color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>{book.author || '—'}</td>
-                      <td style={{ padding: '0.875rem 1rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                        <button onClick={() => openEditBook(book)} style={{ background: 'none', border: 'none', color: '#C9A84C', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>Editează</button>
-                        <button onClick={() => setDeleteBookId(book.id)} style={{ background: 'none', border: 'none', color: '#C06050', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>Șterge</button>
-                      </td>
-                    </tr>
+                    <StaticBookRow
+                      key={book.id}
+                      book={book}
+                      isLast={i === filteredBooks.length - 1}
+                      onEdit={openEditBook}
+                      onDelete={setDeleteBookId}
+                    />
                   ))}
                 </tbody>
               </table>
@@ -511,7 +711,11 @@ export default function AdminCartiPage() {
                     placeholder="https://..."
                     style={{ ...inp, flex: 1 }}
                   />
-                  <ImageUploadButton onUpload={url => setBookForm(f => ({ ...f, imageUrl: url }))} label="Încarcă" />
+                  <ImageUploadButton
+                    key={`img-${editBook?.id ?? 'new'}`}
+                    onUpload={url => setBookForm(f => ({ ...f, imageUrl: url }))}
+                    label="Încarcă"
+                  />
                 </div>
                 {bookForm.imageUrl && (
                   <div style={{ marginTop: '0.75rem', position: 'relative', display: 'inline-block' }}>
@@ -525,6 +729,7 @@ export default function AdminCartiPage() {
               <div style={{ borderTop: '1px solid #1E1208', paddingTop: '1.1rem' }}>
                 <div style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '0.875rem', marginBottom: '0.875rem' }}>📷 Galerie imagini</div>
                 <ImageUploadButton
+                  key={`gal-${editBook?.id ?? 'new'}`}
                   onUpload={url => setBookForm(f => ({ ...f, galleryUrls: [...f.galleryUrls, url] }))}
                   label="+ Adaugă imagine"
                 />
