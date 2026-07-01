@@ -74,12 +74,12 @@ export default function PublicGallery({ items }: Props) {
             onClick={() => open(i)}
             style={{ cursor: 'pointer', borderRadius: '6px', overflow: 'hidden', border: '1px solid #2A1A0A', backgroundColor: '#1A1008' }}
           >
-            <div style={{ position: 'relative', aspectRatio: '4/3' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '160px', backgroundColor: '#1A1008' }}>
               <img
                 src={item.thumbnailUrl || item.url}
                 alt={item.caption || ''}
                 loading="lazy"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.25s' }}
+                style={{ width: '100%', height: 'auto', maxHeight: '320px', objectFit: 'contain', display: 'block', transition: 'transform 0.25s' }}
                 onMouseEnter={e => { (e.target as HTMLImageElement).style.transform = 'scale(1.04)' }}
                 onMouseLeave={e => { (e.target as HTMLImageElement).style.transform = 'scale(1)' }}
                 onError={e => { const el = e.target as HTMLImageElement; if (item.thumbnailUrl && el.src !== item.url) el.src = item.url }}

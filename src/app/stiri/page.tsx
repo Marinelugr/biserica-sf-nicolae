@@ -57,18 +57,21 @@ export default async function StiriPage() {
               style={{ borderColor: '#E8E5E0' }}
             >
               <div
-                className="relative h-48 overflow-hidden"
-                style={{ backgroundColor: '#F2EBD9' }}
+                className="overflow-hidden flex items-center justify-center"
+                style={{ backgroundColor: '#F2EBD9', maxHeight: '260px' }}
               >
                 {article.imageUrl ? (
                   <Image
                     src={article.imageUrl}
                     alt={article.titleRo}
-                    fill
-                    className="object-cover transition-transform group-hover:scale-105"
+                    width={600}
+                    height={400}
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="transition-transform group-hover:scale-105"
+                    style={{ width: '100%', height: 'auto', maxHeight: '260px', objectFit: 'contain' }}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
+                  <div className="w-full flex items-center justify-center" style={{ height: '192px' }}>
                     <span style={{ color: '#D4C8A0', fontSize: '48px' }} aria-hidden="true">☦</span>
                   </div>
                 )}

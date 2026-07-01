@@ -79,16 +79,17 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
                   >
                     {/* Thumbnail */}
                     <div
-                      className="relative shrink-0 overflow-hidden rounded"
+                      className="shrink-0 overflow-hidden rounded flex items-center justify-center"
                       style={{ width: '90px', height: '68px', backgroundColor: '#F2EBD9' }}
                     >
                       {article.imageUrl ? (
                         <Image
                           src={article.imageUrl}
                           alt={article.titleRo}
-                          fill
-                          className="object-cover"
+                          width={90}
+                          height={68}
                           sizes="90px"
+                          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">

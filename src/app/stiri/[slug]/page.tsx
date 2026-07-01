@@ -21,12 +21,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: article.titleRo,
     description: plainText,
+    alternates: { canonical: `/stiri/${slug}` },
     openGraph: {
       title: article.titleRo,
       description: plainText,
       type: 'article',
+      url: `/stiri/${slug}`,
+      siteName: 'Biserica Sfântul Ierarh Nicolae',
+      locale: 'ro_RO',
       publishedTime: article.publishedAt?.toISOString(),
       images: article.imageUrl ? [{ url: article.imageUrl, width: 1200, height: 630, alt: article.titleRo }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: article.titleRo,
+      description: plainText,
+      images: article.imageUrl ? [article.imageUrl] : undefined,
     },
   }
 }
@@ -76,12 +86,14 @@ export default async function ArticolPage({ params }: Props) {
 
       {/* Imagine principală */}
       {article.imageUrl && (
-        <div className="relative w-full mb-10 rounded-lg overflow-hidden" style={{ aspectRatio: '16/9' }}>
+        <div className="w-full mb-10 rounded-lg overflow-hidden" style={{ maxHeight: '70vh', display: 'flex', justifyContent: 'center', backgroundColor: '#F2EBD9' }}>
           <Image
             src={article.imageUrl}
             alt={article.titleRo}
-            fill
-            className="object-cover"
+            width={1200}
+            height={800}
+            sizes="(max-width: 768px) 100vw, 768px"
+            style={{ width: '100%', height: 'auto', maxHeight: '70vh', objectFit: 'contain' }}
             priority
           />
         </div>

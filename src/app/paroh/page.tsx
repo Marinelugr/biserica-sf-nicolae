@@ -10,10 +10,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `Parohul Bisericii — ${priest?.nameRo ?? 'Preot Paroh'} | Sf. Nicolae Hîrtopul Mic`,
     description: plainBio,
+    alternates: { canonical: '/paroh' },
     openGraph: {
       title: `${priest?.nameRo ?? 'Preot Paroh'} — Parohul Bisericii`,
       description: plainBio,
       type: 'profile',
+      url: '/paroh',
+      siteName: 'Biserica Sfântul Ierarh Nicolae',
+      locale: 'ro_RO',
       images: [{ url: priest?.photoUrl || '/og-default.jpg', width: 800, height: 600, alt: priest?.nameRo ?? 'Parohul Bisericii' }],
     },
   }
@@ -60,8 +64,8 @@ export default async function ParohPage() {
           {/* Fotografie */}
           <div className="flex-shrink-0 w-full md:w-auto flex justify-center md:block">
             {priest.photoUrl ? (
-              <div style={{ width: '280px', aspectRatio: '3/4', borderRadius: '8px', overflow: 'hidden', border: '3px solid #C9A84C', boxShadow: '0 4px 24px rgba(0,0,0,0.18)' }}>
-                <img src={priest.photoUrl} alt={priest.nameRo} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
+              <div style={{ width: '280px', maxHeight: '373px', borderRadius: '8px', overflow: 'hidden', border: '3px solid #C9A84C', boxShadow: '0 4px 24px rgba(0,0,0,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#F7F3EC' }}>
+                <img src={priest.photoUrl} alt={priest.nameRo} style={{ width: '100%', height: 'auto', maxHeight: '373px', objectFit: 'contain' }} />
               </div>
             ) : (
               <div style={{ width: '280px', aspectRatio: '3/4', borderRadius: '8px', backgroundColor: '#F7F3EC', border: '2px solid #E8DFC8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

@@ -43,9 +43,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${book.titleRo} | Bibliotecă Ortodoxă`,
     description: plain,
+    alternates: { canonical: `/carti/${slug}` },
     openGraph: {
       title: book.titleRo, description: plain, type: 'article',
+      url: `/carti/${slug}`,
+      siteName: 'Biserica Sfântul Ierarh Nicolae',
+      locale: 'ro_RO',
       images: book.imageUrl ? [{ url: book.imageUrl }] : [],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: book.titleRo,
+      description: plain,
+      images: book.imageUrl ? [book.imageUrl] : undefined,
     },
   }
 }
@@ -108,12 +118,14 @@ export default async function CartePage({ params }: Props) {
 
       {/* Imagine principală (cover) */}
       {book.imageUrl && (
-        <div className="relative w-full mb-10 rounded-xl overflow-hidden shadow-md" style={{ aspectRatio: '16/7' }}>
+        <div className="w-full mb-10 rounded-xl overflow-hidden shadow-md" style={{ maxHeight: '70vh', display: 'flex', justifyContent: 'center', backgroundColor: '#F2EBD9' }}>
           <Image
             src={book.imageUrl}
             alt={book.titleRo}
-            fill
-            className="object-cover"
+            width={1200}
+            height={800}
+            sizes="(max-width: 768px) 100vw, 768px"
+            style={{ width: '100%', height: 'auto', maxHeight: '70vh', objectFit: 'contain' }}
             priority
           />
         </div>

@@ -34,6 +34,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${cat.label} | Bibliotecă Ortodoxă — Sf. Nicolae Hîrtopul Mic`,
     description: cat.description,
+    alternates: { canonical: `/carti/categorie/${slug}` },
+    openGraph: {
+      title: `${cat.label} | Bibliotecă Ortodoxă`,
+      description: cat.description,
+      type: 'website',
+      url: `/carti/categorie/${slug}`,
+      siteName: 'Biserica Sfântul Ierarh Nicolae',
+      locale: 'ro_RO',
+    },
   }
 }
 
