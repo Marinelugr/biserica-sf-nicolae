@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useI18n, type Locale } from '@/lib/i18n/context'
 
 const LOCALES: Locale[] = ['ro', 'ru', 'en']
@@ -9,6 +10,12 @@ const LOCALES: Locale[] = ['ro', 'ru', 'en']
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { t, locale, setLocale } = useI18n()
+  const router = useRouter()
+
+  function changeLocale(l: Locale) {
+    setLocale(l)
+    router.refresh()
+  }
 
   const navLinks = [
     { href: '/', label: t.nav.home },
@@ -77,7 +84,7 @@ export default function Header() {
               {LOCALES.map((l, i) => (
                 <span key={l} className="flex items-center">
                   <button
-                    onClick={() => setLocale(l)}
+                    onClick={() => changeLocale(l)}
                     className="font-body uppercase transition-colors duration-200 hover:text-amber-400"
                     style={{
                       color: locale === l ? '#C9A84C' : '#5A4020',
@@ -143,7 +150,7 @@ export default function Header() {
               {LOCALES.map(l => (
                 <button
                   key={l}
-                  onClick={() => { setLocale(l); setMenuOpen(false) }}
+                  onClick={() => { changeLocale(l); setMenuOpen(false) }}
                   className="font-body uppercase transition-colors"
                   style={{
                     color: locale === l ? '#C9A84C' : '#5A4020',
