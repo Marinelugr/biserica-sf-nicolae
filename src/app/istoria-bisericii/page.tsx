@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick } from '@/lib/i18n/pick'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,35 +13,13 @@ export const metadata: Metadata = {
     'Istoria Bisericii Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Ctitorii, etapele de construcție și restaurare a lăcașului de cult de la întemeierea sa în secolul al XIX-lea.',
 }
 
-const FALLBACK_SECTIONS = [
-  {
-    title: 'Întemeierea (sec. XIX)',
-    text: `Prima atestare documentară a parohiei datează din a doua jumătate a secolului al XIX-lea. Conform mărturiilor orale și arhivelor ecleziastice, prima structură de lemn a fost ridicată de ctitorii din sat, cu sprijinul comunității locale. Hramul Sfântului Ierarh Nicolae — arhiepiscopul Mirelor Lichiei, ocrotitorul celor în nevoi — a fost ales de la bun început, reflectând evlavia deosebită a locuitorilor față de acest sfânt.`,
-  },
-  {
-    title: 'Construcția edificiului actual',
-    text: `La sfârșitul secolului al XIX-lea și începutul celui de-al XX-lea, comunitatea parohială a decis ridicarea unei noi biserici din piatră și cărămidă, mai trainice și mai încăpătoare. Lucrările s-au desfășurat în mai mulți ani, cu contribuția materială și fizică a credincioșilor din Hîrtopul Mic și din localitățile vecine. Arhitectura îmbină elemente ale stilului ecleziastic moldovenesc cu influențe neo-bizantine.`,
-  },
-  {
-    title: 'Perioadele de restriște',
-    text: `Ca toate lăcașurile de cult din Moldova, Biserica Sfântul Ierarh Nicolae a traversat perioade de restriște în secolul al XX-lea. În timpul regimului sovietic, activitatea religioasă a fost limitată, iar edificiul a suferit din lipsa întreținerii corespunzătoare. Cu toate acestea, credincioșii au păstrat vie tradiția ortodoxă, transmițindu-o din generație în generație.`,
-  },
-  {
-    title: 'Renașterea după 1991',
-    text: `Odată cu obținerea independenței Republicii Moldova, viața parohială a înflorit din nou. Au fost reluate slujbele regulate, comunitatea s-a reunit în jurul lăcașului sfânt, iar primele lucrări de renovare au putut fi efectuate. În deceniile următoare, cu sprijinul enoriașilor din țară și din diasporă, biserica a primit o serie de îmbunătățiri.`,
-  },
-  {
-    title: 'Proiecte actuale de restaurare',
-    text: `Parohia se află în prezent în mijlocul unui amplu program de restaurare și înfrumusețare. Prioritățile includ renovarea completă a acoperișului, restaurarea turnului clopotniță, realizarea picturii murale în interior și modernizarea instalațiilor. Aceste lucrări sunt posibile datorită jertfelnicitei contribuții a credincioșilor și a binecuvântării ierarhilor Mitropoliei Chișinăului și a întregii Moldove.`,
-  },
-]
-
 function extractYouTubeId(url: string): string | null {
   const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/)
   return m ? m[1] : null
 }
 
 export default async function IstoriaBisericiiPage() {
+  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
   let dynContent: string | null = null
   let videos: { url: string; title: string }[] = []
 
@@ -47,7 +27,8 @@ export default async function IstoriaBisericiiPage() {
     const setting = await prisma.setting.findUnique({ where: { key: 'church_history_content' } })
     if (setting) {
       const data = JSON.parse(setting.value)
-      dynContent = data.content || null
+      // suportă și forma veche { content } pentru compatibilitate cu datele deja introduse
+      dynContent = pick(locale, data.contentRo ?? data.content ?? '', data.contentRu, data.contentEn) || null
       videos = data.videos || []
     }
   } catch { /* use fallback */ }
@@ -63,7 +44,7 @@ export default async function IstoriaBisericiiPage() {
       <div className="w-full overflow-hidden" style={{ aspectRatio: '21/9', position: 'relative', maxHeight: '420px' }}>
         <Image
           src="/images/12.jpg"
-          alt="Vedere aeriană a Bisericii Sfântul Ierarh Nicolae, Hîrtopul Mic"
+          alt={t.home.heroImageAlt}
           fill
           className="object-cover object-center"
           priority
@@ -75,10 +56,10 @@ export default async function IstoriaBisericiiPage() {
       {/* Dark header */}
       <div className="py-14 px-4 text-center" style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}>
         <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
-          Parohia Sfântul Ierarh Nicolae
+          {t.priest.badge}
         </p>
         <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 400 }}>
-          Istoria Bisericii
+          {t.historyPage.pageTitle}
         </h1>
         <div className="flex items-center justify-center gap-3 mb-4">
           <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
@@ -86,9 +67,9 @@ export default async function IstoriaBisericiiPage() {
           <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
         </div>
         <p className="font-body text-sm" style={{ color: '#6A5030' }}>
-          Hîrtopul Mic · Raionul Criuleni · Republica Moldova
+          {t.home.heroSubtitle}
           <br />
-          Mitropolia Chișinăului și a întregii Moldove
+          {t.home.heroMitropolia}
         </p>
       </div>
 
@@ -102,11 +83,11 @@ export default async function IstoriaBisericiiPage() {
         ) : (
           <>
             <p className="font-body text-lg leading-relaxed mb-12 text-center italic" style={{ color: '#4A3020' }}>
-              Biserica Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, este unul dintre lăcașurile de cult cu o istorie îndelungată din ținuturile Moldovei. Întemeiată în secolul al XIX-lea, biserica a fost martoră a nenumărate generații de credincioși care și-au botezat pruncii, și-au cununat tinerii și și-au odihnit pe cei adormiți.
+              {t.historyPage.fallbackIntro}
             </p>
             <div className="h-px mb-12" style={{ backgroundColor: '#E8E5E0' }} />
             <div className="space-y-12">
-              {FALLBACK_SECTIONS.map((section, i) => (
+              {t.historyPage.sections.map((section, i) => (
                 <article key={i}>
                   <div className="flex items-center gap-3 mb-4">
                     <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: '#C9A84C' }} aria-hidden="true" />
@@ -127,7 +108,7 @@ export default async function IstoriaBisericiiPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="flex items-center gap-4 mb-8">
             <span className="flex-1 h-px" style={{ backgroundColor: '#D4C8A0' }} />
-            <h2 className="font-body text-xs uppercase tracking-[0.35em]" style={{ color: '#8A7050' }}>Galerie Foto</h2>
+            <h2 className="font-body text-xs uppercase tracking-[0.35em]" style={{ color: '#8A7050' }}>{t.common.gallery}</h2>
             <span className="flex-1 h-px" style={{ backgroundColor: '#D4C8A0' }} />
           </div>
 
@@ -135,7 +116,7 @@ export default async function IstoriaBisericiiPage() {
             <div className="text-center py-10">
               <span style={{ color: '#D4C8A0', fontSize: '40px' }} aria-hidden="true">📷</span>
               <p className="font-body text-sm mt-3" style={{ color: '#8A7050' }}>
-                Imaginile vor fi adăugate de administrator.
+                {t.historyPage.galleryEmpty}
               </p>
             </div>
           ) : (
@@ -149,7 +130,7 @@ export default async function IstoriaBisericiiPage() {
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
           <div className="flex items-center gap-4 mb-8">
             <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-            <h2 className="font-body text-xs uppercase tracking-[0.35em]" style={{ color: '#8A7050' }}>Video</h2>
+            <h2 className="font-body text-xs uppercase tracking-[0.35em]" style={{ color: '#8A7050' }}>{t.nav.video}</h2>
             <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
           </div>
 
@@ -157,7 +138,7 @@ export default async function IstoriaBisericiiPage() {
             <div className="rounded-lg p-8 text-center" style={{ backgroundColor: '#F7F3EC', border: '2px dashed #D4C8A0' }}>
               <span style={{ color: '#D4C8A0', fontSize: '40px' }} aria-hidden="true">▶</span>
               <p className="font-body text-sm mt-3" style={{ color: '#8A7050' }}>
-                Videoclipurile vor fi adăugate de administrator.
+                {t.historyPage.videosEmpty}
               </p>
             </div>
           ) : (
@@ -195,14 +176,14 @@ export default async function IstoriaBisericiiPage() {
         <div className="rounded-lg p-8 text-center" style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
           <span style={{ color: '#C9A84C', fontSize: '32px' }} aria-hidden="true">☦</span>
           <p className="font-body text-base mt-4 mb-6" style={{ color: '#4A3020' }}>
-            Susținerea lucrărilor de restaurare ale acestui lăcaș sfânt este un act de binecuvântare pentru generațiile viitoare.
+            {t.historyPage.ctaText}
           </p>
           <a
             href="/donatii"
             className="font-body text-sm px-6 py-2.5 rounded inline-block transition-all hover:opacity-90"
             style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}
           >
-            Susțineți restaurarea bisericii
+            {t.historyPage.ctaBtn}
           </a>
         </div>
       </div>

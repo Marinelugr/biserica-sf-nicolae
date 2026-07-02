@@ -39,18 +39,23 @@ interface ConfigForm {
   paypalEmail: string
   paypalLink: string
   contactName: string
+  contactNameRu: string
+  contactNameEn: string
   contactPhone: string
   facebookUrl: string
   tiktokUrl: string
   instagramUrl: string
   safetyNote: string
+  safetyNoteRu: string
+  safetyNoteEn: string
   videoLinks: VideoLink[]
 }
 
 const emptyConfig: ConfigForm = {
   localAccounts: [], ibanAccounts: [], paypalEmail: '', paypalLink: '',
-  contactName: '', contactPhone: '', facebookUrl: '', tiktokUrl: '', instagramUrl: '',
-  safetyNote: '', videoLinks: [],
+  contactName: '', contactNameRu: '', contactNameEn: '', contactPhone: '',
+  facebookUrl: '', tiktokUrl: '', instagramUrl: '',
+  safetyNote: '', safetyNoteRu: '', safetyNoteEn: '', videoLinks: [],
 }
 
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
@@ -92,11 +97,15 @@ export default function AdminDonatiiPage() {
         paypalEmail: data.paypalEmail || '',
         paypalLink: data.paypalLink || '',
         contactName: data.contactName || '',
+        contactNameRu: data.contactNameRu || '',
+        contactNameEn: data.contactNameEn || '',
         contactPhone: data.contactPhone || '',
         facebookUrl: data.facebookUrl || '',
         tiktokUrl: data.tiktokUrl || '',
         instagramUrl: data.instagramUrl || '',
         safetyNote: data.safetyNote || '',
+        safetyNoteRu: data.safetyNoteRu || '',
+        safetyNoteEn: data.safetyNoteEn || '',
         videoLinks: data.videoLinks || [],
       }))
       .catch(() => showToast('Eroare la încărcarea configurării', 'error'))
@@ -191,6 +200,30 @@ export default function AdminDonatiiPage() {
 
   function setConfigField<K extends keyof ConfigForm>(key: K, value: ConfigForm[K]) {
     setConfig(c => ({ ...c, [key]: value }))
+  }
+
+  async function translateConfigField(sourceField: 'contactName' | 'safetyNote', targetSuffix: 'Ru' | 'En') {
+    const key = `config-${sourceField}-${targetSuffix}`
+    const sourceText = config[sourceField]
+    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
+    setTranslating(t => ({ ...t, [key]: true }))
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sourceText, field: sourceField }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const lang = targetSuffix === 'Ru' ? 'ru' : 'en'
+      const targetField = (sourceField + targetSuffix) as keyof ConfigForm
+      setConfigField(targetField, data.translations[lang])
+      showToast('Tradus cu DeepL ✓', 'success')
+    } catch {
+      showToast('Eroare la traducere DeepL', 'error')
+    } finally {
+      setTranslating(t => ({ ...t, [key]: false }))
+    }
   }
 
   function addLocalAccount() {
@@ -421,6 +454,27 @@ export default function AdminDonatiiPage() {
                   </div>
                 </div>
 
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                      <label style={{ ...lbl, marginBottom: 0 }}>Nume contact (Rusă)</label>
+                      <button onClick={() => translateConfigField('contactName', 'Ru')} disabled={translating['config-contactName-Ru']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                        {translating['config-contactName-Ru'] ? '...' : '🔄 RU'}
+                      </button>
+                    </div>
+                    <input value={config.contactNameRu} onChange={e => setConfigField('contactNameRu', e.target.value)} style={inpSm} />
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                      <label style={{ ...lbl, marginBottom: 0 }}>Nume contact (Engleză)</label>
+                      <button onClick={() => translateConfigField('contactName', 'En')} disabled={translating['config-contactName-En']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                        {translating['config-contactName-En'] ? '...' : '🔄 EN'}
+                      </button>
+                    </div>
+                    <input value={config.contactNameEn} onChange={e => setConfigField('contactNameEn', e.target.value)} style={inpSm} />
+                  </div>
+                </div>
+
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
                     <label style={lbl}>Facebook URL</label>
@@ -436,9 +490,30 @@ export default function AdminDonatiiPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label style={lbl}>Notă de siguranță</label>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={lbl}>Notă de siguranță (Română)</label>
                   <textarea value={config.safetyNote} onChange={e => setConfigField('safetyNote', e.target.value)} rows={2} style={{ ...inp, resize: 'vertical' }} />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                      <label style={{ ...lbl, marginBottom: 0 }}>Notă de siguranță (Rusă)</label>
+                      <button onClick={() => translateConfigField('safetyNote', 'Ru')} disabled={translating['config-safetyNote-Ru']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                        {translating['config-safetyNote-Ru'] ? '...' : '🔄 RU'}
+                      </button>
+                    </div>
+                    <textarea value={config.safetyNoteRu} onChange={e => setConfigField('safetyNoteRu', e.target.value)} rows={2} style={{ ...inpSm, resize: 'vertical' }} />
+                  </div>
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                      <label style={{ ...lbl, marginBottom: 0 }}>Notă de siguranță (Engleză)</label>
+                      <button onClick={() => translateConfigField('safetyNote', 'En')} disabled={translating['config-safetyNote-En']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                        {translating['config-safetyNote-En'] ? '...' : '🔄 EN'}
+                      </button>
+                    </div>
+                    <textarea value={config.safetyNoteEn} onChange={e => setConfigField('safetyNoteEn', e.target.value)} rows={2} style={{ ...inpSm, resize: 'vertical' }} />
+                  </div>
                 </div>
               </>
             )}

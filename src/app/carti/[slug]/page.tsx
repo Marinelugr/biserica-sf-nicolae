@@ -3,17 +3,19 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import PublicGallery from '@/components/PublicGallery'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick } from '@/lib/i18n/pick'
 
 export const dynamic = 'force-dynamic'
 
 const CATEGORY_META = [
-  { key: 'ACATIST',   slug: 'acatist',   icon: '☦', color: '#8B1A1A', label: 'Acatiste' },
-  { key: 'CANON',     slug: 'canon',     icon: '✝', color: '#8B6014', label: 'Canoane' },
-  { key: 'RUGACIUNE', slug: 'rugaciune', icon: '🕯', color: '#6B4A2A', label: 'Rugăciuni' },
-  { key: 'SLUJBA',    slug: 'slujba',    icon: '⛪', color: '#4A6A2A', label: 'Slujbe' },
-  { key: 'VIATA',     slug: 'viata',     icon: '✦', color: '#1C4A6A', label: 'Vieți de Sfinți' },
-  { key: 'PREDICA',   slug: 'predica',   icon: '📖', color: '#4A1A6A', label: 'Predici' },
-  { key: 'ALTELE',    slug: 'altele',    icon: '◆', color: '#5A5050', label: 'Altele' },
+  { key: 'ACATIST',   slug: 'acatist',   icon: '☦', color: '#8B1A1A' },
+  { key: 'CANON',     slug: 'canon',     icon: '✝', color: '#8B6014' },
+  { key: 'RUGACIUNE', slug: 'rugaciune', icon: '🕯', color: '#6B4A2A' },
+  { key: 'SLUJBA',    slug: 'slujba',    icon: '⛪', color: '#4A6A2A' },
+  { key: 'VIATA',     slug: 'viata',     icon: '✦', color: '#1C4A6A' },
+  { key: 'PREDICA',   slug: 'predica',   icon: '📖', color: '#4A1A6A' },
+  { key: 'ALTELE',    slug: 'altele',    icon: '◆', color: '#5A5050' },
 ] as const
 
 function extractYouTubeId(url: string): string | null {
@@ -28,8 +30,8 @@ async function getBook(slug: string) {
   return prisma.libraryBook.findUnique({
     where: { slug },
     select: {
-      slug: true, titleRo: true, type: true,
-      contentRo: true, author: true, source: true,
+      slug: true, titleRo: true, titleRu: true, titleEn: true, type: true,
+      contentRo: true, contentRu: true, contentEn: true, author: true, source: true,
       imageUrl: true, galleryUrls: true, videoUrl: true, videoTitle: true,
     },
   })
@@ -39,13 +41,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const book = await getBook(slug)
   if (!book) return {}
-  const plain = book.contentRo.replace(/<[^>]*>/g, '').substring(0, 160)
+  const locale = await getServerLocale()
+  const title = pick(locale, book.titleRo, book.titleRu, book.titleEn)
+  const content = pick(locale, book.contentRo, book.contentRu, book.contentEn)
+  const plain = content.replace(/<[^>]*>/g, '').substring(0, 160)
   return {
-    title: `${book.titleRo} | Bibliotecă Ortodoxă`,
+    title: `${title} | Bibliotecă Ortodoxă`,
     description: plain,
     alternates: { canonical: `/carti/${slug}` },
     openGraph: {
-      title: book.titleRo, description: plain, type: 'article',
+      title, description: plain, type: 'article',
       url: `/carti/${slug}`,
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
@@ -53,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: book.titleRo,
+      title,
       description: plain,
       images: book.imageUrl ? [book.imageUrl] : undefined,
     },
@@ -62,7 +67,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CartePage({ params }: Props) {
   const { slug } = await params
-  const book = await getBook(slug)
+  const [book, t, locale] = await Promise.all([getBook(slug), getServerT(), getServerLocale()])
   if (!book) notFound()
 
   const cat = CATEGORY_META.find(c => c.key === book.type) ?? CATEGORY_META[CATEGORY_META.length - 1]
@@ -70,6 +75,9 @@ export default async function CartePage({ params }: Props) {
   const galleryItems = (book.galleryUrls || []).map((url, i) => ({
     id: String(i), url, thumbnailUrl: url, caption: null,
   }))
+  const title = pick(locale, book.titleRo, book.titleRu, book.titleEn)
+  const content = pick(locale, book.contentRo, book.contentRu, book.contentEn)
+  const categoryLabel = t.books.categories[cat.key]
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -77,18 +85,18 @@ export default async function CartePage({ params }: Props) {
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 mb-10 font-body text-sm flex-wrap" style={{ color: '#8A7050' }}>
         <Link href="/" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          Acasă
+          {t.nav.home}
         </Link>
         <span aria-hidden="true">›</span>
         <Link href="/carti" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          Bibliotecă Ortodoxă
+          {t.books.title}
         </Link>
         <span aria-hidden="true">›</span>
         <Link href={`/carti/categorie/${cat.slug}`} className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          {cat.label}
+          {categoryLabel}
         </Link>
         <span aria-hidden="true">›</span>
-        <span className="truncate max-w-[200px]">{book.titleRo}</span>
+        <span className="truncate max-w-[200px]">{title}</span>
       </nav>
 
       {/* Header */}
@@ -97,10 +105,10 @@ export default async function CartePage({ params }: Props) {
           {cat.icon}
         </span>
         <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
-          {cat.label}
+          {categoryLabel}
         </p>
         <h1 className="font-heading leading-tight mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(22px, 4vw, 36px)' }}>
-          {book.titleRo}
+          {title}
         </h1>
         {(book.author || book.source) && (
           <p className="font-body text-sm" style={{ color: '#8A7050' }}>
@@ -121,7 +129,7 @@ export default async function CartePage({ params }: Props) {
         <div className="w-full mb-10 rounded-xl overflow-hidden shadow-md" style={{ maxHeight: '70vh', display: 'flex', justifyContent: 'center', backgroundColor: '#F2EBD9' }}>
           <Image
             src={book.imageUrl}
-            alt={book.titleRo}
+            alt={title}
             width={1200}
             height={800}
             sizes="(max-width: 768px) 100vw, 768px"
@@ -142,7 +150,7 @@ export default async function CartePage({ params }: Props) {
           <div className="rounded-xl overflow-hidden shadow-md" style={{ aspectRatio: '16/9' }}>
             <iframe
               src={`https://www.youtube.com/embed/${ytId}`}
-              title={book.videoTitle || book.titleRo}
+              title={book.videoTitle || title}
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
@@ -155,7 +163,7 @@ export default async function CartePage({ params }: Props) {
       <div
         className="font-body prose prose-lg max-w-none"
         style={{ color: '#2A1A0A', lineHeight: 1.9, fontSize: '1.05rem' }}
-        dangerouslySetInnerHTML={{ __html: book.contentRo }}
+        dangerouslySetInnerHTML={{ __html: content }}
       />
 
       {/* Galerie imagini */}
@@ -163,7 +171,7 @@ export default async function CartePage({ params }: Props) {
         <div className="mt-12">
           <div className="flex items-center gap-3 mb-6">
             <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-            <span className="font-body text-xs uppercase tracking-[0.3em]" style={{ color: '#8A7050' }}>Galerie foto</span>
+            <span className="font-body text-xs uppercase tracking-[0.3em]" style={{ color: '#8A7050' }}>{t.common.gallery}</span>
             <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
           </div>
           <PublicGallery items={galleryItems} />
@@ -177,14 +185,14 @@ export default async function CartePage({ params }: Props) {
           className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
           style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
         >
-          ← Înapoi la {cat.label}
+          ← {t.common.backTo} {categoryLabel}
         </Link>
         <Link
           href="/carti"
           className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
           style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
         >
-          Toate categoriile →
+          {t.common.allCategories}
         </Link>
       </div>
 

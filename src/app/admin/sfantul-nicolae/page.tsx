@@ -25,39 +25,83 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
   )
 }
 
+interface ContentForm {
+  lifeRo: string; lifeRu: string; lifeEn: string
+  troparRo: string; troparRu: string; troparEn: string
+  condacRo: string; condacRu: string; condacEn: string
+  iconUrl: string
+  feast1Ro: string; feast1Ru: string; feast1En: string
+  feast1DescRo: string; feast1DescRu: string; feast1DescEn: string
+  feast2Ro: string; feast2Ru: string; feast2En: string
+  feast2DescRo: string; feast2DescRu: string; feast2DescEn: string
+}
+
+const DEFAULT_FEAST1_RO = '19 Decembrie — Adormirea Sfântului Nicolae'
+const DEFAULT_FEAST1_DESC_RO = 'Ziua principală de prăznuire. Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.'
+const DEFAULT_FEAST2_RO = '22 Mai — Aducerea Sfintelor Moaște la Bari'
+const DEFAULT_FEAST2_DESC_RO = 'Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087.'
+
+const emptyForm: ContentForm = {
+  lifeRo: '', lifeRu: '', lifeEn: '',
+  troparRo: '', troparRu: '', troparEn: '',
+  condacRo: '', condacRu: '', condacEn: '',
+  iconUrl: '',
+  feast1Ro: DEFAULT_FEAST1_RO, feast1Ru: '', feast1En: '',
+  feast1DescRo: DEFAULT_FEAST1_DESC_RO, feast1DescRu: '', feast1DescEn: '',
+  feast2Ro: DEFAULT_FEAST2_RO, feast2Ru: '', feast2En: '',
+  feast2DescRo: DEFAULT_FEAST2_DESC_RO, feast2DescRu: '', feast2DescEn: '',
+}
+
 export default function AdminSfantulNicolaePage() {
-  const [life, setLife] = useState('')
-  const [tropar, setTropar] = useState('')
-  const [condac, setCondac] = useState('')
-  const [iconUrl, setIconUrl] = useState('')
-  const [feast1, setFeast1] = useState('19 Decembrie — Adormirea Sfântului Nicolae')
-  const [feast1Desc, setFeast1Desc] = useState('Ziua principală de prăznuire. Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.')
-  const [feast2, setFeast2] = useState('22 Mai — Aducerea Sfintelor Moaște la Bari')
-  const [feast2Desc, setFeast2Desc] = useState('Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087.')
+  const [form, setForm] = useState<ContentForm>(emptyForm)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
+  const set = (key: keyof ContentForm, val: string) => setForm(f => ({ ...f, [key]: val }))
 
   useEffect(() => {
     fetch('/api/admin/settings?key=saint_nicholas_content')
       .then(r => r.json())
       .then(data => {
         if (data) {
-          setLife(data.life || '')
-          setTropar(data.tropar || '')
-          setCondac(data.condac || '')
-          setIconUrl(data.iconUrl || '')
-          setFeast1(data.feast1 || '19 Decembrie — Adormirea Sfântului Nicolae')
-          setFeast1Desc(data.feast1Desc || 'Ziua principală de prăznuire. Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.')
-          setFeast2(data.feast2 || '22 Mai — Aducerea Sfintelor Moaște la Bari')
-          setFeast2Desc(data.feast2Desc || 'Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087.')
+          setForm({
+            // suportă și forma veche (un singur câmp per limbă) pentru compatibilitate cu datele deja introduse
+            lifeRo: data.lifeRo ?? data.life ?? '', lifeRu: data.lifeRu ?? '', lifeEn: data.lifeEn ?? '',
+            troparRo: data.troparRo ?? data.tropar ?? '', troparRu: data.troparRu ?? '', troparEn: data.troparEn ?? '',
+            condacRo: data.condacRo ?? data.condac ?? '', condacRu: data.condacRu ?? '', condacEn: data.condacEn ?? '',
+            iconUrl: data.iconUrl || '',
+            feast1Ro: data.feast1Ro ?? data.feast1 ?? DEFAULT_FEAST1_RO, feast1Ru: data.feast1Ru ?? '', feast1En: data.feast1En ?? '',
+            feast1DescRo: data.feast1DescRo ?? data.feast1Desc ?? DEFAULT_FEAST1_DESC_RO, feast1DescRu: data.feast1DescRu ?? '', feast1DescEn: data.feast1DescEn ?? '',
+            feast2Ro: data.feast2Ro ?? data.feast2 ?? DEFAULT_FEAST2_RO, feast2Ru: data.feast2Ru ?? '', feast2En: data.feast2En ?? '',
+            feast2DescRo: data.feast2DescRo ?? data.feast2Desc ?? DEFAULT_FEAST2_DESC_RO, feast2DescRu: data.feast2DescRu ?? '', feast2DescEn: data.feast2DescEn ?? '',
+          })
         }
         setLoading(false)
       })
       .catch(() => setLoading(false))
   }, [])
+
+  async function translateField(sourceField: keyof ContentForm, targetField: keyof ContentForm) {
+    const sourceText = form[sourceField]
+    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
+    setTranslating(t => ({ ...t, [targetField]: true }))
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sourceText, field: targetField }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const lang = String(targetField).endsWith('Ru') ? 'ru' : 'en'
+      set(targetField, data.translations[lang])
+      showToast('Tradus cu DeepL ✓', 'success')
+    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    finally { setTranslating(t => ({ ...t, [targetField]: false })) }
+  }
 
   async function handleSave() {
     setSaving(true)
@@ -65,7 +109,7 @@ export default function AdminSfantulNicolaePage() {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'saint_nicholas_content', value: { life, tropar, condac, iconUrl, feast1, feast1Desc, feast2, feast2Desc } }),
+        body: JSON.stringify({ key: 'saint_nicholas_content', value: form }),
       })
       if (!res.ok) throw new Error('Eroare la salvare')
       showToast('Conținut salvat cu succes ✓', 'success')
@@ -116,20 +160,20 @@ export default function AdminSfantulNicolaePage() {
                     <label style={lbl}>URL icoană</label>
                     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                       <input
-                        value={iconUrl}
-                        onChange={e => setIconUrl(e.target.value)}
+                        value={form.iconUrl}
+                        onChange={e => set('iconUrl', e.target.value)}
                         placeholder="https://... sau încarcă mai jos"
                         style={{ ...inp, flex: 1 }}
                       />
-                      <ImageUploadButton onUpload={url => setIconUrl(url)} />
+                      <ImageUploadButton onUpload={url => set('iconUrl', url)} />
                     </div>
                     <p style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.4rem' }}>
                       Introduceți un URL sau încărcați direct din calculator.
                     </p>
                   </div>
-                  {iconUrl && (
+                  {form.iconUrl && (
                     <div style={{ flexShrink: 0, width: '100px', height: '120px', borderRadius: '6px', overflow: 'hidden', border: '1px solid #2A1A0A' }}>
-                      <img src={iconUrl} alt="Icoana" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                      <img src={form.iconUrl} alt="Icoana" style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                     </div>
                   )}
                 </div>
@@ -148,12 +192,44 @@ export default function AdminSfantulNicolaePage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       <div>
-                        <label style={lbl}>Titlu</label>
-                        <input value={feast1} onChange={e => setFeast1(e.target.value)} style={inp} />
+                        <label style={lbl}>Titlu (Română)</label>
+                        <input value={form.feast1Ro} onChange={e => set('feast1Ro', e.target.value)} style={inp} />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
+                            <button onClick={() => translateField('feast1Ro', 'feast1Ru')} disabled={translating['feast1Ru']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 RU</button>
+                          </div>
+                          <input value={form.feast1Ru} onChange={e => set('feast1Ru', e.target.value)} style={inp} />
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Engleză)</label>
+                            <button onClick={() => translateField('feast1Ro', 'feast1En')} disabled={translating['feast1En']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 EN</button>
+                          </div>
+                          <input value={form.feast1En} onChange={e => set('feast1En', e.target.value)} style={inp} />
+                        </div>
                       </div>
                       <div>
-                        <label style={lbl}>Descriere</label>
-                        <input value={feast1Desc} onChange={e => setFeast1Desc(e.target.value)} style={inp} />
+                        <label style={lbl}>Descriere (Română)</label>
+                        <input value={form.feast1DescRo} onChange={e => set('feast1DescRo', e.target.value)} style={inp} />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Rusă)</label>
+                            <button onClick={() => translateField('feast1DescRo', 'feast1DescRu')} disabled={translating['feast1DescRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 RU</button>
+                          </div>
+                          <input value={form.feast1DescRu} onChange={e => set('feast1DescRu', e.target.value)} style={inp} />
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Engleză)</label>
+                            <button onClick={() => translateField('feast1DescRo', 'feast1DescEn')} disabled={translating['feast1DescEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 EN</button>
+                          </div>
+                          <input value={form.feast1DescEn} onChange={e => set('feast1DescEn', e.target.value)} style={inp} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -166,12 +242,44 @@ export default function AdminSfantulNicolaePage() {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       <div>
-                        <label style={lbl}>Titlu</label>
-                        <input value={feast2} onChange={e => setFeast2(e.target.value)} style={inp} />
+                        <label style={lbl}>Titlu (Română)</label>
+                        <input value={form.feast2Ro} onChange={e => set('feast2Ro', e.target.value)} style={inp} />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
+                            <button onClick={() => translateField('feast2Ro', 'feast2Ru')} disabled={translating['feast2Ru']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 RU</button>
+                          </div>
+                          <input value={form.feast2Ru} onChange={e => set('feast2Ru', e.target.value)} style={inp} />
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Engleză)</label>
+                            <button onClick={() => translateField('feast2Ro', 'feast2En')} disabled={translating['feast2En']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 EN</button>
+                          </div>
+                          <input value={form.feast2En} onChange={e => set('feast2En', e.target.value)} style={inp} />
+                        </div>
                       </div>
                       <div>
-                        <label style={lbl}>Descriere</label>
-                        <input value={feast2Desc} onChange={e => setFeast2Desc(e.target.value)} style={inp} />
+                        <label style={lbl}>Descriere (Română)</label>
+                        <input value={form.feast2DescRo} onChange={e => set('feast2DescRo', e.target.value)} style={inp} />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Rusă)</label>
+                            <button onClick={() => translateField('feast2DescRo', 'feast2DescRu')} disabled={translating['feast2DescRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 RU</button>
+                          </div>
+                          <input value={form.feast2DescRu} onChange={e => set('feast2DescRu', e.target.value)} style={inp} />
+                        </div>
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                            <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Engleză)</label>
+                            <button onClick={() => translateField('feast2DescRo', 'feast2DescEn')} disabled={translating['feast2DescEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>🔄 EN</button>
+                          </div>
+                          <input value={form.feast2DescEn} onChange={e => set('feast2DescEn', e.target.value)} style={inp} />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -180,23 +288,43 @@ export default function AdminSfantulNicolaePage() {
 
               {/* ─── Viața sfântului ─── */}
               <div style={sectionBox}>
-                <div style={sectionTitle}>📖 Viața Sfântului (conținut principal)</div>
+                <div style={sectionTitle}>📖 Viața Sfântului — Română (conținut principal)</div>
                 <p style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginBottom: '0.875rem' }}>
                   Editați biografia Sfântului Ierarh Nicolae. Aceasta va înlocui textul implicit de pe pagina publică.
                 </p>
                 <TipTapEditor
-                  value={life}
-                  onChange={setLife}
+                  value={form.lifeRo}
+                  onChange={v => set('lifeRo', v)}
                   placeholder="Sfântul Ierarh Nicolae s-a născut..."
                 />
               </div>
 
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>📖 Viața Sfântului — Rusă</span>
+                  <button onClick={() => translateField('lifeRo', 'lifeRu')} disabled={translating['lifeRu']} style={btnGhost}>
+                    {translating['lifeRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
+                  </button>
+                </div>
+                <TipTapEditor value={form.lifeRu} onChange={v => set('lifeRu', v)} placeholder="Житие святителя Николая..." />
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>📖 Viața Sfântului — Engleză</span>
+                  <button onClick={() => translateField('lifeRo', 'lifeEn')} disabled={translating['lifeEn']} style={btnGhost}>
+                    {translating['lifeEn'] ? 'Se traduce...' : '🔄 Traduce EN'}
+                  </button>
+                </div>
+                <TipTapEditor value={form.lifeEn} onChange={v => set('lifeEn', v)} placeholder="The life of Saint Nicholas..." />
+              </div>
+
               {/* ─── Tropar ─── */}
               <div style={sectionBox}>
-                <div style={sectionTitle}>🎵 Troparul</div>
+                <div style={sectionTitle}>🎵 Troparul (Română)</div>
                 <textarea
-                  value={tropar}
-                  onChange={e => setTropar(e.target.value)}
+                  value={form.troparRo}
+                  onChange={e => set('troparRo', e.target.value)}
                   rows={6}
                   placeholder="Regulă a credinței și chip al blândeții..."
                   style={{ ...inp, resize: 'vertical', lineHeight: '1.8' }}
@@ -206,16 +334,59 @@ export default function AdminSfantulNicolaePage() {
                 </p>
               </div>
 
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>🎵 Troparul (Rusă / slavonă bisericească)</span>
+                  <button onClick={() => translateField('troparRo', 'troparRu')} disabled={translating['troparRu']} style={btnGhost}>
+                    {translating['troparRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
+                  </button>
+                </div>
+                <textarea value={form.troparRu} onChange={e => set('troparRu', e.target.value)} rows={6} style={{ ...inp, resize: 'vertical', lineHeight: '1.8' }} />
+                <p style={{ color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.4rem' }}>
+                  Recomandat: textul liturgic tradițional (slavonă/rusă), nu traducere automată — corectați manual după traducerea DeepL.
+                </p>
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>🎵 Troparul (Engleză)</span>
+                  <button onClick={() => translateField('troparRo', 'troparEn')} disabled={translating['troparEn']} style={btnGhost}>
+                    {translating['troparEn'] ? 'Se traduce...' : '🔄 Traduce EN'}
+                  </button>
+                </div>
+                <textarea value={form.troparEn} onChange={e => set('troparEn', e.target.value)} rows={6} style={{ ...inp, resize: 'vertical', lineHeight: '1.8' }} />
+              </div>
+
               {/* ─── Condac ─── */}
               <div style={sectionBox}>
-                <div style={sectionTitle}>🎵 Condacul</div>
+                <div style={sectionTitle}>🎵 Condacul (Română)</div>
                 <textarea
-                  value={condac}
-                  onChange={e => setCondac(e.target.value)}
+                  value={form.condacRo}
+                  onChange={e => set('condacRo', e.target.value)}
                   rows={6}
                   placeholder="În Mireele Lichiei, sfinte, sfințitor te-ai arătat..."
                   style={{ ...inp, resize: 'vertical', lineHeight: '1.8' }}
                 />
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>🎵 Condacul (Rusă / slavonă bisericească)</span>
+                  <button onClick={() => translateField('condacRo', 'condacRu')} disabled={translating['condacRu']} style={btnGhost}>
+                    {translating['condacRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
+                  </button>
+                </div>
+                <textarea value={form.condacRu} onChange={e => set('condacRu', e.target.value)} rows={6} style={{ ...inp, resize: 'vertical', lineHeight: '1.8' }} />
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>🎵 Condacul (Engleză)</span>
+                  <button onClick={() => translateField('condacRo', 'condacEn')} disabled={translating['condacEn']} style={btnGhost}>
+                    {translating['condacEn'] ? 'Se traduce...' : '🔄 Traduce EN'}
+                  </button>
+                </div>
+                <textarea value={form.condacEn} onChange={e => set('condacEn', e.target.value)} rows={6} style={{ ...inp, resize: 'vertical', lineHeight: '1.8' }} />
               </div>
 
               {/* ─── Galerie imagini ─── */}

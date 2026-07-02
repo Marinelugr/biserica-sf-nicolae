@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick } from '@/lib/i18n/pick'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,13 +11,13 @@ export const metadata: Metadata = {
 }
 
 const CATEGORY_META = [
-  { key: 'ACATIST', icon: '☦', color: '#8B1A1A', bg: '#FDF5F5', border: '#F0D5D5', description: 'Acatistele sfinților și ale Maicii Domnului' },
-  { key: 'CANON',   icon: '✝', color: '#8B6014', bg: '#FDF8EF', border: '#E8D8B0', description: 'Canoane de rugăciune și pocăință' },
-  { key: 'RUGACIUNE', icon: '🕯', color: '#6B4A2A', bg: '#FAF5EE', border: '#DDD0B8', description: 'Rugăciuni de dimineață, seară și speciale' },
-  { key: 'SLUJBA',  icon: '⛪', color: '#4A6A2A', bg: '#F5FAF0', border: '#C8D8B8', description: 'Tipicul slujbelor liturgice ortodoxe' },
-  { key: 'VIATA',   icon: '✦', color: '#1C4A6A', bg: '#F0F5FA', border: '#B8C8D8', description: 'Prologul și vieținele sfinților' },
-  { key: 'PREDICA', icon: '📖', color: '#4A1A6A', bg: '#F5F0FA', border: '#C8B8D8', description: 'Cuvântări și predici duhovnicești' },
-  { key: 'ALTELE',  icon: '◆', color: '#5A5050', bg: '#F8F7F5', border: '#E0DEDA', description: 'Alte texte liturgice și duhovnicești' },
+  { key: 'ACATIST', icon: '☦', color: '#8B1A1A', bg: '#FDF5F5', border: '#F0D5D5' },
+  { key: 'CANON',   icon: '✝', color: '#8B6014', bg: '#FDF8EF', border: '#E8D8B0' },
+  { key: 'RUGACIUNE', icon: '🕯', color: '#6B4A2A', bg: '#FAF5EE', border: '#DDD0B8' },
+  { key: 'SLUJBA',  icon: '⛪', color: '#4A6A2A', bg: '#F5FAF0', border: '#C8D8B8' },
+  { key: 'VIATA',   icon: '✦', color: '#1C4A6A', bg: '#F0F5FA', border: '#B8C8D8' },
+  { key: 'PREDICA', icon: '📖', color: '#4A1A6A', bg: '#F5F0FA', border: '#C8B8D8' },
+  { key: 'ALTELE',  icon: '◆', color: '#5A5050', bg: '#F8F7F5', border: '#E0DEDA' },
 ] as const
 
 type CategoryKey = typeof CATEGORY_META[number]['key']
@@ -38,7 +39,7 @@ async function getRecentBooks() {
   try {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.libraryBook.findMany({
-      select: { slug: true, titleRo: true, type: true },
+      select: { slug: true, titleRo: true, titleRu: true, titleEn: true, type: true },
       orderBy: { createdAt: 'desc' },
       take: 6,
     })
@@ -48,7 +49,7 @@ async function getRecentBooks() {
 }
 
 export default async function CartiPage() {
-  const [counts, recentBooks, t] = await Promise.all([getCounts(), getRecentBooks(), getServerT()])
+  const [counts, recentBooks, t, locale] = await Promise.all([getCounts(), getRecentBooks(), getServerT(), getServerLocale()])
   const totalBooks = Object.values(counts).reduce((a, b) => a + b, 0)
 
   return (
@@ -119,14 +120,14 @@ export default async function CartiPage() {
                       {t.books.categories[cat.key as CategoryKey]}
                     </h2>
                     <p className="font-body text-xs mb-3" style={{ color: '#8A7050' }}>
-                      {cat.description}
+                      {t.books.categoryDescriptions[cat.key]}
                     </p>
                     {count > 0 && (
                       <span
                         className="font-body text-xs px-2 py-0.5 rounded-full"
                         style={{ backgroundColor: cat.color, color: '#F2EBD9' }}
                       >
-                        {count} {count === 1 ? 'text' : 'texte'}
+                        {count} {count === 1 ? t.books.textSingular : t.books.textPlural}
                       </span>
                     )}
                   </Link>
@@ -161,7 +162,7 @@ export default async function CartiPage() {
                           )}
                           <span className="font-body text-sm group-hover:underline underline-offset-2"
                             style={{ color: '#3A1A1A', textDecorationColor: '#C9A84C' }}>
-                            {book.titleRo}
+                            {pick(locale, book.titleRo, book.titleRu, book.titleEn)}
                           </span>
                         </div>
                         <span className="ml-3 transition-transform group-hover:translate-x-1 shrink-0"

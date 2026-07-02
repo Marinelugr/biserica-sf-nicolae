@@ -4,10 +4,12 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { formatDate } from '@/lib/utils'
+import { useI18n } from '@/lib/i18n/context'
+import { localeToIntl } from '@/lib/i18n/pick'
 
 interface Article {
   slug: string
-  titleRo: string
+  title: string
   imageUrl: string | null
   publishedAt: Date | null
   category: string | null
@@ -15,7 +17,7 @@ interface Article {
 
 interface LibraryItem {
   slug: string
-  titleRo: string
+  title: string
   type: string
 }
 
@@ -24,16 +26,10 @@ interface NewsAndLibraryProps {
   libraryBooks: LibraryItem[]
 }
 
-const typeLabels: Record<string, string> = {
-  ACATIST: 'Acatist',
-  CANON: 'Canon',
-  BIBLIE: 'Biblie',
-  RUGACIUNE: 'Rugăciune',
-  VIATA: 'Viața Sfântului',
-  SLUJBA: 'Slujbă',
-}
-
 export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibraryProps) {
+  const { t, locale } = useI18n()
+  const typeLabels: Record<string, string> = t.books.categories
+
   return (
     <section style={{ backgroundColor: '#FFFFFF' }} className="py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -44,10 +40,10 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
             <div className="flex items-end justify-between mb-8">
               <div>
                 <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
-                  Parohia noastră
+                  {t.home.ourParish}
                 </p>
                 <h2 className="font-heading text-3xl" style={{ color: '#1C1B3A' }}>
-                  Ultimele Știri
+                  {t.home.latestNews}
                 </h2>
               </div>
               <Link
@@ -55,7 +51,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
                 className="font-body text-sm transition-colors hover:opacity-70"
                 style={{ color: '#C9A84C' }}
               >
-                Toate →
+                {t.home.viewAllLink}
               </Link>
             </div>
 
@@ -64,7 +60,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
 
             {articles.length === 0 ? (
               <p className="font-body italic" style={{ color: '#8A7050' }}>
-                Nu există știri publicate momentan.
+                {t.home.noNews}
               </p>
             ) : (
               <div className="space-y-6">
@@ -85,7 +81,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
                       {article.imageUrl ? (
                         <Image
                           src={article.imageUrl}
-                          alt={article.titleRo}
+                          alt={article.title}
                           width={90}
                           height={68}
                           sizes="90px"
@@ -113,7 +109,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
                           className="font-heading text-lg leading-snug mt-0.5 group-hover:underline underline-offset-2 line-clamp-2"
                           style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}
                         >
-                          {article.titleRo}
+                          {article.title}
                         </h3>
                       </Link>
                       {article.publishedAt && (
@@ -122,7 +118,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
                           className="font-body text-xs mt-1 block"
                           style={{ color: '#8A7050' }}
                         >
-                          {formatDate(article.publishedAt)}
+                          {formatDate(article.publishedAt, localeToIntl(locale))}
                         </time>
                       )}
                     </div>
@@ -142,10 +138,10 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
             <div className="flex items-end justify-between mb-8">
               <div>
                 <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
-                  Texte sacre
+                  {t.home.sacredTexts}
                 </p>
                 <h2 className="font-heading text-3xl" style={{ color: '#1C1B3A' }}>
-                  Bibliotecă
+                  {t.home.libraryLabel}
                 </h2>
               </div>
               <Link
@@ -153,7 +149,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
                 className="font-body text-sm transition-colors hover:opacity-70"
                 style={{ color: '#C9A84C' }}
               >
-                Toate →
+                {t.home.viewAllLink}
               </Link>
             </div>
 
@@ -162,7 +158,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
 
             {libraryBooks.length === 0 ? (
               <p className="font-body italic" style={{ color: '#8A7050' }}>
-                Biblioteca este în curs de completare.
+                {t.home.libraryInProgress}
               </p>
             ) : (
               <ul className="space-y-0">
@@ -190,7 +186,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
                           className="font-body text-sm leading-snug group-hover:underline underline-offset-2 line-clamp-2"
                           style={{ color: '#3A1A1A', textDecorationColor: '#C9A84C' }}
                         >
-                          {book.titleRo}
+                          {book.title}
                         </span>
                       </div>
                       <span
@@ -209,14 +205,14 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
             {/* Call to action */}
             <div className="mt-8 p-4 rounded-md" style={{ backgroundColor: '#F2EBD9', border: '1px solid #D4C8A0' }}>
               <p className="font-body text-sm mb-3" style={{ color: '#3A1A1A' }}>
-                Caută în Sfânta Scriptură
+                {t.home.searchInScripture}
               </p>
               <Link
                 href="/biblie"
                 className="font-body text-sm inline-flex items-center gap-2 px-4 py-2 rounded transition-all hover:opacity-90"
                 style={{ backgroundColor: '#1C1B3A', color: '#F2EBD9' }}
               >
-                ☦ Biblia Ortodoxă
+                {t.home.orthodoxBibleBtn}
               </Link>
             </div>
           </div>

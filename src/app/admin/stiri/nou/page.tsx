@@ -22,13 +22,32 @@ function slugify(text: string) {
 
 export default function NouArticolPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ titleRo: '', slug: '', category: '', imageUrl: '', published: false, content: '' })
+  const [form, setForm] = useState({ titleRo: '', titleRu: '', titleEn: '', slug: '', category: '', imageUrl: '', published: false, contentRo: '', contentRu: '', contentEn: '' })
   const [saving, setSaving] = useState(false)
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [error, setError] = useState('')
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const title = e.target.value
     setForm(f => ({ ...f, titleRo: title, slug: slugify(title) }))
+  }
+
+  async function translate(field: string) {
+    const sourceText = field.startsWith('title') ? form.titleRo : form.contentRo
+    if (!sourceText.trim()) { setError('Completați mai întâi câmpul în română'); return }
+    setTranslating(t => ({ ...t, [field]: true }))
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sourceText, field }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
+      setForm(f => ({ ...f, [field]: val }))
+    } catch { setError('Eroare la traducere DeepL') }
+    finally { setTranslating(t => ({ ...t, [field]: false })) }
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -63,6 +82,7 @@ export default function NouArticolPage() {
     display: 'block', color: '#9B8050', fontSize: '0.875rem',
     marginBottom: '0.375rem', fontFamily: 'Georgia, serif',
   }
+  const btnGhost: React.CSSProperties = { backgroundColor: 'transparent', color: '#9B8050', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.2rem 0.5rem', fontFamily: 'Georgia, serif', fontSize: '0.7rem', cursor: 'pointer' }
 
   return (
     <div style={{ display: 'flex', flex: 1 }}>
@@ -86,9 +106,30 @@ export default function NouArticolPage() {
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gap: '1.25rem', maxWidth: '860px' }}>
               <div>
-                <label style={lbl}>Titlu *</label>
+                <label style={lbl}>Titlu (Română) *</label>
                 <input type="text" value={form.titleRo} onChange={handleTitleChange} required
                   placeholder="Titlul articolului" style={inp} />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+                    <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
+                    <button type="button" onClick={() => translate('titleRu')} disabled={!!translating['titleRu']} style={btnGhost}>
+                    {translating['titleRu'] ? '...' : '🔄 RU'}
+                  </button>
+                  </div>
+                  <input type="text" value={form.titleRu} onChange={e => setForm(f => ({ ...f, titleRu: e.target.value }))} placeholder="Заголовок..." style={inp} />
+                </div>
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
+                    <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Engleză)</label>
+                    <button type="button" onClick={() => translate('titleEn')} disabled={!!translating['titleEn']} style={btnGhost}>
+                    {translating['titleEn'] ? '...' : '🔄 EN'}
+                  </button>
+                  </div>
+                  <input type="text" value={form.titleEn} onChange={e => setForm(f => ({ ...f, titleEn: e.target.value }))} placeholder="Title..." style={inp} />
+                </div>
               </div>
 
               <div>
@@ -117,10 +158,38 @@ export default function NouArticolPage() {
               </div>
 
               <div>
-                <label style={lbl}>Conținut *</label>
+                <label style={lbl}>Conținut (Română) *</label>
                 <TipTapEditor
-                  value={form.content}
-                  onChange={content => setForm(f => ({ ...f, content }))}
+                  value={form.contentRo}
+                  onChange={contentRo => setForm(f => ({ ...f, contentRo }))}
+                />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem' }}>
+                  <label style={{ ...lbl, marginBottom: 0 }}>Conținut (Rusă)</label>
+                  <button type="button" onClick={() => translate('contentRu')} disabled={!!translating['contentRu']} style={btnGhost}>
+                    {translating['contentRu'] ? '...' : '🔄 RU'}
+                  </button>
+                </div>
+                <TipTapEditor
+                  value={form.contentRu}
+                  onChange={contentRu => setForm(f => ({ ...f, contentRu }))}
+                  placeholder="Содержание на русском языке..."
+                />
+              </div>
+
+              <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem' }}>
+                  <label style={{ ...lbl, marginBottom: 0 }}>Conținut (Engleză)</label>
+                  <button type="button" onClick={() => translate('contentEn')} disabled={!!translating['contentEn']} style={btnGhost}>
+                    {translating['contentEn'] ? '...' : '🔄 EN'}
+                  </button>
+                </div>
+                <TipTapEditor
+                  value={form.contentEn}
+                  onChange={contentEn => setForm(f => ({ ...f, contentEn }))}
+                  placeholder="Content in English..."
                 />
               </div>
 

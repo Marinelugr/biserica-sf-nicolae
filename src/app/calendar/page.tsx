@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLiturgicalDates, formatDate } from '@/lib/utils'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick, localeToIntl } from '@/lib/i18n/pick'
 import { getFixedFeasts, FIXED_FASTS, isApostlesFast } from '@/lib/constants/oldCalendarFeasts'
 
 export const dynamic = 'force-dynamic'
@@ -20,7 +21,7 @@ async function getSaintsForDay(day: number, month: number) {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.saint.findMany({
       where: { day, month },
-      select: { nameRo: true, nameRu: true },
+      select: { nameRo: true, nameRu: true, nameEn: true },
       orderBy: { nameRo: 'asc' },
     })
   } catch {
@@ -33,7 +34,7 @@ export default async function CalendarPage({
 }: {
   searchParams: Promise<{ zi?: string; luna?: string; an?: string }>
 }) {
-  const [params, t] = await Promise.all([searchParams, getServerT()])
+  const [params, t, locale] = await Promise.all([searchParams, getServerT(), getServerLocale()])
 
   const today = new Date()
   const selDay   = parseInt(params.zi   || String(today.getDate()), 10)
@@ -102,7 +103,7 @@ export default async function CalendarPage({
     }
   }
 
-  const selectedDateStr = new Date(selYear, selMonth - 1, safeDay).toLocaleDateString('ro-MD', {
+  const selectedDateStr = new Date(selYear, selMonth - 1, safeDay).toLocaleDateString(localeToIntl(locale), {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
 
@@ -271,8 +272,7 @@ export default async function CalendarPage({
                   style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
                   <span className="text-lg shrink-0 mt-0.5" aria-hidden="true">☦</span>
                   <div>
-                    <p className="font-heading text-base" style={{ color: '#3A1A1A' }}>{saint.nameRo}</p>
-                    {saint.nameRu && <p className="font-body text-xs mt-0.5" style={{ color: '#8A7050' }}>{saint.nameRu}</p>}
+                    <p className="font-heading text-base" style={{ color: '#3A1A1A' }}>{pick(locale, saint.nameRo, saint.nameRu, saint.nameEn)}</p>
                   </div>
                 </li>
               ))}
@@ -305,7 +305,7 @@ export default async function CalendarPage({
                       {t.calendar.feastNames[feast.nameKey]}
                     </p>
                     <p className="font-body text-xs mt-0.5" style={{ color: feast.type === 'GREAT' ? 'rgba(242,235,217,0.6)' : '#9B8050' }}>
-                      Stil vechi: {feast.julianDate} (iulian)
+                      {t.calendar.julianDate}: {feast.julianDate} {t.calendar.julianSuffix}
                     </p>
                   </div>
                 </li>
@@ -343,10 +343,10 @@ export default async function CalendarPage({
               {t.calendar.easterLabel} {selYear}
             </p>
             <p className="font-heading text-lg" style={{ color: '#8B1A1A' }}>
-              {formatDate(liturgicalDates.easter)}
+              {formatDate(liturgicalDates.easter, localeToIntl(locale))}
             </p>
             <p className="font-body text-xs mt-0.5" style={{ color: '#9B8050' }}>
-              Stil vechi · Algoritmul Gauss Julian
+              {t.calendar.gaussFooter}
             </p>
           </div>
         </section>

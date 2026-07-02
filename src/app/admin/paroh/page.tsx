@@ -22,13 +22,21 @@ interface PriestForm {
   nameRu: string
   nameEn: string
   titleRo: string
+  titleRu: string
+  titleEn: string
   photoUrl: string
   bioRo: string
   bioRu: string
   bioEn: string
   ordained: string
+  ordainedRu: string
+  ordainedEn: string
   parish: string
+  parishRu: string
+  parishEn: string
   education: string
+  educationRu: string
+  educationEn: string
   phone: string
   email: string
   facebook: string
@@ -43,7 +51,12 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
   )
 }
 
-const empty: PriestForm = { id: null, nameRo: '', nameRu: '', nameEn: '', titleRo: 'Preot Paroh', photoUrl: '', bioRo: '', bioRu: '', bioEn: '', ordained: '', parish: '', education: '', phone: '', email: '', facebook: '' }
+const empty: PriestForm = {
+  id: null, nameRo: '', nameRu: '', nameEn: '', titleRo: 'Preot Paroh', titleRu: '', titleEn: '',
+  photoUrl: '', bioRo: '', bioRu: '', bioEn: '',
+  ordained: '', ordainedRu: '', ordainedEn: '', parish: '', parishRu: '', parishEn: '',
+  education: '', educationRu: '', educationEn: '', phone: '', email: '', facebook: '',
+}
 
 const DRAFT_KEY = 'draft_paroh'
 
@@ -68,7 +81,7 @@ export default function AdminParohPage() {
     return () => clearInterval(t)
   }, [isDirty, form, loading])
 
-  async function translateField(sourceText: string, field: string) {
+  async function translateField(sourceText: string, field: keyof PriestForm) {
     if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
     setTranslating(t => ({ ...t, [field]: true }))
     try {
@@ -79,10 +92,8 @@ export default function AdminParohPage() {
       })
       if (!res.ok) throw new Error()
       const data = await res.json()
-      if (field === 'nameRu') set('nameRu', data.translations.ru)
-      if (field === 'nameEn') set('nameEn', data.translations.en)
-      if (field === 'bioRu') set('bioRu', data.translations.ru)
-      if (field === 'bioEn') set('bioEn', data.translations.en)
+      const lang = String(field).endsWith('Ru') ? 'ru' : 'en'
+      set(field, data.translations[lang])
       showToast('Tradus cu DeepL ✓', 'success')
     } catch { showToast('Eroare la traducere DeepL', 'error') }
     finally { setTranslating(t => ({ ...t, [field]: false })) }
@@ -115,13 +126,21 @@ export default function AdminParohPage() {
             nameRu: data.nameRu || '',
             nameEn: data.nameEn || '',
             titleRo: data.titleRo || 'Preot Paroh',
+            titleRu: data.titleRu || '',
+            titleEn: data.titleEn || '',
             photoUrl: data.photoUrl || '',
             bioRo: data.bioRo || '',
             bioRu: data.bioRu || '',
             bioEn: data.bioEn || '',
             ordained: data.ordained || '',
+            ordainedRu: data.ordainedRu || '',
+            ordainedEn: data.ordainedEn || '',
             parish: data.parish || '',
+            parishRu: data.parishRu || '',
+            parishEn: data.parishEn || '',
             education: data.education || '',
+            educationRu: data.educationRu || '',
+            educationEn: data.educationEn || '',
             phone: data.phone || '',
             email: data.email || '',
             facebook: data.facebook || '',
@@ -243,12 +262,72 @@ export default function AdminParohPage() {
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                     <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Titlul (Rusă)</label>
+                        <button onClick={() => translateField(form.titleRo, 'titleRu')} disabled={translating['titleRu']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                          {translating['titleRu'] ? '...' : '🔄 RU'}
+                        </button>
+                      </div>
+                      <input value={form.titleRu} onChange={e => set('titleRu', e.target.value)} style={inp} />
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Titlul (Engleză)</label>
+                        <button onClick={() => translateField(form.titleRo, 'titleEn')} disabled={translating['titleEn']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                          {translating['titleEn'] ? '...' : '🔄 EN'}
+                        </button>
+                      </div>
+                      <input value={form.titleEn} onChange={e => set('titleEn', e.target.value)} style={inp} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
                       <label style={lbl}>Hirotonit în...</label>
                       <input value={form.ordained} onChange={e => set('ordained', e.target.value)} placeholder="ex: Hirotonit în anul 2005..." style={inp} />
                     </div>
                     <div>
                       <label style={lbl}>Parohia</label>
                       <input value={form.parish} onChange={e => set('parish', e.target.value)} placeholder="Paroh la Parohia..." style={inp} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Hirotonit în... (Rusă)</label>
+                        <button onClick={() => translateField(form.ordained, 'ordainedRu')} disabled={translating['ordainedRu']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                          {translating['ordainedRu'] ? '...' : '🔄 RU'}
+                        </button>
+                      </div>
+                      <input value={form.ordainedRu} onChange={e => set('ordainedRu', e.target.value)} style={inp} />
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Hirotonit în... (Engleză)</label>
+                        <button onClick={() => translateField(form.ordained, 'ordainedEn')} disabled={translating['ordainedEn']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                          {translating['ordainedEn'] ? '...' : '🔄 EN'}
+                        </button>
+                      </div>
+                      <input value={form.ordainedEn} onChange={e => set('ordainedEn', e.target.value)} style={inp} />
+                    </div>
+                  </div>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Parohia (Rusă)</label>
+                        <button onClick={() => translateField(form.parish, 'parishRu')} disabled={translating['parishRu']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                          {translating['parishRu'] ? '...' : '🔄 RU'}
+                        </button>
+                      </div>
+                      <input value={form.parishRu} onChange={e => set('parishRu', e.target.value)} style={inp} />
+                    </div>
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                        <label style={{ ...lbl, marginBottom: 0 }}>Parohia (Engleză)</label>
+                        <button onClick={() => translateField(form.parish, 'parishEn')} disabled={translating['parishEn']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
+                          {translating['parishEn'] ? '...' : '🔄 EN'}
+                        </button>
+                      </div>
+                      <input value={form.parishEn} onChange={e => set('parishEn', e.target.value)} style={inp} />
                     </div>
                   </div>
                 </div>
@@ -295,8 +374,28 @@ export default function AdminParohPage() {
 
               {/* ─── Educație ─── */}
               <div style={sectionBox}>
-                <div style={sectionTitle}>🎓 Educație și formare</div>
+                <div style={sectionTitle}>🎓 Educație și formare (Română)</div>
                 <TipTapEditor value={form.education} onChange={v => set('education', v)} placeholder="Studii teologice, formare pastorală..." />
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>🎓 Educație și formare (Rusă)</span>
+                  <button onClick={() => translateField(form.education, 'educationRu')} disabled={translating['educationRu']} style={{ ...btnGhost, padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
+                    {translating['educationRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
+                  </button>
+                </div>
+                <TipTapEditor value={form.educationRu} onChange={v => set('educationRu', v)} placeholder="Богословское образование..." />
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>🎓 Educație și formare (Engleză)</span>
+                  <button onClick={() => translateField(form.education, 'educationEn')} disabled={translating['educationEn']} style={{ ...btnGhost, padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
+                    {translating['educationEn'] ? 'Se traduce...' : '🔄 Traduce EN'}
+                  </button>
+                </div>
+                <TipTapEditor value={form.educationEn} onChange={v => set('educationEn', v)} placeholder="Theological education..." />
               </div>
 
               {/* ─── Contact ─── */}

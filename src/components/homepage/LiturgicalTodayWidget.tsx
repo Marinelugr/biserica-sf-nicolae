@@ -1,13 +1,11 @@
 import Link from 'next/link'
 import { getLiturgicalDates, getWeeklyTone, toJulianDate } from '@/lib/utils'
 import { isApostlesFast, FIXED_FASTS } from '@/lib/constants/oldCalendarFeasts'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { localeToIntl } from '@/lib/i18n/pick'
+import type { Translations } from '@/lib/i18n/ro'
 
-const MONTH_NAMES_RO = [
-  'Ianuarie','Februarie','Martie','Aprilie','Mai','Iunie',
-  'Iulie','August','Septembrie','Octombrie','Noiembrie','Decembrie',
-]
-
-function getFastInfo(now: Date): string | null {
+function getFastInfo(now: Date, t: Translations): string | null {
   const year = now.getFullYear()
   const month = now.getMonth() + 1
   const day = now.getDate()
@@ -16,23 +14,24 @@ function getFastInfo(now: Date): string | null {
   const lentStart = new Date(dates.greatLentStart); lentStart.setHours(0, 0, 0, 0)
   const easterDay = new Date(dates.easter); easterDay.setHours(0, 0, 0, 0)
 
-  if (target >= lentStart && target < easterDay) return 'Postul Mare'
-  if (isApostlesFast(day, month, year, dates.allSaintsDay)) return 'Postul Sfinților Apostoli'
+  if (target >= lentStart && target < easterDay) return t.calendar.fastNames.greatLent
+  if (isApostlesFast(day, month, year, dates.allSaintsDay)) return t.calendar.fastNames.apostlesFast
   for (const fast of FIXED_FASTS) {
-    if (fast.inFast(day, month, year)) return fast.nameKey === 'dormitionFast' ? 'Postul Adormirii' : 'Postul Crăciunului'
+    if (fast.inFast(day, month, year)) return fast.nameKey === 'dormitionFast' ? t.calendar.fastNames.dormitionFast : t.calendar.fastNames.christmasFast
   }
   return null
 }
 
-export default function LiturgicalTodayWidget() {
+export default async function LiturgicalTodayWidget() {
+  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
   const now = new Date()
   const year = now.getFullYear()
   const julianDate = toJulianDate(now)
   const tone = getWeeklyTone(now, year)
-  const fastInfo = getFastInfo(now)
+  const fastInfo = getFastInfo(now, t)
 
-  const gregorianStr = now.toLocaleDateString('ro-MD', { day: 'numeric', month: 'long', year: 'numeric' })
-  const julianStr = `${julianDate.day} ${MONTH_NAMES_RO[julianDate.month - 1]}`
+  const gregorianStr = now.toLocaleDateString(localeToIntl(locale), { day: 'numeric', month: 'long', year: 'numeric' })
+  const julianStr = `${julianDate.day} ${t.calendar.months[julianDate.month - 1]}`
 
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -45,13 +44,13 @@ export default function LiturgicalTodayWidget() {
           {/* Left: dates */}
           <div>
             <p className="font-body text-xs tracking-[0.3em] uppercase mb-2" style={{ color: '#8A7050' }}>
-              Astăzi în calendar
+              {t.home.todayInCalendar}
             </p>
             <p className="font-heading text-xl mb-0.5" style={{ color: '#1C1B3A' }}>
               {gregorianStr}
             </p>
             <p className="font-body text-sm" style={{ color: '#9B8050' }}>
-              Stil vechi (iulian): <span style={{ color: '#8B1A1A' }}>{julianStr}</span>
+              {t.home.oldStyleJulian} <span style={{ color: '#8B1A1A' }}>{julianStr}</span>
             </p>
           </div>
 
@@ -62,7 +61,7 @@ export default function LiturgicalTodayWidget() {
               style={{ backgroundColor: '#1C1B3A', color: '#F2EBD9' }}
             >
               <span style={{ fontSize: '0.9rem' }}>☦</span>
-              <span className="font-body text-sm">Glasul {tone}</span>
+              <span className="font-body text-sm">{t.home.toneLabel} {tone}</span>
             </div>
             {fastInfo ? (
               <div
@@ -77,7 +76,7 @@ export default function LiturgicalTodayWidget() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
                 style={{ backgroundColor: '#F2EBD9', border: '1px solid #D4C8A0', color: '#8A7050' }}
               >
-                <span className="font-body text-sm">Zi obișnuită</span>
+                <span className="font-body text-sm">{t.home.ordinaryDay}</span>
               </div>
             )}
           </div>
@@ -85,10 +84,10 @@ export default function LiturgicalTodayWidget() {
 
         <div className="mt-4 pt-4 flex items-center justify-between" style={{ borderTop: '1px solid #E8DFC8' }}>
           <span className="font-body text-xs" style={{ color: '#B0A080' }}>
-            Calendar Ortodox Stil Vechi (Julian) · Algoritmul Gauss
+            {t.home.oldCalendarFooter}
           </span>
           <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
-            Deschide calendarul →
+            {t.home.openCalendarLink}
           </span>
         </div>
       </Link>

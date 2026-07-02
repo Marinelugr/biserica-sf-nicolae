@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick } from '@/lib/i18n/pick'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,94 +11,94 @@ export const metadata: Metadata = {
 
 // ─── VECHIUL TESTAMENT — 53 cărți ────────────────────────────────────────────
 const VT_BOOKS = [
-  { label: 'Facerea (Întâia Carte a lui Moise)',               slug: 'facerea' },
-  { label: 'Ieșirea (A doua Carte a lui Moise)',               slug: 'iesirea' },
-  { label: 'Leviticul (A treia Carte a lui Moise)',            slug: 'leviticul' },
-  { label: 'Numerii (A patra Carte a lui Moise)',              slug: 'numerii' },
-  { label: 'Deuteronomul (A cincea Carte a lui Moise)',        slug: 'deuteronomul' },
-  { label: 'Cartea lui Iosua Navi',                           slug: 'iosua-navi' },
-  { label: 'Cartea Judecătorilor',                            slug: 'judecatorii' },
-  { label: 'Cartea Rut',                                      slug: 'rut' },
-  { label: 'Cartea întâi a Regilor',                          slug: '1-regi' },
-  { label: 'Cartea a doua a Regilor',                         slug: '2-regi' },
-  { label: 'Cartea a treia a Regilor',                        slug: '3-regi' },
-  { label: 'Cartea a patra a Regilor',                        slug: '4-regi' },
-  { label: 'Cartea întâi Paralipomena (întâi a Cronicilor)',  slug: '1-paralipomena' },
-  { label: 'Cartea a doua Paralipomena (a doua a Cronicilor)',slug: '2-paralipomena' },
-  { label: 'Cartea întâi a lui Ezdra',                       slug: '1-ezdra' },
-  { label: 'Cartea lui Neemia (a doua Ezdra)',                slug: 'neemia' },
-  { label: 'Cartea a treia a lui Ezdra',                      slug: '3-ezdra' },
-  { label: 'Cartea lui Tobit',                                slug: 'tobit' },
-  { label: 'Cartea Iuditei',                                  slug: 'iudita' },
-  { label: 'Cartea Esterei',                                  slug: 'estera' },
-  { label: 'Cartea lui Iov',                                  slug: 'iov' },
-  { label: 'Psalmii',                                         slug: 'psalmi' },
-  { label: 'Pildele lui Solomon',                             slug: 'pilde' },
-  { label: 'Ecclesiastul',                                    slug: 'eclesiastul' },
-  { label: 'Cântarea Cântărilor',                             slug: 'cantarea-cantarilor' },
-  { label: 'Cartea înțelepciunii lui Solomon',                slug: 'intelepciunea-lui-solomon' },
-  { label: 'Cartea înțelepciunii lui Isus, fiul lui Sirah',  slug: 'sirah' },
-  { label: 'Isaia',                                           slug: 'isaia' },
-  { label: 'Ieremia',                                         slug: 'ieremia' },
-  { label: 'Plângerile lui Ieremia',                          slug: 'plangerile' },
-  { label: 'Baruh',                                           slug: 'baruh' },
-  { label: 'Epistola lui Ieremia',                            slug: 'epistola-lui-ieremia' },
-  { label: 'Iezechiel',                                       slug: 'iezechiel' },
-  { label: 'Daniel',                                          slug: 'daniel' },
-  { label: 'Cântarea celor trei tineri',                      slug: 'cei-trei-tineri' },
-  { label: 'Istoria Susanei',                                 slug: 'susana' },
-  { label: 'Istoria omorârii balaurului',                     slug: 'balaur' },
-  { label: 'Osea',                                            slug: 'osea' },
-  { label: 'Ioil',                                            slug: 'ioil' },
-  { label: 'Amos',                                            slug: 'amos' },
-  { label: 'Avdie',                                           slug: 'avdie' },
-  { label: 'Iona',                                            slug: 'iona' },
-  { label: 'Miheia',                                          slug: 'miheia' },
-  { label: 'Naum',                                            slug: 'naum' },
-  { label: 'Avacum',                                          slug: 'avacum' },
-  { label: 'Sofonie',                                         slug: 'sofonie' },
-  { label: 'Agheu',                                           slug: 'agheu' },
-  { label: 'Zaharia',                                         slug: 'zaharia' },
-  { label: 'Maleahi',                                         slug: 'maleahi' },
-  { label: 'Cartea întâi a Macabeilor',                       slug: '1-macabei' },
-  { label: 'Cartea a doua a Macabeilor',                      slug: '2-macabei' },
-  { label: 'Cartea a treia a Macabeilor',                     slug: '3-macabei' },
-  { label: 'Rugăciunea regelui Manase',                       slug: 'rugaciunea-manase' },
+  { labelRo: 'Facerea (Întâia Carte a lui Moise)', labelRu: 'Бытие (Первая книга Моисеева)', labelEn: 'Genesis (The First Book of Moses)', slug: 'facerea' },
+  { labelRo: 'Ieșirea (A doua Carte a lui Moise)', labelRu: 'Исход (Вторая книга Моисеева)', labelEn: 'Exodus (The Second Book of Moses)', slug: 'iesirea' },
+  { labelRo: 'Leviticul (A treia Carte a lui Moise)', labelRu: 'Левит (Третья книга Моисеева)', labelEn: 'Leviticus (The Third Book of Moses)', slug: 'leviticul' },
+  { labelRo: 'Numerii (A patra Carte a lui Moise)', labelRu: 'Числа (Четвёртая книга Моисеева)', labelEn: 'Numbers (The Fourth Book of Moses)', slug: 'numerii' },
+  { labelRo: 'Deuteronomul (A cincea Carte a lui Moise)', labelRu: 'Второзаконие (Пятая книга Моисеева)', labelEn: 'Deuteronomy (The Fifth Book of Moses)', slug: 'deuteronomul' },
+  { labelRo: 'Cartea lui Iosua Navi', labelRu: 'Книга Иисуса Навина', labelEn: 'The Book of Joshua', slug: 'iosua-navi' },
+  { labelRo: 'Cartea Judecătorilor', labelRu: 'Книга Судей израилевых', labelEn: 'The Book of Judges', slug: 'judecatorii' },
+  { labelRo: 'Cartea Rut', labelRu: 'Книга Руфь', labelEn: 'The Book of Ruth', slug: 'rut' },
+  { labelRo: 'Cartea întâi a Regilor', labelRu: 'Первая книга Царств', labelEn: '1 Kingdoms (1 Samuel)', slug: '1-regi' },
+  { labelRo: 'Cartea a doua a Regilor', labelRu: 'Вторая книга Царств', labelEn: '2 Kingdoms (2 Samuel)', slug: '2-regi' },
+  { labelRo: 'Cartea a treia a Regilor', labelRu: 'Третья книга Царств', labelEn: '3 Kingdoms (1 Kings)', slug: '3-regi' },
+  { labelRo: 'Cartea a patra a Regilor', labelRu: 'Четвёртая книга Царств', labelEn: '4 Kingdoms (2 Kings)', slug: '4-regi' },
+  { labelRo: 'Cartea întâi Paralipomena (întâi a Cronicilor)', labelRu: 'Первая книга Паралипоменон', labelEn: '1 Chronicles (Paralipomenon)', slug: '1-paralipomena' },
+  { labelRo: 'Cartea a doua Paralipomena (a doua a Cronicilor)', labelRu: 'Вторая книга Паралипоменон', labelEn: '2 Chronicles (Paralipomenon)', slug: '2-paralipomena' },
+  { labelRo: 'Cartea întâi a lui Ezdra', labelRu: 'Первая книга Ездры', labelEn: '1 Esdras', slug: '1-ezdra' },
+  { labelRo: 'Cartea lui Neemia (a doua Ezdra)', labelRu: 'Книга Неемии (Вторая книга Ездры)', labelEn: 'Nehemiah (2 Esdras)', slug: 'neemia' },
+  { labelRo: 'Cartea a treia a lui Ezdra', labelRu: 'Третья книга Ездры', labelEn: '3 Esdras', slug: '3-ezdra' },
+  { labelRo: 'Cartea lui Tobit', labelRu: 'Книга Товита', labelEn: 'The Book of Tobit', slug: 'tobit' },
+  { labelRo: 'Cartea Iuditei', labelRu: 'Книга Иудифи', labelEn: 'The Book of Judith', slug: 'iudita' },
+  { labelRo: 'Cartea Esterei', labelRu: 'Книга Есфирь', labelEn: 'The Book of Esther', slug: 'estera' },
+  { labelRo: 'Cartea lui Iov', labelRu: 'Книга Иова', labelEn: 'The Book of Job', slug: 'iov' },
+  { labelRo: 'Psalmii', labelRu: 'Псалтирь', labelEn: 'The Psalms', slug: 'psalmi' },
+  { labelRo: 'Pildele lui Solomon', labelRu: 'Притчи Соломона', labelEn: 'The Proverbs of Solomon', slug: 'pilde' },
+  { labelRo: 'Ecclesiastul', labelRu: 'Книга Екклесиаста', labelEn: 'Ecclesiastes', slug: 'eclesiastul' },
+  { labelRo: 'Cântarea Cântărilor', labelRu: 'Песнь Песней Соломона', labelEn: 'The Song of Songs', slug: 'cantarea-cantarilor' },
+  { labelRo: 'Cartea înțelepciunii lui Solomon', labelRu: 'Книга Премудрости Соломона', labelEn: 'The Wisdom of Solomon', slug: 'intelepciunea-lui-solomon' },
+  { labelRo: 'Cartea înțelepciunii lui Isus, fiul lui Sirah', labelRu: 'Книга Премудрости Иисуса, сына Сирахова', labelEn: 'The Wisdom of Sirach', slug: 'sirah' },
+  { labelRo: 'Isaia', labelRu: 'Книга пророка Исаии', labelEn: 'Isaiah', slug: 'isaia' },
+  { labelRo: 'Ieremia', labelRu: 'Книга пророка Иеремии', labelEn: 'Jeremiah', slug: 'ieremia' },
+  { labelRo: 'Plângerile lui Ieremia', labelRu: 'Плач Иеремии', labelEn: 'Lamentations of Jeremiah', slug: 'plangerile' },
+  { labelRo: 'Baruh', labelRu: 'Книга пророка Варуха', labelEn: 'Baruch', slug: 'baruh' },
+  { labelRo: 'Epistola lui Ieremia', labelRu: 'Послание Иеремии', labelEn: 'The Epistle of Jeremiah', slug: 'epistola-lui-ieremia' },
+  { labelRo: 'Iezechiel', labelRu: 'Книга пророка Иезекииля', labelEn: 'Ezekiel', slug: 'iezechiel' },
+  { labelRo: 'Daniel', labelRu: 'Книга пророка Даниила', labelEn: 'Daniel', slug: 'daniel' },
+  { labelRo: 'Cântarea celor trei tineri', labelRu: 'Песнь трёх отроков', labelEn: 'The Song of the Three Young Men', slug: 'cei-trei-tineri' },
+  { labelRo: 'Istoria Susanei', labelRu: 'История Сусанны', labelEn: 'The History of Susanna', slug: 'susana' },
+  { labelRo: 'Istoria omorârii balaurului', labelRu: 'История о Виле и драконе', labelEn: 'Bel and the Dragon', slug: 'balaur' },
+  { labelRo: 'Osea', labelRu: 'Книга пророка Осии', labelEn: 'Hosea', slug: 'osea' },
+  { labelRo: 'Ioil', labelRu: 'Книга пророка Иоиля', labelEn: 'Joel', slug: 'ioil' },
+  { labelRo: 'Amos', labelRu: 'Книга пророка Амоса', labelEn: 'Amos', slug: 'amos' },
+  { labelRo: 'Avdie', labelRu: 'Книга пророка Авдия', labelEn: 'Obadiah', slug: 'avdie' },
+  { labelRo: 'Iona', labelRu: 'Книга пророка Ионы', labelEn: 'Jonah', slug: 'iona' },
+  { labelRo: 'Miheia', labelRu: 'Книга пророка Михея', labelEn: 'Micah', slug: 'miheia' },
+  { labelRo: 'Naum', labelRu: 'Книга пророка Наума', labelEn: 'Nahum', slug: 'naum' },
+  { labelRo: 'Avacum', labelRu: 'Книга пророка Аввакума', labelEn: 'Habakkuk', slug: 'avacum' },
+  { labelRo: 'Sofonie', labelRu: 'Книга пророка Софонии', labelEn: 'Zephaniah', slug: 'sofonie' },
+  { labelRo: 'Agheu', labelRu: 'Книга пророка Аггея', labelEn: 'Haggai', slug: 'agheu' },
+  { labelRo: 'Zaharia', labelRu: 'Книга пророка Захарии', labelEn: 'Zechariah', slug: 'zaharia' },
+  { labelRo: 'Maleahi', labelRu: 'Книга пророка Малахии', labelEn: 'Malachi', slug: 'maleahi' },
+  { labelRo: 'Cartea întâi a Macabeilor', labelRu: 'Первая книга Маккавейская', labelEn: '1 Maccabees', slug: '1-macabei' },
+  { labelRo: 'Cartea a doua a Macabeilor', labelRu: 'Вторая книга Маккавейская', labelEn: '2 Maccabees', slug: '2-macabei' },
+  { labelRo: 'Cartea a treia a Macabeilor', labelRu: 'Третья книга Маккавейская', labelEn: '3 Maccabees', slug: '3-macabei' },
+  { labelRo: 'Rugăciunea regelui Manase', labelRu: 'Молитва Манассии', labelEn: 'The Prayer of Manasseh', slug: 'rugaciunea-manase' },
 ] // 53 cărți
 
 // ─── NOUL TESTAMENT — 27 cărți ───────────────────────────────────────────────
 const NT_BOOKS = [
-  { label: 'Sfânta Evanghelie după Matei',                                          slug: 'matei' },
-  { label: 'Sfânta Evanghelie după Marcu',                                          slug: 'marcu' },
-  { label: 'Sfânta Evanghelie după Luca',                                           slug: 'luca' },
-  { label: 'Sfânta Evanghelie după Ioan',                                           slug: 'ioan' },
-  { label: 'Faptele Sfinților Apostoli',                                            slug: 'faptele-apostolilor' },
-  { label: 'Epistola către Romani a Sfântului Apostol Pavel',                       slug: 'romani' },
-  { label: 'Epistola întâi către Corinteni a Sfântului Apostol Pavel',             slug: '1-corinteni' },
-  { label: 'Epistola a doua către Corinteni a Sfântului Apostol Pavel',            slug: '2-corinteni' },
-  { label: 'Epistola către Galateni a Sfântului Apostol Pavel',                    slug: 'galateni' },
-  { label: 'Epistola către Efeseni a Sfântului Apostol Pavel',                     slug: 'efeseni' },
-  { label: 'Epistola către Filipeni a Sfântului Apostol Pavel',                    slug: 'filipeni' },
-  { label: 'Epistola către Coloseni a Sfântului Apostol Pavel',                    slug: 'coloseni' },
-  { label: 'Epistola întâi către Tesaloniceni a Sfântului Apostol Pavel',          slug: '1-tesaloniceni' },
-  { label: 'Epistola a doua către Tesaloniceni a Sfântului Apostol Pavel',         slug: '2-tesaloniceni' },
-  { label: 'Epistola întâi către Timotei a Sfântului Apostol Pavel',              slug: '1-timotei' },
-  { label: 'Epistola a doua către Timotei a Sfântului Apostol Pavel',             slug: '2-timotei' },
-  { label: 'Epistola către Tit a Sfântului Apostol Pavel',                         slug: 'tit' },
-  { label: 'Epistola către Filimon a Sfântului Apostol Pavel',                     slug: 'filimon' },
-  { label: 'Epistola către Evrei a Sfântului Apostol Pavel',                       slug: 'evrei' },
-  { label: 'Epistola Sobornicească a Sfântului Apostol Iacov',                     slug: 'iacov' },
-  { label: 'Întâia Epistolă Sobornicească a Sfântului Apostol Petru',             slug: '1-petru' },
-  { label: 'A doua Epistolă Sobornicească a Sfântului Apostol Petru',             slug: '2-petru' },
-  { label: 'Întâia Epistolă Sobornicească a Sfântului Apostol Ioan',              slug: '1-ioan' },
-  { label: 'A doua Epistolă Sobornicească a Sfântului Apostol Ioan',              slug: '2-ioan' },
-  { label: 'A treia Epistolă Sobornicească a Sfântului Apostol Ioan',             slug: '3-ioan' },
-  { label: 'Epistola Sobornicească a Sfântului Apostol Iuda',                      slug: 'iuda' },
-  { label: 'Apocalipsa Sfântului Ioan Teologul',                                   slug: 'apocalipsa' },
+  { labelRo: 'Sfânta Evanghelie după Matei', labelRu: 'Евангелие от Матфея', labelEn: 'The Holy Gospel according to Matthew', slug: 'matei' },
+  { labelRo: 'Sfânta Evanghelie după Marcu', labelRu: 'Евангелие от Марка', labelEn: 'The Holy Gospel according to Mark', slug: 'marcu' },
+  { labelRo: 'Sfânta Evanghelie după Luca', labelRu: 'Евангелие от Луки', labelEn: 'The Holy Gospel according to Luke', slug: 'luca' },
+  { labelRo: 'Sfânta Evanghelie după Ioan', labelRu: 'Евангелие от Иоанна', labelEn: 'The Holy Gospel according to John', slug: 'ioan' },
+  { labelRo: 'Faptele Sfinților Apostoli', labelRu: 'Деяния святых Апостолов', labelEn: 'The Acts of the Holy Apostles', slug: 'faptele-apostolilor' },
+  { labelRo: 'Epistola către Romani a Sfântului Apostol Pavel', labelRu: 'Послание к Римлянам святого апостола Павла', labelEn: 'The Epistle of St. Paul to the Romans', slug: 'romani' },
+  { labelRo: 'Epistola întâi către Corinteni a Sfântului Apostol Pavel', labelRu: 'Первое послание к Коринфянам святого апостола Павла', labelEn: 'The First Epistle of St. Paul to the Corinthians', slug: '1-corinteni' },
+  { labelRo: 'Epistola a doua către Corinteni a Sfântului Apostol Pavel', labelRu: 'Второе послание к Коринфянам святого апостола Павла', labelEn: 'The Second Epistle of St. Paul to the Corinthians', slug: '2-corinteni' },
+  { labelRo: 'Epistola către Galateni a Sfântului Apostol Pavel', labelRu: 'Послание к Галатам святого апостола Павла', labelEn: 'The Epistle of St. Paul to the Galatians', slug: 'galateni' },
+  { labelRo: 'Epistola către Efeseni a Sfântului Apostol Pavel', labelRu: 'Послание к Ефесянам святого апостола Павла', labelEn: 'The Epistle of St. Paul to the Ephesians', slug: 'efeseni' },
+  { labelRo: 'Epistola către Filipeni a Sfântului Apostol Pavel', labelRu: 'Послание к Филиппийцам святого апостола Павла', labelEn: 'The Epistle of St. Paul to the Philippians', slug: 'filipeni' },
+  { labelRo: 'Epistola către Coloseni a Sfântului Apostol Pavel', labelRu: 'Послание к Колоссянам святого апостола Павла', labelEn: 'The Epistle of St. Paul to the Colossians', slug: 'coloseni' },
+  { labelRo: 'Epistola întâi către Tesaloniceni a Sfântului Apostol Pavel', labelRu: 'Первое послание к Фессалоникийцам святого апостола Павла', labelEn: 'The First Epistle of St. Paul to the Thessalonians', slug: '1-tesaloniceni' },
+  { labelRo: 'Epistola a doua către Tesaloniceni a Sfântului Apostol Pavel', labelRu: 'Второе послание к Фессалоникийцам святого апостола Павла', labelEn: 'The Second Epistle of St. Paul to the Thessalonians', slug: '2-tesaloniceni' },
+  { labelRo: 'Epistola întâi către Timotei a Sfântului Apostol Pavel', labelRu: 'Первое послание к Тимофею святого апостола Павла', labelEn: 'The First Epistle of St. Paul to Timothy', slug: '1-timotei' },
+  { labelRo: 'Epistola a doua către Timotei a Sfântului Apostol Pavel', labelRu: 'Второе послание к Тимофею святого апостола Павла', labelEn: 'The Second Epistle of St. Paul to Timothy', slug: '2-timotei' },
+  { labelRo: 'Epistola către Tit a Sfântului Apostol Pavel', labelRu: 'Послание к Титу святого апостола Павла', labelEn: 'The Epistle of St. Paul to Titus', slug: 'tit' },
+  { labelRo: 'Epistola către Filimon a Sfântului Apostol Pavel', labelRu: 'Послание к Филимону святого апостола Павла', labelEn: 'The Epistle of St. Paul to Philemon', slug: 'filimon' },
+  { labelRo: 'Epistola către Evrei a Sfântului Apostol Pavel', labelRu: 'Послание к Евреям святого апостола Павла', labelEn: 'The Epistle of St. Paul to the Hebrews', slug: 'evrei' },
+  { labelRo: 'Epistola Sobornicească a Sfântului Apostol Iacov', labelRu: 'Соборное послание святого апостола Иакова', labelEn: 'The Catholic Epistle of St. James', slug: 'iacov' },
+  { labelRo: 'Întâia Epistolă Sobornicească a Sfântului Apostol Petru', labelRu: 'Первое соборное послание святого апостола Петра', labelEn: 'The First Catholic Epistle of St. Peter', slug: '1-petru' },
+  { labelRo: 'A doua Epistolă Sobornicească a Sfântului Apostol Petru', labelRu: 'Второе соборное послание святого апостола Петра', labelEn: 'The Second Catholic Epistle of St. Peter', slug: '2-petru' },
+  { labelRo: 'Întâia Epistolă Sobornicească a Sfântului Apostol Ioan', labelRu: 'Первое соборное послание святого апостола Иоанна', labelEn: 'The First Catholic Epistle of St. John', slug: '1-ioan' },
+  { labelRo: 'A doua Epistolă Sobornicească a Sfântului Apostol Ioan', labelRu: 'Второе соборное послание святого апостола Иоанна', labelEn: 'The Second Catholic Epistle of St. John', slug: '2-ioan' },
+  { labelRo: 'A treia Epistolă Sobornicească a Sfântului Apostol Ioan', labelRu: 'Третье соборное послание святого апостола Иоанна', labelEn: 'The Third Catholic Epistle of St. John', slug: '3-ioan' },
+  { labelRo: 'Epistola Sobornicească a Sfântului Apostol Iuda', labelRu: 'Соборное послание святого апостола Иуды', labelEn: 'The Catholic Epistle of St. Jude', slug: 'iuda' },
+  { labelRo: 'Apocalipsa Sfântului Ioan Teologul', labelRu: 'Откровение святого Иоанна Богослова (Апокалипсис)', labelEn: 'The Revelation of St. John the Theologian (Apocalypse)', slug: 'apocalipsa' },
 ] // 27 cărți
 
 export default async function BibliePage() {
-  const t = await getServerT()
+  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -165,7 +166,7 @@ export default async function BibliePage() {
                   className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
                   style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
                 >
-                  {book.label}
+                  {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
                 </span>
               </a>
             </li>
@@ -204,7 +205,7 @@ export default async function BibliePage() {
                   className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
                   style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
                 >
-                  {book.label}
+                  {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
                 </span>
               </a>
             </li>
@@ -216,15 +217,15 @@ export default async function BibliePage() {
       <div className="mt-10 pt-6 flex justify-center gap-8 text-center" style={{ borderTop: '1px solid #E8E5E0' }}>
         <div>
           <p className="font-heading text-2xl" style={{ color: '#8B1A1A' }}>53</p>
-          <p className="font-body text-xs" style={{ color: '#8A7050' }}>cărți VT</p>
+          <p className="font-body text-xs" style={{ color: '#8A7050' }}>{t.bible.otBooksLabel}</p>
         </div>
         <div>
           <p className="font-heading text-2xl" style={{ color: '#8B6014' }}>27</p>
-          <p className="font-body text-xs" style={{ color: '#8A7050' }}>cărți NT</p>
+          <p className="font-body text-xs" style={{ color: '#8A7050' }}>{t.bible.ntBooksLabel}</p>
         </div>
         <div>
           <p className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>80</p>
-          <p className="font-body text-xs" style={{ color: '#8A7050' }}>total</p>
+          <p className="font-body text-xs" style={{ color: '#8A7050' }}>{t.bible.totalLabel}</p>
         </div>
       </div>
     </div>

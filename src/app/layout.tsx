@@ -4,6 +4,7 @@ import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { I18nProvider } from '@/lib/i18n/context'
+import { getServerLocale } from '@/lib/i18n/server'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
@@ -61,10 +62,11 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const initialLocale = await getServerLocale()
   return (
     <html
-      lang="ro"
+      lang={initialLocale}
       className={`${cormorant.variable} ${ebGaramond.variable} h-full`}
       data-scroll-behavior="smooth"
     >
@@ -101,7 +103,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className="min-h-full flex flex-col antialiased"
         style={{ fontFamily: 'var(--font-eb-garamond), Georgia, serif' }}
       >
-        <I18nProvider>
+        <I18nProvider initialLocale={initialLocale}>
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />

@@ -19,8 +19,9 @@ export async function POST(req: NextRequest) {
   const data = await req.json()
   const {
     localAccounts, ibanAccounts, paypalEmail, paypalLink,
-    contactName, contactPhone, facebookUrl, tiktokUrl, instagramUrl,
-    safetyNote, videoLinks,
+    contactName, contactNameRu, contactNameEn, contactPhone,
+    facebookUrl, tiktokUrl, instagramUrl,
+    safetyNote, safetyNoteRu, safetyNoteEn, videoLinks,
   } = data
 
   const payload = {
@@ -29,11 +30,15 @@ export async function POST(req: NextRequest) {
     paypalEmail: paypalEmail || null,
     paypalLink: paypalLink || null,
     contactName: contactName || null,
+    contactNameRu: contactNameRu || null,
+    contactNameEn: contactNameEn || null,
     contactPhone: contactPhone || null,
     facebookUrl: facebookUrl || null,
     tiktokUrl: tiktokUrl || null,
     instagramUrl: instagramUrl || null,
     safetyNote: safetyNote || null,
+    safetyNoteRu: safetyNoteRu || null,
+    safetyNoteEn: safetyNoteEn || null,
     videoLinks: videoLinks ?? [],
   }
 

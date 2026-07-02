@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
-  const { nameRo, nameRu, nameEn, month, day, feastType, lifeRo, iconUrl } = await req.json()
+  const { nameRo, nameRu, nameEn, month, day, feastType, lifeRo, lifeRu, lifeEn, iconUrl } = await req.json()
   if (!nameRo || !month || !day) return NextResponse.json({ error: 'Nume, lună și zi sunt obligatorii' }, { status: 400 })
 
   let slug = `sf-${slugify(nameRo)}-${month}-${day}`
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       nameRo, nameRu: nameRu || null, nameEn: nameEn || null,
       month: parseInt(month), day: parseInt(day),
       feastType: feastType || null,
-      lifeRo: lifeRo || null,
+      lifeRo: lifeRo || null, lifeRu: lifeRu || null, lifeEn: lifeEn || null,
       iconUrl: iconUrl || null,
       slug,
     },

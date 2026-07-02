@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick, type Locale } from '@/lib/i18n/pick'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,9 +9,9 @@ export const metadata: Metadata = {
   description: 'Filme ortodoxe, acatiste video, conferințe, predici și rugăciuni. Colecția video a Parohiei Sfântul Ierarh Nicolae.',
 }
 
-type VideoItem = { id: string; title: string; duration: string; thumb: null }
+type VideoItem = { id: string; titleRo: string; titleRu: string; titleEn: string; duration: string; thumb: null }
 
-function VideoCard({ video }: { video: VideoItem }) {
+function VideoCard({ video, locale }: { video: VideoItem; locale: Locale }) {
   return (
     <div
       className="group rounded-lg overflow-hidden transition-shadow hover:shadow-md cursor-pointer"
@@ -32,7 +33,7 @@ function VideoCard({ video }: { video: VideoItem }) {
       </div>
       <div className="p-3" style={{ backgroundColor: '#FAFAF8' }}>
         <p className="font-body text-sm leading-snug group-hover:underline" style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}>
-          {video.title}
+          {pick(locale, video.titleRo, video.titleRu, video.titleEn)}
         </p>
       </div>
     </div>
@@ -40,45 +41,45 @@ function VideoCard({ video }: { video: VideoItem }) {
 }
 
 export default async function VideoPage() {
-  const t = await getServerT()
+  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
 
   const CATEGORIES = [
     {
       key: 'orthodoxFilms' as const,
       icon: '🎬',
       videos: [
-        { id: 'placeholder-1', title: 'Film despre viața Sfântului Nicolae', duration: '1:24:00', thumb: null },
-        { id: 'placeholder-2', title: 'Documentar: Mânăstirile Moldovei', duration: '52:30', thumb: null },
+        { id: 'placeholder-1', titleRo: 'Film despre viața Sfântului Nicolae', titleRu: 'Фильм о жизни святителя Николая', titleEn: 'A film about the life of Saint Nicholas', duration: '1:24:00', thumb: null },
+        { id: 'placeholder-2', titleRo: 'Documentar: Mânăstirile Moldovei', titleRu: 'Документальный фильм: Монастыри Молдовы', titleEn: 'Documentary: The Monasteries of Moldova', duration: '52:30', thumb: null },
       ],
     },
     {
       key: 'akathists' as const,
       icon: '☦',
       videos: [
-        { id: 'placeholder-3', title: 'Acatistul Sfântului Ierarh Nicolae', duration: '45:00', thumb: null },
-        { id: 'placeholder-4', title: 'Acatistul Maicii Domnului', duration: '38:20', thumb: null },
+        { id: 'placeholder-3', titleRo: 'Acatistul Sfântului Ierarh Nicolae', titleRu: 'Акафист святителю Николаю', titleEn: 'The Akathist to Saint Nicholas the Hierarch', duration: '45:00', thumb: null },
+        { id: 'placeholder-4', titleRo: 'Acatistul Maicii Domnului', titleRu: 'Акафист Пресвятой Богородице', titleEn: 'The Akathist to the Mother of God', duration: '38:20', thumb: null },
       ],
     },
     {
       key: 'conferences' as const,
       icon: '🎙',
       videos: [
-        { id: 'placeholder-5', title: 'Conferință despre tradiția ortodoxă', duration: '1:10:00', thumb: null },
+        { id: 'placeholder-5', titleRo: 'Conferință despre tradiția ortodoxă', titleRu: 'Конференция о православной традиции', titleEn: 'Conference on the Orthodox Tradition', duration: '1:10:00', thumb: null },
       ],
     },
     {
       key: 'prayers' as const,
       icon: '🕯',
       videos: [
-        { id: 'placeholder-6', title: 'Rugăciunile dimineții', duration: '15:00', thumb: null },
-        { id: 'placeholder-7', title: 'Rugăciunile serii', duration: '18:00', thumb: null },
+        { id: 'placeholder-6', titleRo: 'Rugăciunile dimineții', titleRu: 'Утренние молитвы', titleEn: 'Morning Prayers', duration: '15:00', thumb: null },
+        { id: 'placeholder-7', titleRo: 'Rugăciunile serii', titleRu: 'Вечерние молитвы', titleEn: 'Evening Prayers', duration: '18:00', thumb: null },
       ],
     },
     {
       key: 'sermons' as const,
       icon: '📖',
       videos: [
-        { id: 'placeholder-8', title: 'Predică la Duminica Floriilor', duration: '22:00', thumb: null },
+        { id: 'placeholder-8', titleRo: 'Predică la Duminica Floriilor', titleRu: 'Проповедь в Вербное воскресенье', titleEn: 'Sermon on Palm Sunday', duration: '22:00', thumb: null },
       ],
     },
   ]
@@ -91,7 +92,7 @@ export default async function VideoPage() {
         style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}
       >
         <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
-          Parohia Sfântul Ierarh Nicolae
+          {t.priest.badge}
         </p>
         <h1
           className="font-heading italic leading-tight mb-5"
@@ -136,7 +137,7 @@ export default async function VideoPage() {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {cat.videos.map(video => (
-                  <VideoCard key={video.id} video={video} />
+                  <VideoCard key={video.id} video={video} locale={locale} />
                 ))}
 
                 {/* Card adăugare admin */}

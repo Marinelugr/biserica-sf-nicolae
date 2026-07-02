@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick } from '@/lib/i18n/pick'
 import { prisma } from '@/lib/prisma'
 import { DONATII_DEFAULTS, type DonationConfigData, type DonationLocalAccount, type DonationIbanAccount, type DonationVideoLink } from '@/lib/donatii-defaults'
 import PublicGallery from '@/components/PublicGallery'
@@ -18,7 +19,7 @@ function facebookEmbedSrc(url: string) {
 }
 
 export default async function DonationsPage() {
-  const t = await getServerT()
+  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
 
   const [projects, configRow, gallery] = await Promise.all([
     prisma.donationProject.findMany({ where: { active: true }, orderBy: { order: 'asc' } }),
@@ -33,14 +34,21 @@ export default async function DonationsPage() {
         paypalEmail: configRow.paypalEmail ?? '',
         paypalLink: configRow.paypalLink ?? '',
         contactName: configRow.contactName ?? '',
+        contactNameRu: configRow.contactNameRu ?? '',
+        contactNameEn: configRow.contactNameEn ?? '',
         contactPhone: configRow.contactPhone ?? '',
         facebookUrl: configRow.facebookUrl ?? '',
         tiktokUrl: configRow.tiktokUrl ?? '',
         instagramUrl: configRow.instagramUrl ?? '',
         safetyNote: configRow.safetyNote ?? '',
+        safetyNoteRu: configRow.safetyNoteRu ?? '',
+        safetyNoteEn: configRow.safetyNoteEn ?? '',
         videoLinks: (configRow.videoLinks as unknown as DonationVideoLink[]) ?? [],
       }
     : DONATII_DEFAULTS
+
+  const contactNameLocalized = pick(locale, config.contactName, config.contactNameRu, config.contactNameEn)
+  const safetyNoteLocalized = pick(locale, config.safetyNote, config.safetyNoteRu, config.safetyNoteEn)
 
   return (
     <div>
@@ -90,10 +98,10 @@ export default async function DonationsPage() {
                   style={{ backgroundColor: '#FAFAF8', border: '1px solid #E8E5E0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
                 >
                   <h3 className="font-heading text-lg mb-2" style={{ color: '#1C1B3A' }}>
-                    {project.titleRo}
+                    {pick(locale, project.titleRo, project.titleRu, project.titleEn)}
                   </h3>
                   <p className="font-body text-sm leading-relaxed mb-4 flex-1" style={{ color: '#6A5030' }}>
-                    {project.descriptionRo}
+                    {pick(locale, project.descriptionRo, project.descriptionRu, project.descriptionEn)}
                   </p>
 
                   {/* Progress bar */}
@@ -220,9 +228,9 @@ export default async function DonationsPage() {
             </div>
           )}
 
-          {config.safetyNote && (
+          {safetyNoteLocalized && (
             <p className="font-body text-center text-sm italic mt-6" style={{ color: '#8A7050' }}>
-              {config.safetyNote}
+              {safetyNoteLocalized}
             </p>
           )}
         </section>
@@ -243,8 +251,8 @@ export default async function DonationsPage() {
                     📞 {config.contactPhone}
                   </a>
                   <p className="font-body text-xs mt-1" style={{ color: '#8A7050' }}>{t.donate.viberWhatsappTelegram}</p>
-                  {config.contactName && (
-                    <p className="font-body text-xs mt-1" style={{ color: '#6A5030' }}>{config.contactName}</p>
+                  {contactNameLocalized && (
+                    <p className="font-body text-xs mt-1" style={{ color: '#6A5030' }}>{contactNameLocalized}</p>
                   )}
                 </div>
               )}

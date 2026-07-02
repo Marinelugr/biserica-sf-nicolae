@@ -15,24 +15,35 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
   const data = await req.json()
-  const { nameRo, nameRu, nameEn, titleRo, photoUrl, bioRo, bioRu, bioEn, ordained, parish, education, phone, email, facebook } = data
+  const {
+    nameRo, nameRu, nameEn, titleRo, titleRu, titleEn, photoUrl,
+    bioRo, bioRu, bioEn, ordained, ordainedRu, ordainedEn,
+    parish, parishRu, parishEn, education, educationRu, educationEn,
+    phone, email, facebook,
+  } = data
 
   if (!nameRo || !titleRo) {
     return NextResponse.json({ error: 'Numele și titlul sunt obligatorii' }, { status: 400 })
+  }
+
+  const payload = {
+    nameRo, nameRu: nameRu || null, nameEn: nameEn || null,
+    titleRo, titleRu: titleRu || null, titleEn: titleEn || null,
+    photoUrl: photoUrl || null,
+    bioRo: bioRo || null, bioRu: bioRu || null, bioEn: bioEn || null,
+    ordained: ordained || null, ordainedRu: ordainedRu || null, ordainedEn: ordainedEn || null,
+    parish: parish || null, parishRu: parishRu || null, parishEn: parishEn || null,
+    education: education || null, educationRu: educationRu || null, educationEn: educationEn || null,
+    phone: phone || null, email: email || null, facebook: facebook || null,
   }
 
   const existing = await prisma.priest.findFirst()
 
   let priest
   if (existing) {
-    priest = await prisma.priest.update({
-      where: { id: existing.id },
-      data: { nameRo, nameRu: nameRu || null, nameEn: nameEn || null, titleRo, photoUrl: photoUrl || null, bioRo: bioRo || null, bioRu: bioRu || null, bioEn: bioEn || null, ordained: ordained || null, parish: parish || null, education: education || null, phone: phone || null, email: email || null, facebook: facebook || null },
-    })
+    priest = await prisma.priest.update({ where: { id: existing.id }, data: payload })
   } else {
-    priest = await prisma.priest.create({
-      data: { nameRo, nameRu: nameRu || null, nameEn: nameEn || null, titleRo, photoUrl: photoUrl || null, bioRo: bioRo || null, bioRu: bioRu || null, bioEn: bioEn || null, ordained: ordained || null, parish: parish || null, education: education || null, phone: phone || null, email: email || null, facebook: facebook || null },
-    })
+    priest = await prisma.priest.create({ data: payload })
   }
 
   return NextResponse.json(priest)

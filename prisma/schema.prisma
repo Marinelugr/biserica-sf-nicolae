@@ -268,22 +268,30 @@ model MediaItem {
 // ─── Preot paroh ─────────────────────────────────────────────────────────────
 
 model Priest {
-  id        String  @id @default(cuid())
-  nameRo    String
-  nameRu    String?
-  nameEn    String?
-  titleRo   String
-  photoUrl  String?
-  bioRo     String? @db.Text
-  bioRu     String? @db.Text
-  bioEn     String? @db.Text
-  ordained  String?
-  parish    String?
-  education String? @db.Text
-  phone     String?
-  email     String?
-  facebook  String?
-  createdAt DateTime @default(now())
+  id           String  @id @default(cuid())
+  nameRo       String
+  nameRu       String?
+  nameEn       String?
+  titleRo      String
+  titleRu      String?
+  titleEn      String?
+  photoUrl     String?
+  bioRo        String? @db.Text
+  bioRu        String? @db.Text
+  bioEn        String? @db.Text
+  ordained     String?
+  ordainedRu   String?
+  ordainedEn   String?
+  parish       String?
+  parishRu     String?
+  parishEn     String?
+  education    String? @db.Text
+  educationRu  String? @db.Text
+  educationEn  String? @db.Text
+  phone        String?
+  email        String?
+  facebook     String?
+  createdAt    DateTime @default(now())
 }
 
 // ─── Donații ──────────────────────────────────────────────────────────────
@@ -310,11 +318,15 @@ model DonationConfig {
   paypalEmail   String?
   paypalLink    String?
   contactName   String?
+  contactNameRu String?
+  contactNameEn String?
   contactPhone  String?
   facebookUrl   String?
   tiktokUrl     String?
   instagramUrl  String?
   safetyNote    String?  @db.Text
+  safetyNoteRu  String?  @db.Text
+  safetyNoteEn  String?  @db.Text
   videoLinks    Json     @default("[]")
   updatedAt     DateTime @updatedAt
 }

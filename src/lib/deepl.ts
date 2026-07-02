@@ -18,6 +18,7 @@ export async function translateText(
       source_lang: sourceLang,
       target_lang: targetLang,
       preserve_formatting: true,
+      tag_handling: 'html',
     }),
   })
   if (!response.ok) throw new Error(`DeepL error: ${response.status}`)

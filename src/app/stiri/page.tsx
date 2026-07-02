@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatDate } from '@/lib/utils'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { pick, localeToIntl } from '@/lib/i18n/pick'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,6 +17,7 @@ async function getArticles() {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.article.findMany({
       where: { published: true },
+      select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true },
       orderBy: { publishedAt: 'desc' },
     })
   } catch {
@@ -23,16 +26,16 @@ async function getArticles() {
 }
 
 export default async function StiriPage() {
-  const articles = await getArticles()
+  const [articles, t, locale] = await Promise.all([getArticles(), getServerT(), getServerLocale()])
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="text-center mb-14">
         <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: '#8A7050' }}>
-          Parohia noastră
+          {t.newsPage.badge}
         </p>
         <h1 className="font-heading text-4xl md:text-5xl mb-4" style={{ color: '#1C1B3A' }}>
-          Știri & Articole
+          {t.newsPage.title}
         </h1>
         <div className="flex items-center justify-center gap-3">
           <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
@@ -45,7 +48,7 @@ export default async function StiriPage() {
         <div className="text-center py-20">
           <span style={{ color: '#D4C8A0', fontSize: '48px' }} aria-hidden="true">☦</span>
           <p className="font-body mt-4" style={{ color: '#8A7050' }}>
-            Nu există articole publicate momentan.
+            {t.newsPage.noArticles}
           </p>
         </div>
       ) : (
@@ -63,7 +66,7 @@ export default async function StiriPage() {
                 {article.imageUrl ? (
                   <Image
                     src={article.imageUrl}
-                    alt={article.titleRo}
+                    alt={pick(locale, article.titleRo, article.titleRu, article.titleEn)}
                     width={600}
                     height={400}
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -84,12 +87,12 @@ export default async function StiriPage() {
                 )}
                 <Link href={`/stiri/${article.slug}`}>
                   <h2 className="font-heading text-xl mt-1 mb-2 group-hover:underline underline-offset-2 leading-snug" style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}>
-                    {article.titleRo}
+                    {pick(locale, article.titleRo, article.titleRu, article.titleEn)}
                   </h2>
                 </Link>
                 {article.publishedAt && (
                   <time className="font-body text-xs" style={{ color: '#8A7050' }}>
-                    {formatDate(article.publishedAt)}
+                    {formatDate(article.publishedAt, localeToIntl(locale))}
                   </time>
                 )}
               </div>

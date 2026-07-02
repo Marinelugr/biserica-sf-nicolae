@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { useI18n } from '@/lib/i18n/context'
 
 interface DailyData {
   saints: string[]
@@ -24,11 +25,12 @@ const cardVariants = {
 }
 
 export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
+  const { t } = useI18n()
   const cards = [
     {
       dot: '#8B6014',
       icon: '✦',
-      label: 'Sfinții zilei',
+      label: t.home.saintsToday,
       content: (
         <ul className="space-y-1.5">
           {data.saints.length > 0 ? (
@@ -39,18 +41,18 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
             ))
           ) : (
             <li className="font-body text-sm italic" style={{ color: '#8A7050' }}>
-              Calendar indisponibil momentan
+              {t.home.noSaints}
             </li>
           )}
         </ul>
       ),
       link: '/sfintii',
-      linkLabel: 'Toți sfinții zilei →',
+      linkLabel: t.home.allSaintsLink,
     },
     {
       dot: '#8B1A1A',
       icon: '✦',
-      label: 'Evanghelia zilei',
+      label: t.home.gospelToday,
       content: (
         <div>
           <p className="font-heading text-sm font-semibold mb-2" style={{ color: '#8B1A1A' }}>
@@ -62,12 +64,12 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
         </div>
       ),
       link: '/biblie',
-      linkLabel: 'Citește integral →',
+      linkLabel: t.home.readFullGospel,
     },
     {
       dot: '#6B4A2A',
       icon: '✦',
-      label: 'Rugăciunea zilei',
+      label: t.home.prayerToday,
       content: (
         <div>
           <p className="font-heading text-sm font-semibold mb-2" style={{ color: '#6B4A2A' }}>
@@ -79,12 +81,12 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
         </div>
       ),
       link: '/carti',
-      linkLabel: 'Toate rugăciunile →',
+      linkLabel: t.home.allPrayersLink,
     },
     {
       dot: '#4A6A2A',
       icon: '✦',
-      label: 'Program Slujbe',
+      label: t.home.serviceSchedule,
       content: (
         <div>
           {data.schedule.length > 0 ? (
@@ -105,13 +107,13 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
             </ul>
           ) : (
             <p className="font-body text-sm italic" style={{ color: '#8A7050' }}>
-              Nu există slujbe programate azi.
+              {t.home.noSchedule}
             </p>
           )}
         </div>
       ),
       link: '/calendar',
-      linkLabel: 'Calendar complet →',
+      linkLabel: t.home.fullCalendarLink,
     },
   ]
 
@@ -124,7 +126,7 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
             {todayLabel}
           </p>
           <h2 className="font-heading text-3xl" style={{ color: '#3A1A1A' }}>
-            Viața liturgică a zilei
+            {t.home.liturgicalLife}
           </h2>
           <div className="flex items-center justify-center gap-3 mt-3">
             <span className="h-px w-20 block" style={{ backgroundColor: '#D4C8A0' }} />

@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma'
+import { getServerT } from '@/lib/i18n/server'
 
 function extractYouTubeId(url: string): string | null {
   if (!url?.trim()) return null
@@ -8,6 +9,7 @@ function extractYouTubeId(url: string): string | null {
 }
 
 export default async function LiveStreamCard() {
+  const t = await getServerT()
   let isLive = false
   let videoId: string | null = null
 
@@ -31,13 +33,13 @@ export default async function LiveStreamCard() {
             {/* Pulsing LIVE badge */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', backgroundColor: '#2A0505', border: '1px solid #5A1A1A', borderRadius: '20px', padding: '0.35rem 0.875rem' }}>
               <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.75rem' }}>●</span>
-              <span style={{ color: '#EF4444', fontFamily: 'Georgia, serif', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Live acum</span>
+              <span style={{ color: '#EF4444', fontFamily: 'Georgia, serif', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' }}>{t.home.liveNow}</span>
             </div>
             <h2
               className="font-heading"
               style={{ color: '#F2EBD9', fontSize: 'clamp(1.1rem, 2.5vw, 1.5rem)', fontWeight: 400, margin: 0 }}
             >
-              Urmărește slujba în direct
+              {t.home.watchLiveService}
             </h2>
           </div>
           <a
@@ -47,7 +49,7 @@ export default async function LiveStreamCard() {
             className="font-body text-sm"
             style={{ color: '#9B8050', borderBottom: '1px solid #3A2010', textDecoration: 'none', paddingBottom: '1px' }}
           >
-            Deschide pe YouTube ↗
+            {t.home.openOnYoutube}
           </a>
         </div>
 
@@ -65,7 +67,7 @@ export default async function LiveStreamCard() {
         >
           <iframe
             src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`}
-            title="Transmisiune live — Parohia Sfântul Ierarh Nicolae"
+            title={t.home.liveStreamTitle}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
             style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
@@ -77,7 +79,7 @@ export default async function LiveStreamCard() {
           className="font-body text-sm text-center mt-4"
           style={{ color: '#5A4020' }}
         >
-          ☦ Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic — transmisiune în direct
+          {t.home.liveFooterNote}
         </p>
       </div>
     </section>

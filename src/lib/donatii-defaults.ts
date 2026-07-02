@@ -23,11 +23,15 @@ export interface DonationConfigData {
   paypalEmail: string
   paypalLink: string
   contactName: string
+  contactNameRu: string
+  contactNameEn: string
   contactPhone: string
   facebookUrl: string
   tiktokUrl: string
   instagramUrl: string
   safetyNote: string
+  safetyNoteRu: string
+  safetyNoteEn: string
   videoLinks: DonationVideoLink[]
 }
 
@@ -46,10 +50,12 @@ export const DONATII_DEFAULTS: DonationConfigData = {
   paypalEmail: 'inimaortodoxiei@gmail.com',
   paypalLink: 'https://www.paypal.me/inimaortodoxiei',
   contactName: 'Părintele Marin Grigoriță',
+  contactNameRu: '', contactNameEn: '',
   contactPhone: '+373 67 306 191',
   facebookUrl: 'https://www.facebook.com/PreotMarin',
   tiktokUrl: 'https://www.tiktok.com/@parintelemarin',
   instagramUrl: 'https://www.instagram.com/parintelemarin.official/',
   safetyNote: 'Donați doar prin această pagină oficială sau la numărul de mai sus.',
+  safetyNoteRu: '', safetyNoteEn: '',
   videoLinks: [],
 }

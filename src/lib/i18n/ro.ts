@@ -4,17 +4,26 @@ export interface Translations {
     churchHistory: string; saintNicholas: string; priest: string; video: string; shop: string; donate: string
   }
   home: {
-    heroTitle: string; heroSubtitle: string; heroMitropolia: string
+    heroTitle: string; heroSubtitle: string; heroMitropolia: string; heroImageAlt: string
     searchPlaceholder: string; searchBtn: string; aboutBtn: string; donateBtn: string
     liturgicalLife: string; saintsToday: string; gospelToday: string
     prayerToday: string; serviceSchedule: string; latestNews: string; allNews: string
     orthodoxLibrary: string; allBooks: string; noSchedule: string; noSaints: string
+    liveNow: string; watchLiveService: string; openOnYoutube: string
+    liveStreamTitle: string; liveFooterNote: string
+    allSaintsLink: string; readFullGospel: string; allPrayersLink: string; fullCalendarLink: string
+    ourParish: string; noNews: string; sacredTexts: string; libraryLabel: string
+    libraryInProgress: string; viewAllLink: string
+    searchInScripture: string; orthodoxBibleBtn: string
+    todayInCalendar: string; oldStyleJulian: string; toneLabel: string
+    ordinaryDay: string; oldCalendarFooter: string; openCalendarLink: string
   }
   bible: {
     pageSubtitle: string; title: string; searchPlaceholder: string; searchBtn: string
     oldTestament: string; newTestament: string
     oldTestamentBooks: string; newTestamentBooks: string
     chapter: string; verse: string
+    otBooksLabel: string; ntBooksLabel: string; totalLabel: string
   }
   calendar: {
     title: string; subtitle: string
@@ -40,11 +49,17 @@ export interface Translations {
     weeklyTone: string
     julianDate: string
     todayWidget: string
+    julianSuffix: string; gaussFooter: string
   }
   books: {
     subtitle: string; title: string; searchPlaceholder: string; searchBtn: string
     inProgress: string; comingSoon: string; recentlyAdded: string
+    textSingular: string; textPlural: string; noTextsInCategory: string
     categories: {
+      ACATIST: string; CANON: string; RUGACIUNE: string; SLUJBA: string
+      VIATA: string; PREDICA: string; ALTELE: string; BIBLIE: string
+    }
+    categoryDescriptions: {
       ACATIST: string; CANON: string; RUGACIUNE: string; SLUJBA: string
       VIATA: string; PREDICA: string; ALTELE: string
     }
@@ -69,6 +84,31 @@ export interface Translations {
     copyLabel: string; copiedLabel: string
     contactSocialTitle: string; viberWhatsappTelegram: string
   }
+  priest: {
+    badge: string; pageTitle: string; biography: string; education: string
+    galleryTitle: string; contactTitle: string
+    phoneLabel: string; emailLabel: string; facebookLabel: string; facebookPageLabel: string
+    notAvailable: string
+  }
+  newsPage: { badge: string; title: string; noArticles: string }
+  historyPage: {
+    pageTitle: string; fallbackIntro: string
+    sections: { title: string; text: string }[]
+    galleryEmpty: string; videosEmpty: string; ctaText: string; ctaBtn: string
+  }
+  saintNicholasPage: {
+    badge: string; pageTitle: string; subtitle: string
+    feastDatesTitle: string
+    feast1: string; feast1Desc: string; feast2: string; feast2Desc: string
+    acatistLink: string
+    lifeTitle: string
+    fallbackViata: { titlu: string; text: string }[]
+    troparTitle: string; troparTone: string; fallbackTropar: string
+    condacTitle: string; condacTone: string; fallbackCondac: string
+    iconAlt: string; iconMissing: string
+    galleryTitle: string
+    acatistCtaTitle: string; acatistCtaText: string; goToLibrary: string
+  }
   footer: {
     parish: string; address: string; country: string; metropolis: string
     pagesTitle: string; scheduleTitle: string; contactTitle: string
@@ -88,7 +128,7 @@ export interface Translations {
     noResults: string; noResultsHint: string
     searchInBible: string; searchInLibrary: string; enterTerm: string
   }
-  common: { loading: string; backToTop: string }
+  common: { loading: string; backToTop: string; gallery: string; backTo: string; allCategories: string }
 }
 
 const ro: Translations = {
@@ -101,6 +141,7 @@ const ro: Translations = {
     heroTitle: 'Biserica Sfântul Ierarh Nicolae',
     heroSubtitle: 'Hîrtopul Mic · Raionul Criuleni · Republica Moldova',
     heroMitropolia: 'Mitropolia Chișinăului și a întregii Moldove',
+    heroImageAlt: 'Vedere aeriană a Bisericii Sfântul Ierarh Nicolae, Hîrtopul Mic',
     searchPlaceholder: 'Caută pe site...', searchBtn: 'Caută',
     aboutBtn: 'Despre Biserică', donateBtn: 'Susține Biserica',
     liturgicalLife: 'Viața liturgică a zilei',
@@ -110,6 +151,20 @@ const ro: Translations = {
     orthodoxLibrary: 'Bibliotecă Ortodoxă', allBooks: 'Toate cărțile →',
     noSchedule: 'Nu există slujbe programate pentru astăzi.',
     noSaints: 'Nu sunt sfinți înregistrați pentru astăzi.',
+    liveNow: 'Live acum', watchLiveService: 'Urmărește slujba în direct',
+    openOnYoutube: 'Deschide pe YouTube ↗',
+    liveStreamTitle: 'Transmisiune live — Parohia Sfântul Ierarh Nicolae',
+    liveFooterNote: '☦ Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic — transmisiune în direct',
+    allSaintsLink: 'Toți sfinții zilei →', readFullGospel: 'Citește integral →',
+    allPrayersLink: 'Toate rugăciunile →', fullCalendarLink: 'Calendar complet →',
+    ourParish: 'Parohia noastră', noNews: 'Nu există știri publicate momentan.',
+    sacredTexts: 'Texte sacre', libraryLabel: 'Bibliotecă',
+    libraryInProgress: 'Biblioteca este în curs de completare.', viewAllLink: 'Toate →',
+    searchInScripture: 'Caută în Sfânta Scriptură', orthodoxBibleBtn: '☦ Biblia Ortodoxă',
+    todayInCalendar: 'Astăzi în calendar', oldStyleJulian: 'Stil vechi (iulian):',
+    toneLabel: 'Glasul', ordinaryDay: 'Zi obișnuită',
+    oldCalendarFooter: 'Calendar Ortodox Stil Vechi (Julian) · Algoritmul Gauss',
+    openCalendarLink: 'Deschide calendarul →',
   },
   bible: {
     pageSubtitle: 'Cuvântul lui Dumnezeu', title: 'Sfânta Scriptură',
@@ -117,6 +172,7 @@ const ro: Translations = {
     oldTestament: 'VECHIUL TESTAMENT', newTestament: 'NOUL TESTAMENT',
     oldTestamentBooks: '(53 de cărți)', newTestamentBooks: '(27 de cărți)',
     chapter: 'Capitol', verse: 'Verset',
+    otBooksLabel: 'cărți VT', ntBooksLabel: 'cărți NT', totalLabel: 'total',
   },
   calendar: {
     title: 'Calendarul Sfinților', subtitle: 'Ortodox',
@@ -150,15 +206,27 @@ const ro: Translations = {
       christmasFast: 'Postul Crăciunului', inFast: 'Zi de post',
     },
     weeklyTone: 'Glasul săptămânii', julianDate: 'Stil vechi', todayWidget: 'Astăzi în calendar',
+    julianSuffix: '(iulian)', gaussFooter: 'Stil vechi · Algoritmul Gauss Julian',
   },
   books: {
     subtitle: 'Texte sacre', title: 'Bibliotecă Ortodoxă',
     searchPlaceholder: 'Caută în bibliotecă...', searchBtn: 'Caută',
     inProgress: 'Biblioteca este în curs de completare.', comingSoon: 'Reveniți curând',
-    recentlyAdded: 'Adăugate recent',
+    recentlyAdded: 'Adăugate recent', textSingular: 'text', textPlural: 'texte',
+    noTextsInCategory: 'Nu sunt texte adăugate în această categorie.',
     categories: {
       ACATIST: 'Acatiste', CANON: 'Canoane', RUGACIUNE: 'Rugăciuni',
       SLUJBA: 'Slujbe', VIATA: 'Vieți de Sfinți', PREDICA: 'Predici', ALTELE: 'Altele',
+      BIBLIE: 'Biblie',
+    },
+    categoryDescriptions: {
+      ACATIST: 'Acatistele sfinților și ale Maicii Domnului',
+      CANON: 'Canoane de rugăciune și pocăință',
+      RUGACIUNE: 'Rugăciuni de dimineață, seară și speciale',
+      SLUJBA: 'Tipicul slujbelor liturgice ortodoxe',
+      VIATA: 'Prologul și vieținele sfinților',
+      PREDICA: 'Cuvântări și predici duhovnicești',
+      ALTELE: 'Alte texte liturgice și duhovnicești',
     },
   },
   video: {
@@ -192,6 +260,73 @@ const ro: Translations = {
     copyLabel: 'Copiază', copiedLabel: 'Copiat ✓',
     contactSocialTitle: 'Contact și rețele sociale', viberWhatsappTelegram: 'Viber · WhatsApp · Telegram',
   },
+  priest: {
+    badge: 'Parohia Sfântul Ierarh Nicolae', pageTitle: 'Parohul Bisericii',
+    biography: 'Biografie', education: 'Educație și formare',
+    galleryTitle: 'Galerie foto', contactTitle: 'Contact',
+    phoneLabel: 'Telefon', emailLabel: 'Email', facebookLabel: 'Facebook', facebookPageLabel: 'Pagina Facebook',
+    notAvailable: 'Informații despre preotul paroh nu sunt disponibile momentan.',
+  },
+  newsPage: {
+    badge: 'Parohia noastră', title: 'Știri & Articole',
+    noArticles: 'Nu există articole publicate momentan.',
+  },
+  historyPage: {
+    pageTitle: 'Istoria Bisericii',
+    fallbackIntro: 'Biserica Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, este unul dintre lăcașurile de cult cu o istorie îndelungată din ținuturile Moldovei. Întemeiată în secolul al XIX-lea, biserica a fost martoră a nenumărate generații de credincioși care și-au botezat pruncii, și-au cununat tinerii și și-au odihnit pe cei adormiți.',
+    sections: [
+      {
+        title: 'Întemeierea (sec. XIX)',
+        text: 'Prima atestare documentară a parohiei datează din a doua jumătate a secolului al XIX-lea. Conform mărturiilor orale și arhivelor ecleziastice, prima structură de lemn a fost ridicată de ctitorii din sat, cu sprijinul comunității locale. Hramul Sfântului Ierarh Nicolae — arhiepiscopul Mirelor Lichiei, ocrotitorul celor în nevoi — a fost ales de la bun început, reflectând evlavia deosebită a locuitorilor față de acest sfânt.',
+      },
+      {
+        title: 'Construcția edificiului actual',
+        text: 'La sfârșitul secolului al XIX-lea și începutul celui de-al XX-lea, comunitatea parohială a decis ridicarea unei noi biserici din piatră și cărămidă, mai trainice și mai încăpătoare. Lucrările s-au desfășurat în mai mulți ani, cu contribuția materială și fizică a credincioșilor din Hîrtopul Mic și din localitățile vecine. Arhitectura îmbină elemente ale stilului ecleziastic moldovenesc cu influențe neo-bizantine.',
+      },
+      {
+        title: 'Perioadele de restriște',
+        text: 'Ca toate lăcașurile de cult din Moldova, Biserica Sfântul Ierarh Nicolae a traversat perioade de restriște în secolul al XX-lea. În timpul regimului sovietic, activitatea religioasă a fost limitată, iar edificiul a suferit din lipsa întreținerii corespunzătoare. Cu toate acestea, credincioșii au păstrat vie tradiția ortodoxă, transmițindu-o din generație în generație.',
+      },
+      {
+        title: 'Renașterea după 1991',
+        text: 'Odată cu obținerea independenței Republicii Moldova, viața parohială a înflorit din nou. Au fost reluate slujbele regulate, comunitatea s-a reunit în jurul lăcașului sfânt, iar primele lucrări de renovare au putut fi efectuate. În deceniile următoare, cu sprijinul enoriașilor din țară și din diasporă, biserica a primit o serie de îmbunătățiri.',
+      },
+      {
+        title: 'Proiecte actuale de restaurare',
+        text: 'Parohia se află în prezent în mijlocul unui amplu program de restaurare și înfrumusețare. Prioritățile includ renovarea completă a acoperișului, restaurarea turnului clopotniță, realizarea picturii murale în interior și modernizarea instalațiilor. Aceste lucrări sunt posibile datorită jertfelnicitei contribuții a credincioșilor și a binecuvântării ierarhilor Mitropoliei Chișinăului și a întregii Moldove.',
+      },
+    ],
+    galleryEmpty: 'Imaginile vor fi adăugate de administrator.',
+    videosEmpty: 'Videoclipurile vor fi adăugate de administrator.',
+    ctaText: 'Susținerea lucrărilor de restaurare ale acestui lăcaș sfânt este un act de binecuvântare pentru generațiile viitoare.',
+    ctaBtn: 'Susțineți restaurarea bisericii',
+  },
+  saintNicholasPage: {
+    badge: 'Hramul Parohiei', pageTitle: 'Sfântul Ierarh Nicolae',
+    subtitle: 'Arhiepiscopul Mirelor Lichiei, Făcătorul de minuni',
+    feastDatesTitle: 'Date prăznuire',
+    feast1: '19 Decembrie — Adormirea Sfântului Nicolae',
+    feast1Desc: 'Ziua principală de prăznuire. Sfântul s-a săvârșit din viață în jurul anului 345 d.Hr.',
+    feast2: '22 Mai — Aducerea Sfintelor Moaște la Bari',
+    feast2Desc: 'Comemorarea transferului moaștelor din Mireele Lichiei la Bari (Italia) în 1087.',
+    acatistLink: 'Acatistul Sfântului Nicolae — Bibliotecă',
+    lifeTitle: 'Viața Sfântului Ierarh Nicolae',
+    fallbackViata: [
+      { titlu: 'Nașterea și tinerețea', text: 'Sfântul Ierarh Nicolae s-a născut în jurul anului 270 d.Hr. în orașul Patara din Licia (Asia Mică, actuala Turcie). Părinții săi, Epifanie și Ana, erau oameni evlavioși și înstăriți, care l-au crescut în frica de Dumnezeu. Rămas orfan de timpuriu, Nicolae a moștenit averea părinților, pe care a împărțit-o celor săraci.' },
+      { titlu: 'Arhiepiscopul Mirelor Lichiei', text: 'Ales în chip minunat ca arhiepiscop al Mirelor Lichiei, Sfântul Nicolae a păstorit cu înțelepciune și smerenie turma sa. Era cunoscut pentru blândețea sa, pentru dragostea față de cei săraci și pentru darul făcerii de minuni. A participat la Sinodul I Ecumenic de la Niceea (325 d.Hr.), apărând cu fervoare dreapta credință împotriva ereziei lui Arie.' },
+      { titlu: 'Faptele milostiviei', text: 'Dintre nenumăratele sale fapte de milostenie, cea mai renumită este ajutorarea unui om sărac cu trei fete. Neputând să le înzestreze pentru căsătorie, tatăl era în mare strâmtorare. Sfântul Nicolae, auzind de aceasta, a aruncat noaptea, pe fereastră, câte un sac cu aur pentru fiecare fată.' },
+      { titlu: 'Adormirea și prăznuirea', text: 'Sfântul Nicolae a adormit întru Domnul în jurul anului 345 d.Hr., la o vârstă înaintată. Sfintele sale moaște au rămas la Mireele Lichiei până în anul 1087, când, din cauza amenințărilor islamice, au fost aduse la Bari (Italia), unde se găsesc și astăzi în Bazilica San Nicola. Sfântul este prăznuit de două ori pe an: pe 19 Decembrie și pe 22 Mai.' },
+    ],
+    troparTitle: 'Tropar', troparTone: 'Glasul al 4-lea',
+    fallbackTropar: 'Regulă a credinței și chip al blândeții, / învățătorule al înfrânării, / te-a arătat pe tine turmei tale adevărul lucrurilor. / Pentru aceasta ai câștigat cu smerenia cele înalte, / cu sărăcia cele bogate. / Părinte Ierarhe Nicolae, / roagă pe Hristos Dumnezeu să mântuiască sufletele noastre.',
+    condacTitle: 'Condac', condacTone: 'Glasul al 3-lea',
+    fallbackCondac: 'În Mireele Lichiei, sfinte, sfințitor te-ai arătat; / că Evanghelia lui Hristos plinind-o, / sufletul tău ți-ai pus pentru poporul tău, / și pe nevinovați i-ai mântuit de moarte. / Pentru aceasta te-ai sfințit / ca un mare înțelegător al harului lui Dumnezeu.',
+    iconAlt: 'Icoana Sfântului Ierarh Nicolae', iconMissing: '(în curs de adăugare)',
+    galleryTitle: 'Galerie imagini',
+    acatistCtaTitle: 'Acatistul Sfântului Ierarh Nicolae',
+    acatistCtaText: 'Citiți Acatistul Sfântului Nicolae din Biblioteca Ortodoxă digitală a parohiei.',
+    goToLibrary: 'Mergi la Bibliotecă',
+  },
   footer: {
     parish: 'Parohia Ortodoxă', address: 'Hîrtopul Mic, Raionul Criuleni',
     country: 'Republica Moldova', metropolis: 'Mitropolia Chișinăului și a întregii Moldove',
@@ -217,7 +352,7 @@ const ro: Translations = {
     searchInBible: 'Caută în Biblie', searchInLibrary: 'Caută în Bibliotecă',
     enterTerm: 'Introduceți un termen pentru a căuta în întregul site.',
   },
-  common: { loading: 'Se încarcă...', backToTop: 'Sus' },
+  common: { loading: 'Se încarcă...', backToTop: 'Sus', gallery: 'Galerie foto', backTo: 'Înapoi la', allCategories: 'Toate categoriile →' },
 }
 
 export default ro

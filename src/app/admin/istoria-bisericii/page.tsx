@@ -33,10 +33,13 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 }
 
 export default function AdminIstoriaBisericiiPage() {
-  const [content, setContent] = useState('')
+  const [contentRo, setContentRo] = useState('')
+  const [contentRu, setContentRu] = useState('')
+  const [contentEn, setContentEn] = useState('')
   const [videos, setVideos] = useState<VideoItem[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const [newVideoUrl, setNewVideoUrl] = useState('')
@@ -49,7 +52,10 @@ export default function AdminIstoriaBisericiiPage() {
       .then(r => r.json())
       .then(data => {
         if (data) {
-          setContent(data.content || '')
+          // suportă și forma veche { content } pentru compatibilitate cu datele deja introduse
+          setContentRo(data.contentRo || data.content || '')
+          setContentRu(data.contentRu || '')
+          setContentEn(data.contentEn || '')
           setVideos(data.videos || [])
         }
         setLoading(false)
@@ -57,13 +63,32 @@ export default function AdminIstoriaBisericiiPage() {
       .catch(() => setLoading(false))
   }, [])
 
+  async function translateContent(targetSuffix: 'Ru' | 'En') {
+    const key = `content${targetSuffix}`
+    if (!contentRo.trim()) { showToast('Completați mai întâi textul în română', 'error'); return }
+    setTranslating(t => ({ ...t, [key]: true }))
+    try {
+      const res = await fetch('/api/admin/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: contentRo, field: key }),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      if (targetSuffix === 'Ru') setContentRu(data.translations.ru)
+      else setContentEn(data.translations.en)
+      showToast('Tradus cu DeepL ✓', 'success')
+    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    finally { setTranslating(t => ({ ...t, [key]: false })) }
+  }
+
   async function handleSave() {
     setSaving(true)
     try {
       const res = await fetch('/api/admin/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'church_history_content', value: { content, videos } }),
+        body: JSON.stringify({ key: 'church_history_content', value: { contentRo, contentRu, contentEn, videos } }),
       })
       if (!res.ok) throw new Error('Eroare la salvare')
       showToast('Conținut salvat cu succes ✓', 'success')
@@ -123,15 +148,35 @@ export default function AdminIstoriaBisericiiPage() {
             <>
               {/* ─── Conținut text ─── */}
               <div style={sectionBox}>
-                <div style={sectionTitle}>📝 Textul istoriei</div>
+                <div style={sectionTitle}>📝 Textul istoriei (Română)</div>
                 <p style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginBottom: '0.875rem' }}>
                   Editați conținutul principal al paginii Istoria Bisericii. Aceasta va înlocui textul implicit.
                 </p>
                 <TipTapEditor
-                  value={content}
-                  onChange={setContent}
+                  value={contentRo}
+                  onChange={setContentRo}
                   placeholder="Introduceți istoria bisericii..."
                 />
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>📝 Textul istoriei (Rusă)</span>
+                  <button onClick={() => translateContent('Ru')} disabled={translating['contentRu']} style={btnGhost}>
+                    {translating['contentRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
+                  </button>
+                </div>
+                <TipTapEditor value={contentRu} onChange={setContentRu} placeholder="История храма на русском..." />
+              </div>
+
+              <div style={sectionBox}>
+                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span>📝 Textul istoriei (Engleză)</span>
+                  <button onClick={() => translateContent('En')} disabled={translating['contentEn']} style={btnGhost}>
+                    {translating['contentEn'] ? 'Se traduce...' : '🔄 Traduce EN'}
+                  </button>
+                </div>
+                <TipTapEditor value={contentEn} onChange={setContentEn} placeholder="Church history in English..." />
               </div>
 
               {/* ─── Galerie foto ─── */}

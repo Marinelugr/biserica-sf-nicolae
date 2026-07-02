@@ -12,7 +12,8 @@ const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { 
 interface Saint {
   id: string; nameRo: string; nameRu: string | null; nameEn: string | null
   month: number; day: number; feastType: string | null
-  lifeRo: string | null; iconUrl: string | null; slug: string
+  lifeRo: string | null; lifeRu: string | null; lifeEn: string | null
+  iconUrl: string | null; slug: string
 }
 
 const MONTHS = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -53,7 +54,7 @@ function ConfirmModal({ message, onConfirm, onCancel, loading }: { message: stri
   )
 }
 
-const emptyForm = { nameRo: '', nameRu: '', nameEn: '', month: '1', day: '1', feastType: '', lifeRo: '', iconUrl: '' }
+const emptyForm = { nameRo: '', nameRu: '', nameEn: '', month: '1', day: '1', feastType: '', lifeRo: '', lifeRu: '', lifeEn: '', iconUrl: '' }
 
 export default function AdminSfintiPage() {
   const [saints, setSaints] = useState<Saint[]>([])
@@ -71,18 +72,19 @@ export default function AdminSfintiPage() {
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
 
-  async function translateField(field: 'nameRu' | 'nameEn') {
-    if (!form.nameRo.trim()) { showToast('Completați mai întâi numele în română', 'error'); return }
+  async function translateField(sourceField: 'nameRo' | 'lifeRo', field: 'nameRu' | 'nameEn' | 'lifeRu' | 'lifeEn') {
+    const sourceText = form[sourceField]
+    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
     setTranslating(t => ({ ...t, [field]: true }))
     try {
       const res = await fetch('/api/admin/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: form.nameRo, field }),
+        body: JSON.stringify({ text: sourceText, field }),
       })
       if (!res.ok) throw new Error()
       const data = await res.json()
-      const val = field === 'nameRu' ? data.translations.ru : data.translations.en
+      const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
       setForm(f => ({ ...f, [field]: val }))
       showToast('Tradus cu DeepL ✓', 'success')
     } catch { showToast('Eroare la traducere DeepL', 'error') }
@@ -105,7 +107,7 @@ export default function AdminSfintiPage() {
 
   function openEdit(s: Saint) {
     setEditSaint(s)
-    setForm({ nameRo: s.nameRo, nameRu: s.nameRu || '', nameEn: s.nameEn || '', month: String(s.month), day: String(s.day), feastType: s.feastType || '', lifeRo: s.lifeRo || '', iconUrl: s.iconUrl || '' })
+    setForm({ nameRo: s.nameRo, nameRu: s.nameRu || '', nameEn: s.nameEn || '', month: String(s.month), day: String(s.day), feastType: s.feastType || '', lifeRo: s.lifeRo || '', lifeRu: s.lifeRu || '', lifeEn: s.lifeEn || '', iconUrl: s.iconUrl || '' })
     setShowForm(true)
   }
 
@@ -277,7 +279,7 @@ export default function AdminSfintiPage() {
                     <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
                       {!form.nameRu && <span style={{ fontSize: '0.65rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
                       {form.nameRu && <span style={{ fontSize: '0.65rem', color: '#5A9050' }}>🤖 DeepL</span>}
-                      <button onClick={() => translateField('nameRu')} disabled={!!translating['nameRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
+                      <button onClick={() => translateField('nameRo', 'nameRu')} disabled={!!translating['nameRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
                         {translating['nameRu'] ? '...' : '🔄 RU'}
                       </button>
                     </div>
@@ -290,7 +292,7 @@ export default function AdminSfintiPage() {
                     <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
                       {!form.nameEn && <span style={{ fontSize: '0.65rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
                       {form.nameEn && <span style={{ fontSize: '0.65rem', color: '#5A9050' }}>🤖 DeepL</span>}
-                      <button onClick={() => translateField('nameEn')} disabled={!!translating['nameEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
+                      <button onClick={() => translateField('nameRo', 'nameEn')} disabled={!!translating['nameEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
                         {translating['nameEn'] ? '...' : '🔄 EN'}
                       </button>
                     </div>
@@ -313,8 +315,28 @@ export default function AdminSfintiPage() {
 
               {/* Life */}
               <div style={{ flex: 1 }}>
-                <label style={lbl}>Viața sfântului (conținut)</label>
+                <label style={lbl}>Viața sfântului (Română)</label>
                 <TipTapEditor value={form.lifeRo} onChange={val => setForm(f => ({ ...f, lifeRo: val }))} placeholder="Viața și faptele sfântului..." />
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <label style={{ ...lbl, marginBottom: 0 }}>Viața sfântului (Rusă)</label>
+                  <button onClick={() => translateField('lifeRo', 'lifeRu')} disabled={!!translating['lifeRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
+                    {translating['lifeRu'] ? '...' : '🔄 RU'}
+                  </button>
+                </div>
+                <TipTapEditor value={form.lifeRu} onChange={val => setForm(f => ({ ...f, lifeRu: val }))} placeholder="Житие и деяния святого..." />
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
+                  <label style={{ ...lbl, marginBottom: 0 }}>Viața sfântului (Engleză)</label>
+                  <button onClick={() => translateField('lifeRo', 'lifeEn')} disabled={!!translating['lifeEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
+                    {translating['lifeEn'] ? '...' : '🔄 EN'}
+                  </button>
+                </div>
+                <TipTapEditor value={form.lifeEn} onChange={val => setForm(f => ({ ...f, lifeEn: val }))} placeholder="The life and deeds of the saint..." />
               </div>
 
               {/* Gallery */}

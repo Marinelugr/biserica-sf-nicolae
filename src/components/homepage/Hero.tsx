@@ -23,7 +23,7 @@ export default function Hero() {
       <div className="absolute inset-0">
         <Image
           src="/images/12.jpg"
-          alt="Vedere aeriană a Bisericii Sfântul Ierarh Nicolae, Hîrtopul Mic"
+          alt={t.home.heroImageAlt}
           fill
           className="object-cover object-center"
           priority
