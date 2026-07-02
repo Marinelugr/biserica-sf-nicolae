@@ -63,6 +63,11 @@ export interface Translations {
     blessing: string; thanks: string; contactTitle: string; contactBtn: string
     bankTransfer: string; directDonation: string; anyAmount: string
     progress: string; target: string
+    galleryTitle: string; gallerySubtitle: string; galleryEmpty: string
+    videosTitle: string; videosEmpty: string
+    bankAccountsTitle: string; ibanAccountsTitle: string; paypalTitle: string; beneficiaryLabel: string
+    copyLabel: string; copiedLabel: string
+    contactSocialTitle: string; viberWhatsappTelegram: string
   }
   footer: {
     parish: string; address: string; country: string; metropolis: string
@@ -179,6 +184,13 @@ const ro: Translations = {
     bankTransfer: 'Transfer bancar', directDonation: 'Donație directă',
     anyAmount: 'Orice sumă, oricât de mică, ajută la restaurarea lăcașului sfânt.',
     progress: 'Realizat', target: 'Țintă',
+    galleryTitle: 'Galerie foto', gallerySubtitle: 'Imagini din viața și lucrările parohiei',
+    galleryEmpty: 'Fotografiile lucrărilor vor fi adăugate în curând.',
+    videosTitle: 'Cuvântul părintelui', videosEmpty: 'Video-urile vor fi adăugate în curând.',
+    bankAccountsTitle: 'Conturi în țară', ibanAccountsTitle: 'Conturi din străinătate (IBAN)',
+    paypalTitle: 'PayPal', beneficiaryLabel: 'Beneficiar',
+    copyLabel: 'Copiază', copiedLabel: 'Copiat ✓',
+    contactSocialTitle: 'Contact și rețele sociale', viberWhatsappTelegram: 'Viber · WhatsApp · Telegram',
   },
   footer: {
     parish: 'Parohia Ortodoxă', address: 'Hîrtopul Mic, Raionul Criuleni',

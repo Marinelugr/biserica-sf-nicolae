@@ -1,6 +1,11 @@
+import 'dotenv/config'
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter })
 
 async function main() {
   console.log('🌱 Seeding database...')
@@ -204,6 +209,50 @@ Dumnezeu să ne ajute să petrecem acest post cu folos duhovnicesc!`,
     })
   }
 
+  // ─── Proiecte de donație ─────────────────────────────────────────────────────
+  const donationProjectsCount = await prisma.donationProject.count()
+  if (donationProjectsCount === 0) {
+    await prisma.donationProject.createMany({
+      data: [
+        {
+          titleRo: 'Renovarea acoperișului',
+          descriptionRo: 'Înlocuirea completă a acoperișului bisericii cu materiale durabile, pentru protejarea lăcașului sfânt.',
+          progress: 35,
+          target: '150,000 MDL',
+          order: 0,
+        },
+        {
+          titleRo: 'Renovarea turnului clopotniță',
+          descriptionRo: 'Restaurarea și consolidarea turnului clopotniță, element central al arhitecturii parohiei.',
+          progress: 20,
+          target: '80,000 MDL',
+          order: 1,
+        },
+        {
+          titleRo: 'Pictarea interiorului',
+          descriptionRo: 'Realizarea picturii murale ortodoxe în interiorul bisericii, conform canoanelor bizantine.',
+          progress: 10,
+          target: '300,000 MDL',
+          order: 2,
+        },
+        {
+          titleRo: 'Lucrări electrice',
+          descriptionRo: 'Modernizarea instalației electrice și iluminatul arhitectural al iconostasului și naosului.',
+          progress: 60,
+          target: '45,000 MDL',
+          order: 3,
+        },
+        {
+          titleRo: 'Automatizarea clopotelor',
+          descriptionRo: 'Sistem electronic de automatizare a clopotelor pentru chemarea credincioșilor la slujbe. (planificat)',
+          progress: 0,
+          target: '25,000 MDL',
+          order: 4,
+        },
+      ],
+    })
+  }
+
   // ─── Settings ────────────────────────────────────────────────────────────────
   await prisma.setting.upsert({
     where: { key: 'site_name' },
@@ -229,6 +278,7 @@ Dumnezeu să ne ajute să petrecem acest post cu folos duhovnicesc!`,
   console.log('   - 3 articole')
   console.log('   - 4 sfinți')
   console.log('   - 3 setări')
+  console.log('   - 5 proiecte de donație')
 }
 
 main()

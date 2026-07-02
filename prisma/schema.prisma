@@ -285,3 +285,36 @@ model Priest {
   facebook  String?
   createdAt DateTime @default(now())
 }
+
+// ─── Donații ──────────────────────────────────────────────────────────────
+
+model DonationProject {
+  id            String   @id @default(cuid())
+  titleRo       String
+  titleRu       String?
+  titleEn       String?
+  descriptionRo String   @db.Text
+  descriptionRu String?  @db.Text
+  descriptionEn String?  @db.Text
+  progress      Int      @default(0)
+  target        String
+  order         Int      @default(0)
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+}
+
+model DonationConfig {
+  id            String   @id @default(cuid())
+  localAccounts Json
+  ibanAccounts  Json
+  paypalEmail   String?
+  paypalLink    String?
+  contactName   String?
+  contactPhone  String?
+  facebookUrl   String?
+  tiktokUrl     String?
+  instagramUrl  String?
+  safetyNote    String?  @db.Text
+  videoLinks    Json     @default("[]")
+  updatedAt     DateTime @updatedAt
+}

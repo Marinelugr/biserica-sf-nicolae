@@ -94,6 +94,13 @@ const en: Translations = {
     bankTransfer: 'Bank Transfer', directDonation: 'Direct Donation',
     anyAmount: 'Any amount, however small, helps restore this holy place.',
     progress: 'Completed', target: 'Goal',
+    galleryTitle: 'Photo Gallery', gallerySubtitle: 'Images from the life and works of the parish',
+    galleryEmpty: 'Photos of the works will be added soon.',
+    videosTitle: 'A Word from the Priest', videosEmpty: 'Videos will be added soon.',
+    bankAccountsTitle: 'Domestic Accounts', ibanAccountsTitle: 'International Accounts (IBAN)',
+    paypalTitle: 'PayPal', beneficiaryLabel: 'Beneficiary',
+    copyLabel: 'Copy', copiedLabel: 'Copied ✓',
+    contactSocialTitle: 'Contact and Social Media', viberWhatsappTelegram: 'Viber · WhatsApp · Telegram',
   },
   footer: {
     parish: 'Orthodox Parish', address: 'Hîrtopul Mic, Criuleni District',

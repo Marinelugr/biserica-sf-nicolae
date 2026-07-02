@@ -94,6 +94,13 @@ const ru: Translations = {
     bankTransfer: 'Банковский перевод', directDonation: 'Прямое пожертвование',
     anyAmount: 'Любая сумма, как бы мала она ни была, помогает восстановлению храма.',
     progress: 'Выполнено', target: 'Цель',
+    galleryTitle: 'Фотогалерея', gallerySubtitle: 'Фотографии из жизни и трудов прихода',
+    galleryEmpty: 'Фотографии работ будут добавлены в ближайшее время.',
+    videosTitle: 'Слово батюшки', videosEmpty: 'Видео будут добавлены в ближайшее время.',
+    bankAccountsTitle: 'Счета внутри страны', ibanAccountsTitle: 'Счета из-за рубежа (IBAN)',
+    paypalTitle: 'PayPal', beneficiaryLabel: 'Получатель',
+    copyLabel: 'Копировать', copiedLabel: 'Скопировано ✓',
+    contactSocialTitle: 'Контакты и соцсети', viberWhatsappTelegram: 'Viber · WhatsApp · Telegram',
   },
   footer: {
     parish: 'Православный приход', address: 'Хыртопул Мик, Район Криулень',
