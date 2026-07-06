@@ -44,8 +44,7 @@ function getDaysInMonth(year: number, month: number) {
   return new Date(year, month, 0).getDate()
 }
 function getFirstDayOfMonth(year: number, month: number) {
-  const d = new Date(year, month - 1, 1).getDay()
-  return d === 0 ? 6 : d - 1
+  return new Date(year, month - 1, 1).getDay()
 }
 
 const emptyForm = { day: '', time: '08:00', serviceRo: '', serviceRu: '', notes: '' }
