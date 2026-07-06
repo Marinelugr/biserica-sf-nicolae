@@ -4,7 +4,7 @@ const en: Translations = {
   nav: {
     home: 'Home', bible: 'Bible', calendar: 'Calendar', books: 'Library',
     churchHistory: 'Church History', saintNicholas: 'Saint Nicholas', priest: 'Our Parish Priest',
-    video: 'Video', shop: 'Shop', donate: 'Donate',
+    video: 'Video', live: 'Live', shop: 'Shop', donate: 'Donate',
   },
   home: {
     heroTitle: 'Church of Saint Nicholas the Hierarch',

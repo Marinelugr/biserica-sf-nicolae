@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useI18n, type Locale } from '@/lib/i18n/context'
+import { useLiveStatus } from '@/lib/hooks/useLiveStatus'
 
 const LOCALES: Locale[] = ['ro', 'ru', 'en']
 
@@ -11,6 +12,7 @@ export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { t, locale, setLocale } = useI18n()
   const router = useRouter()
+  const isLive = useLiveStatus()?.isLive ?? false
 
   function changeLocale(l: Locale) {
     setLocale(l)
@@ -65,6 +67,17 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+
+            <Link
+              href="/live"
+              className="font-body whitespace-nowrap flex items-center gap-1.5 transition-colors duration-200 hover:text-amber-400"
+              style={{ color: '#9B8050', fontSize: '16px' }}
+            >
+              {t.nav.live}
+              {isLive && (
+                <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.7rem' }} aria-label="LIVE">●</span>
+              )}
+            </Link>
 
             <Link
               href="/donatii"
@@ -135,6 +148,17 @@ export default function Header() {
                 {link.label}
               </Link>
             ))}
+            <Link
+              href="/live"
+              onClick={() => setMenuOpen(false)}
+              className="font-body py-2.5 px-3 rounded transition-colors hover:bg-stone-900 flex items-center gap-1.5"
+              style={{ color: '#C9A84C', fontSize: '16px' }}
+            >
+              {t.nav.live}
+              {isLive && (
+                <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.7rem' }} aria-label="LIVE">●</span>
+              )}
+            </Link>
             <Link
               href="/donatii"
               onClick={() => setMenuOpen(false)}

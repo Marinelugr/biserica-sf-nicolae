@@ -1,26 +1,9 @@
-import { prisma } from '@/lib/prisma'
 import { getServerT } from '@/lib/i18n/server'
-
-function extractYouTubeId(url: string): string | null {
-  if (!url?.trim()) return null
-  if (/^[A-Za-z0-9_-]{11}$/.test(url.trim())) return url.trim()
-  const m = url.match(/(?:youtube\.com\/live\/|youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([A-Za-z0-9_-]{11})/)
-  return m ? m[1] : null
-}
+import { getCombinedLiveStatus } from '@/lib/live-stream'
 
 export default async function LiveStreamCard() {
   const t = await getServerT()
-  let isLive = false
-  let videoId: string | null = null
-
-  try {
-    const [activeSetting, urlSetting] = await Promise.all([
-      prisma.setting.findUnique({ where: { key: 'live_stream_active' } }),
-      prisma.setting.findUnique({ where: { key: 'live_stream_url' } }),
-    ])
-    isLive = activeSetting?.value === 'true'
-    videoId = extractYouTubeId(urlSetting?.value || '')
-  } catch { /* DB unavailable — hide card */ }
+  const { isLive, videoId } = await getCombinedLiveStatus()
 
   if (!isLive || !videoId) return null
 

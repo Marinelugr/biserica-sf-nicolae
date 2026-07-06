@@ -1,7 +1,7 @@
 export interface Translations {
   nav: {
     home: string; bible: string; calendar: string; books: string
-    churchHistory: string; saintNicholas: string; priest: string; video: string; shop: string; donate: string
+    churchHistory: string; saintNicholas: string; priest: string; video: string; live: string; shop: string; donate: string
   }
   home: {
     heroTitle: string; heroSubtitle: string; heroMitropolia: string; heroImageAlt: string
@@ -135,7 +135,7 @@ const ro: Translations = {
   nav: {
     home: 'Acasă', bible: 'Biblie', calendar: 'Calendar', books: 'Bibliotecă',
     churchHistory: 'Istoria Bisericii', saintNicholas: 'Sfântul Nicolae', priest: 'Parohul Bisericii',
-    video: 'Video', shop: 'Magazin', donate: 'Donații',
+    video: 'Video', live: 'Live', shop: 'Magazin', donate: 'Donații',
   },
   home: {
     heroTitle: 'Biserica Sfântul Ierarh Nicolae',

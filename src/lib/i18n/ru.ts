@@ -4,7 +4,7 @@ const ru: Translations = {
   nav: {
     home: 'Главная', bible: 'Библия', calendar: 'Календарь', books: 'Библиотека',
     churchHistory: 'История Церкви', saintNicholas: 'Святой Николай', priest: 'Священник прихода',
-    video: 'Видео', shop: 'Магазин', donate: 'Пожертвовать',
+    video: 'Видео', live: 'Прямой эфир', shop: 'Магазин', donate: 'Пожертвовать',
   },
   home: {
     heroTitle: 'Церковь Святителя Николая',
