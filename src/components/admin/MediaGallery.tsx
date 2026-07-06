@@ -217,14 +217,14 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
           </span>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '0.875rem' }}>
+        <div className="mg-grid">
           {items.map((item, i) => (
-            <div key={item.id} style={{ backgroundColor: '#0A0704', border: '1px solid #2A1A0A', borderRadius: '6px', overflow: 'hidden' }}>
-              <div style={{ position: 'relative', aspectRatio: '4/3' }}>
+            <div key={item.id} className="mg-item" style={{ backgroundColor: '#0A0704', border: '1px solid #2A1A0A', borderRadius: '6px', overflow: 'hidden' }}>
+              <div style={{ position: 'relative' }}>
                 <img
                   src={(item as MediaItem & { thumbnailUrl?: string }).thumbnailUrl || item.url}
                   alt={item.caption || ''}
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                  style={{ width: '100%', height: 'auto', display: 'block' }}
                   onError={e => {
                     const el = e.target as HTMLImageElement
                     if (el.src !== item.url) el.src = item.url
@@ -259,6 +259,13 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
           ))}
         </div>
       )}
+      <style>{`
+        .mg-grid { columns: 5; column-gap: 0.875rem; }
+        .mg-item { break-inside: avoid; margin-bottom: 0.875rem; }
+        @media (max-width: 1200px) { .mg-grid { columns: 4; } }
+        @media (max-width: 900px)  { .mg-grid { columns: 3; } }
+        @media (max-width: 600px)  { .mg-grid { columns: 2; } }
+      `}</style>
     </div>
   )
 }

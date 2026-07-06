@@ -63,28 +63,23 @@ export default function PublicGallery({ items }: Props) {
 
   return (
     <>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-        gap: '0.875rem',
-      }}>
+      <div className="pg-grid">
         {items.map((item, i) => (
           <div
             key={item.id}
+            className="pg-item"
             onClick={() => open(i)}
             style={{ cursor: 'pointer', borderRadius: '6px', overflow: 'hidden', border: '1px solid #2A1A0A', backgroundColor: '#1A1008' }}
           >
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '160px', backgroundColor: '#1A1008' }}>
-              <img
-                src={item.thumbnailUrl || item.url}
-                alt={item.caption || ''}
-                loading="lazy"
-                style={{ width: '100%', height: 'auto', maxHeight: '320px', objectFit: 'contain', display: 'block', transition: 'transform 0.25s' }}
-                onMouseEnter={e => { (e.target as HTMLImageElement).style.transform = 'scale(1.04)' }}
-                onMouseLeave={e => { (e.target as HTMLImageElement).style.transform = 'scale(1)' }}
-                onError={e => { const el = e.target as HTMLImageElement; if (item.thumbnailUrl && el.src !== item.url) el.src = item.url }}
-              />
-            </div>
+            <img
+              src={item.thumbnailUrl || item.url}
+              alt={item.caption || ''}
+              loading="lazy"
+              style={{ width: '100%', height: 'auto', display: 'block', transition: 'transform 0.25s' }}
+              onMouseEnter={e => { (e.target as HTMLImageElement).style.transform = 'scale(1.04)' }}
+              onMouseLeave={e => { (e.target as HTMLImageElement).style.transform = 'scale(1)' }}
+              onError={e => { const el = e.target as HTMLImageElement; if (item.thumbnailUrl && el.src !== item.url) el.src = item.url }}
+            />
             {item.caption && (
               <div style={{ padding: '0.5rem 0.75rem', color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.78rem', lineHeight: 1.4 }}>
                 {item.caption}
@@ -93,6 +88,13 @@ export default function PublicGallery({ items }: Props) {
           </div>
         ))}
       </div>
+      <style>{`
+        .pg-grid { columns: 4; column-gap: 0.875rem; }
+        .pg-item { break-inside: avoid; margin-bottom: 0.875rem; }
+        @media (max-width: 1024px) { .pg-grid { columns: 3; } }
+        @media (max-width: 768px)  { .pg-grid { columns: 2; } }
+        @media (max-width: 480px)  { .pg-grid { columns: 1; } }
+      `}</style>
 
       {lightbox !== null && (
         <div
