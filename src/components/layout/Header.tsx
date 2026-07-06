@@ -2,21 +2,22 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useI18n, type Locale } from '@/lib/i18n/context'
+import { localizedHref } from '@/lib/i18n/href'
 import { useLiveStatus } from '@/lib/hooks/useLiveStatus'
 
 const LOCALES: Locale[] = ['ro', 'ru', 'en']
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const { t, locale, setLocale } = useI18n()
-  const router = useRouter()
+  const { t, locale } = useI18n()
   const isLive = useLiveStatus()?.isLive ?? false
 
   function changeLocale(l: Locale) {
-    setLocale(l)
-    router.refresh()
+    if (l === locale) return
+    const currentPath = window.location.pathname
+    const cleanPath = currentPath.replace(/^\/(ro|ru|en)(?=\/|$)/, '') || '/'
+    window.location.href = localizedHref(cleanPath, l)
   }
 
   const navLinks = [
@@ -29,7 +30,11 @@ export default function Header() {
     { href: '/paroh', label: t.nav.priest },
     { href: '/video', label: t.nav.video },
     { href: '/magazin', label: t.nav.shop },
-  ]
+  ].map(link => ({ ...link, href: localizedHref(link.href, locale) }))
+
+  const liveHref = localizedHref('/live', locale)
+  const donateHref = localizedHref('/donatii', locale)
+  const homeHref = localizedHref('/', locale)
 
   return (
     <header
@@ -40,7 +45,7 @@ export default function Header() {
         <div className="flex items-center justify-between h-16">
 
           {/* Logo — DOAR cruce + titlu */}
-          <Link href="/" className="flex items-center gap-2 shrink-0 group" aria-label="Acasă">
+          <Link href={homeHref} className="flex items-center gap-2 shrink-0 group" aria-label="Acasă">
             <span
               aria-hidden="true"
               style={{ color: '#C9A84C', fontSize: '26px', lineHeight: 1 }}
@@ -69,7 +74,7 @@ export default function Header() {
             ))}
 
             <Link
-              href="/live"
+              href={liveHref}
               className="font-body whitespace-nowrap flex items-center gap-1.5 transition-colors duration-200 hover:text-amber-400"
               style={{ color: '#9B8050', fontSize: '16px' }}
             >
@@ -80,7 +85,7 @@ export default function Header() {
             </Link>
 
             <Link
-              href="/donatii"
+              href={donateHref}
               className="font-body whitespace-nowrap px-4 py-2 rounded border transition-all duration-200 hover:bg-red-950"
               style={{
                 color: '#C06050',
@@ -98,12 +103,15 @@ export default function Header() {
                 <span key={l} className="flex items-center">
                   <button
                     onClick={() => changeLocale(l)}
-                    className="font-body uppercase transition-colors duration-200 hover:text-amber-400"
+                    className="font-body uppercase transition-opacity duration-200 hover:opacity-100"
                     style={{
-                      color: locale === l ? '#C9A84C' : '#5A4020',
+                      color: '#C9A84C',
+                      opacity: locale === l ? 1 : 0.6,
                       fontSize: '13px',
-                      fontWeight: locale === l ? 600 : 400,
+                      fontWeight: locale === l ? 700 : 400,
                       letterSpacing: '0.05em',
+                      textDecoration: locale === l ? 'underline' : 'none',
+                      textUnderlineOffset: '3px',
                     }}
                     aria-pressed={locale === l}
                     aria-label={`Limba ${l.toUpperCase()}`}
@@ -111,7 +119,7 @@ export default function Header() {
                     {l.toUpperCase()}
                   </button>
                   {i < LOCALES.length - 1 && (
-                    <span style={{ color: '#2A1A0A', fontSize: '12px', margin: '0 3px' }}>|</span>
+                    <span style={{ color: '#C9A84C', opacity: 0.3, fontSize: '12px', margin: '0 3px' }}>|</span>
                   )}
                 </span>
               ))}
@@ -149,7 +157,7 @@ export default function Header() {
               </Link>
             ))}
             <Link
-              href="/live"
+              href={liveHref}
               onClick={() => setMenuOpen(false)}
               className="font-body py-2.5 px-3 rounded transition-colors hover:bg-stone-900 flex items-center gap-1.5"
               style={{ color: '#C9A84C', fontSize: '16px' }}
@@ -160,7 +168,7 @@ export default function Header() {
               )}
             </Link>
             <Link
-              href="/donatii"
+              href={donateHref}
               onClick={() => setMenuOpen(false)}
               className="font-body mt-2 py-2.5 px-4 rounded border text-center transition-colors hover:bg-red-950"
               style={{ color: '#C06050', borderColor: '#6B1A1A', fontSize: '16px', borderWidth: '1.5px' }}
@@ -170,16 +178,19 @@ export default function Header() {
 
             {/* Selector limbă mobile */}
             <div className="flex items-center gap-3 px-3 pt-3 pb-1">
-              <span className="font-body" style={{ color: '#5A4020', fontSize: '13px' }}>Limbă:</span>
+              <span className="font-body" style={{ color: '#9B8050', fontSize: '13px' }}>Limbă:</span>
               {LOCALES.map(l => (
                 <button
                   key={l}
                   onClick={() => { changeLocale(l); setMenuOpen(false) }}
-                  className="font-body uppercase transition-colors"
+                  className="font-body uppercase transition-opacity"
                   style={{
-                    color: locale === l ? '#C9A84C' : '#5A4020',
+                    color: '#C9A84C',
+                    opacity: locale === l ? 1 : 0.6,
                     fontSize: '14px',
-                    fontWeight: locale === l ? 600 : 400,
+                    fontWeight: locale === l ? 700 : 400,
+                    textDecoration: locale === l ? 'underline' : 'none',
+                    textUnderlineOffset: '3px',
                   }}
                 >
                   {l.toUpperCase()}

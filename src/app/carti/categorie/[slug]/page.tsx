@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${label} | Bibliotecă Ortodoxă — Sf. Nicolae Hîrtopul Mic`,
     description,
-    alternates: { canonical: `/carti/categorie/${slug}` },
+    alternates: buildAlternates(`/carti/categorie/${slug}`),
     openGraph: {
       title: `${label} | Bibliotecă Ortodoxă`,
       description,

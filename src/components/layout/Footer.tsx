@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { localizedHref } from '@/lib/i18n/href'
 
 const CONTACT_INFO = {
   phone: '+373 XXX XXXXX',
@@ -7,7 +8,7 @@ const CONTACT_INFO = {
 }
 
 export default async function Footer() {
-  const t = await getServerT()
+  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
   const year = new Date().getFullYear()
 
   const pageLinks = [
@@ -19,7 +20,7 @@ export default async function Footer() {
     { href: '/sfantul-nicolae',    label: t.footer.pages.saint },
     { href: '/video',              label: t.footer.pages.video },
     { href: '/stiri',              label: t.footer.pages.news },
-  ]
+  ].map(link => ({ ...link, href: localizedHref(link.href, locale) }))
 
   const scheduleItems = [
     { zi: t.footer.schedule.sunday,   ora: '09:00', slujba: t.footer.schedule.liturgy },
@@ -102,12 +103,12 @@ export default async function Footer() {
             </h3>
             <ul className="space-y-2 mb-6">
               <li>
-                <Link href="/contact" className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#5A4020' }}>
+                <Link href={localizedHref('/contact', locale)} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#5A4020' }}>
                   {t.footer.contact}
                 </Link>
               </li>
               <li>
-                <Link href="/donatii" className="font-body text-sm transition-colors hover:text-red-400" style={{ color: '#8B1A1A' }}>
+                <Link href={localizedHref('/donatii', locale)} className="font-body text-sm transition-colors hover:text-red-400" style={{ color: '#8B1A1A' }}>
                   {t.footer.support}
                 </Link>
               </li>
@@ -159,7 +160,7 @@ export default async function Footer() {
               { href: '/donatii', label: t.nav.donate },
               { href: '/magazin', label: t.nav.shop },
             ].map(link => (
-              <Link key={link.href} href={link.href} className="font-body text-xs transition-colors hover:text-amber-600" style={{ color: '#3A2010' }}>
+              <Link key={link.href} href={localizedHref(link.href, locale)} className="font-body text-xs transition-colors hover:text-amber-600" style={{ color: '#3A2010' }}>
                 {link.label}
               </Link>
             ))}

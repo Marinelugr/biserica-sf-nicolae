@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { formatDate } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: plainText,
-    alternates: { canonical: `/stiri/${slug}` },
+    alternates: buildAlternates(`/stiri/${slug}`),
     openGraph: {
       title,
       description: plainText,

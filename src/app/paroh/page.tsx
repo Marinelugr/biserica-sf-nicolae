@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `Parohul Bisericii — ${priest?.nameRo ?? 'Preot Paroh'} | Sf. Nicolae Hîrtopul Mic`,
     description: plainBio,
-    alternates: { canonical: '/paroh' },
+    alternates: buildAlternates('/paroh'),
     openGraph: {
       title: `${priest?.nameRo ?? 'Preot Paroh'} — Parohul Bisericii`,
       description: plainBio,

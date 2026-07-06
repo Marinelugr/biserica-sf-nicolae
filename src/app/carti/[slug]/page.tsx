@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import PublicGallery from '@/components/PublicGallery'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -48,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${title} | Bibliotecă Ortodoxă`,
     description: plain,
-    alternates: { canonical: `/carti/${slug}` },
+    alternates: buildAlternates(`/carti/${slug}`),
     openGraph: {
       title, description: plain, type: 'article',
       url: `/carti/${slug}`,
