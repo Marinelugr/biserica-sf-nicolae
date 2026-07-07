@@ -13,6 +13,11 @@ export default async function LiveStreamCard() {
         {/* Header row */}
         <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
           <div className="flex items-center gap-3">
+            {/* Clopote animate */}
+            <div style={{ display: 'flex', alignItems: 'center' }}>
+              <span className="bell-icon" style={{ fontSize: '22px' }}>🔔</span>
+              <span className="bell-icon" style={{ fontSize: '18px', animationDelay: '0.2s', marginLeft: '2px' }}>🔔</span>
+            </div>
             {/* Pulsing LIVE badge */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', backgroundColor: '#2A0505', border: '1px solid #5A1A1A', borderRadius: '20px', padding: '0.35rem 0.875rem' }}>
               <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.75rem' }}>●</span>

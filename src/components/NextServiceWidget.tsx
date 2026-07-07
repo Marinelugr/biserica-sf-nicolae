@@ -9,88 +9,111 @@ interface TimeLeft {
   secunde: number
 }
 
-interface NextServiceInfo {
-  name: string
-  time: string
-  day: string
+interface ServiceInfo {
+  titlu: string
+  data: string
+  ora: string
 }
 
-interface ScheduleEntry {
+interface FallbackEntry {
   day: number
   hour: number
   minute: number
-  name: string
+  titlu: string
   dayName: string
 }
 
-const SCHEDULE: ScheduleEntry[] = [
-  { day: 0, hour: 9, minute: 0, name: 'Sfânta Liturghie', dayName: 'Duminică' },
-  { day: 5, hour: 8, minute: 0, name: 'Utrenia', dayName: 'Vineri' },
-  { day: 6, hour: 17, minute: 0, name: 'Vecernia și Utrenia', dayName: 'Sâmbătă' },
+const FALLBACK_SCHEDULE: FallbackEntry[] = [
+  { day: 0, hour: 9, minute: 0, titlu: 'Sfânta Liturghie', dayName: 'Duminică' },
+  { day: 5, hour: 8, minute: 0, titlu: 'Utrenia', dayName: 'Vineri' },
+  { day: 6, hour: 17, minute: 0, titlu: 'Vecernia și Utrenia', dayName: 'Sâmbătă' },
 ]
 
-export default function NextServiceWidget() {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null)
-  const [nextService, setNextService] = useState<NextServiceInfo | null>(null)
+function getFallbackService(): ServiceInfo | null {
+  const now = new Date()
+  let minDiff = Infinity
+  let next: (FallbackEntry & { date: Date }) | null = null
 
-  useEffect(() => {
-    function getNextService() {
-      const now = new Date()
-      const currentDay = now.getDay()
-      const currentHour = now.getHours()
-      const currentMinute = now.getMinutes()
-
-      let minDiff = Infinity
-      let nextSvc: (ScheduleEntry & { nextDate: Date; diff: number }) | null = null
-
-      for (const svc of SCHEDULE) {
-        let daysUntil = svc.day - currentDay
-        if (daysUntil < 0) daysUntil += 7
-        if (daysUntil === 0) {
-          if (svc.hour < currentHour || (svc.hour === currentHour && svc.minute <= currentMinute)) {
-            daysUntil = 7
-          }
-        }
-
-        const nextDate = new Date(now)
-        nextDate.setDate(now.getDate() + daysUntil)
-        nextDate.setHours(svc.hour, svc.minute, 0, 0)
-
-        const diff = nextDate.getTime() - now.getTime()
-        if (diff < minDiff) {
-          minDiff = diff
-          nextSvc = { ...svc, nextDate, diff }
-        }
-      }
-
-      if (!nextSvc) return
-
-      const totalSeconds = Math.floor(nextSvc.diff / 1000)
-      const zile = Math.floor(totalSeconds / 86400)
-      const ore = Math.floor((totalSeconds % 86400) / 3600)
-      const minute = Math.floor((totalSeconds % 3600) / 60)
-      const secunde = totalSeconds % 60
-
-      setTimeLeft({ zile, ore, minute, secunde })
-      setNextService({
-        name: nextSvc.name,
-        time: `${String(nextSvc.hour).padStart(2, '0')}:${String(nextSvc.minute).padStart(2, '0')}`,
-        day: nextSvc.dayName,
-      })
+  for (const entry of FALLBACK_SCHEDULE) {
+    let daysUntil = entry.day - now.getDay()
+    if (daysUntil < 0) daysUntil += 7
+    if (daysUntil === 0 && (entry.hour < now.getHours() || (entry.hour === now.getHours() && entry.minute <= now.getMinutes()))) {
+      daysUntil = 7
     }
 
-    getNextService()
-    const interval = setInterval(getNextService, 1000)
-    return () => clearInterval(interval)
+    const date = new Date(now)
+    date.setDate(now.getDate() + daysUntil)
+    date.setHours(entry.hour, entry.minute, 0, 0)
+
+    const diff = date.getTime() - now.getTime()
+    if (diff < minDiff) {
+      minDiff = diff
+      next = { ...entry, date }
+    }
+  }
+
+  if (!next) return null
+  return {
+    titlu: next.titlu,
+    data: next.date.toISOString(),
+    ora: `${String(next.hour).padStart(2, '0')}:${String(next.minute).padStart(2, '0')}`,
+  }
+}
+
+export default function NextServiceWidget() {
+  const [service, setService] = useState<ServiceInfo | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null)
+
+  useEffect(() => {
+    async function fetchNextService() {
+      try {
+        const res = await fetch('/api/next-service')
+        const result = await res.json()
+        if (result.found) {
+          setService({ titlu: result.titlu, data: result.data, ora: result.ora })
+        } else {
+          setService(getFallbackService())
+        }
+      } catch {
+        setService(getFallbackService())
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchNextService()
   }, [])
 
-  if (!timeLeft || !nextService) return null
+  useEffect(() => {
+    if (!service) return
+    function tick() {
+      if (!service) return
+      const diff = new Date(service.data).getTime() - Date.now()
+      if (diff <= 0) {
+        setTimeLeft(null)
+        return
+      }
+      const totalSeconds = Math.floor(diff / 1000)
+      setTimeLeft({
+        zile: Math.floor(totalSeconds / 86400),
+        ore: Math.floor((totalSeconds % 86400) / 3600),
+        minute: Math.floor((totalSeconds % 3600) / 60),
+        secunde: totalSeconds % 60,
+      })
+    }
+    tick()
+    const interval = setInterval(tick, 1000)
+    return () => clearInterval(interval)
+  }, [service])
+
+  if (loading) return <div className="next-service-widget skeleton max-w-md mx-auto" />
+  if (!service || !timeLeft) return null
 
   return (
     <div className="next-service-widget max-w-md mx-auto">
       <div className="widget-label">⛪ Următoarea slujbă</div>
-      <div className="widget-service-name">{nextService.name}</div>
-      <div className="widget-service-time">{nextService.day} · {nextService.time}</div>
+      <div className="widget-service-name">{service.titlu}</div>
+      <div className="widget-service-time">{service.ora}</div>
       <div className="widget-countdown">
         {timeLeft.zile > 0 && (
           <div className="countdown-unit">
