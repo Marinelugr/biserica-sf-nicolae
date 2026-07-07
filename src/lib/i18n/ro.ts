@@ -2,6 +2,7 @@ export interface Translations {
   nav: {
     home: string; bible: string; calendar: string; books: string
     churchHistory: string; saintNicholas: string; priest: string; video: string; live: string; shop: string; donate: string
+    contact: string
   }
   home: {
     heroTitle: string; heroSubtitle: string; heroMitropolia: string; heroImageAlt: string
@@ -129,6 +130,17 @@ export interface Translations {
     searchInBible: string; searchInLibrary: string; enterTerm: string
   }
   common: { loading: string; backToTop: string; gallery: string; backTo: string; allCategories: string }
+  contactPage: {
+    title: string; subtitle: string
+    addressLabel: string; hramLabel: string; hramValue: string
+    phoneLabel: string; emailLabel: string; facebookLabel: string
+    scheduleTitle: string
+    mapTitle: string
+    formTitle: string; nameLabel: string; emailLabel2: string; messageLabel: string
+    namePlaceholder: string; emailPlaceholder: string; messagePlaceholder: string
+    submitBtn: string; sendingBtn: string
+    successMsg: string; errorMsg: string
+  }
 }
 
 const ro: Translations = {
@@ -136,6 +148,7 @@ const ro: Translations = {
     home: 'Acasă', bible: 'Biblie', calendar: 'Calendar', books: 'Bibliotecă',
     churchHistory: 'Istoria Bisericii', saintNicholas: 'Sfântul Nicolae', priest: 'Parohul Bisericii',
     video: 'Video', live: 'Live', shop: 'Magazin', donate: 'Donații',
+    contact: 'Contact',
   },
   home: {
     heroTitle: 'Biserica Sfântul Ierarh Nicolae',
@@ -353,6 +366,18 @@ const ro: Translations = {
     enterTerm: 'Introduceți un termen pentru a căuta în întregul site.',
   },
   common: { loading: 'Se încarcă...', backToTop: 'Sus', gallery: 'Galerie foto', backTo: 'Înapoi la', allCategories: 'Toate categoriile →' },
+  contactPage: {
+    title: 'Contactați-ne', subtitle: 'Suntem bucuroși să răspundem întrebărilor dumneavoastră',
+    addressLabel: 'Adresă', hramLabel: 'Hram', hramValue: 'Sfântul Ierarh Nicolae (19 decembrie / 22 mai)',
+    phoneLabel: 'Telefon', emailLabel: 'Email', facebookLabel: 'Facebook',
+    scheduleTitle: 'Program slujbe',
+    mapTitle: 'Cum ajungeți la noi',
+    formTitle: 'Trimite un mesaj', nameLabel: 'Nume', emailLabel2: 'Email', messageLabel: 'Mesaj',
+    namePlaceholder: 'Numele dumneavoastră', emailPlaceholder: 'email@exemplu.com', messagePlaceholder: 'Scrieți mesajul dumneavoastră...',
+    submitBtn: 'Trimite mesajul', sendingBtn: 'Se trimite...',
+    successMsg: '✓ Mesajul a fost trimis cu succes! Vă vom răspunde în cel mai scurt timp.',
+    errorMsg: '✗ A apărut o eroare. Vă rugăm să încercați din nou sau să ne contactați direct.',
+  },
 }
 
 export default ro

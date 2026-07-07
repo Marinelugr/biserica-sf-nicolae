@@ -13,6 +13,15 @@ interface DailyData {
 interface DailyCardsProps {
   data: DailyData
   todayLabel: string
+  enabled: Record<string, boolean>
+  order: string[]
+}
+
+const GRID_COLS: Record<number, string> = {
+  1: 'sm:grid-cols-1 lg:grid-cols-1',
+  2: 'sm:grid-cols-2 lg:grid-cols-2',
+  3: 'sm:grid-cols-2 lg:grid-cols-3',
+  4: 'sm:grid-cols-2 lg:grid-cols-4',
 }
 
 const cardVariants = {
@@ -24,10 +33,11 @@ const cardVariants = {
   }),
 }
 
-export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
+export default function DailyCards({ data, todayLabel, enabled, order }: DailyCardsProps) {
   const { t } = useI18n()
-  const cards = [
+  const allCards = [
     {
+      key: 'sfintii_zilei',
       dot: '#8B6014',
       icon: '✦',
       label: t.home.saintsToday,
@@ -50,6 +60,7 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
       linkLabel: t.home.allSaintsLink,
     },
     {
+      key: 'evanghelia_zilei',
       dot: '#8B1A1A',
       icon: '✦',
       label: t.home.gospelToday,
@@ -67,6 +78,7 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
       linkLabel: t.home.readFullGospel,
     },
     {
+      key: 'rugaciunea_zilei',
       dot: '#6B4A2A',
       icon: '✦',
       label: t.home.prayerToday,
@@ -84,6 +96,7 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
       linkLabel: t.home.allPrayersLink,
     },
     {
+      key: 'program_slujbe',
       dot: '#4A6A2A',
       icon: '✦',
       label: t.home.serviceSchedule,
@@ -117,6 +130,12 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
     },
   ]
 
+  const cards = allCards
+    .filter(card => enabled[card.key] !== false)
+    .sort((a, b) => order.indexOf(a.key) - order.indexOf(b.key))
+
+  if (cards.length === 0) return null
+
   return (
     <section style={{ backgroundColor: '#F2EBD9' }} className="py-14">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,7 +155,7 @@ export default function DailyCards({ data, todayLabel }: DailyCardsProps) {
         </div>
 
         {/* Grid carduri */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className={`grid grid-cols-1 ${GRID_COLS[cards.length] || GRID_COLS[4]} gap-4`}>
           {cards.map((card, i) => (
             <motion.article
               key={card.label}

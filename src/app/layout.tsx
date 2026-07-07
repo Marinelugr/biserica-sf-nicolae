@@ -80,7 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               name: 'Parohia Sfântul Ierarh Nicolae',
               alternateName: 'Biserica Sfântul Nicolae, Hîrtopul Mic',
               url: 'https://biserica-sf-nicolae.org',
-              telephone: '+373-XXX-XXXXX',
+              telephone: '+373-67-306-191',
               address: {
                 '@type': 'PostalAddress',
                 streetAddress: 'Hîrtopul Mic',
@@ -90,8 +90,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               },
               geo: {
                 '@type': 'GeoCoordinates',
-                latitude: 47.1900,
-                longitude: 29.0100,
+                latitude: 47.2469,
+                longitude: 28.9283,
               },
               denomination: 'Eastern Orthodox',
               openingHours: ['Su 09:00-12:00', 'Sa 17:00-19:00'],

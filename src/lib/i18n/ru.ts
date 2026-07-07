@@ -5,6 +5,7 @@ const ru: Translations = {
     home: 'Главная', bible: 'Библия', calendar: 'Календарь', books: 'Библиотека',
     churchHistory: 'История Церкви', saintNicholas: 'Святой Николай', priest: 'Священник прихода',
     video: 'Видео', live: 'Прямой эфир', shop: 'Магазин', donate: 'Пожертвовать',
+    contact: 'Контакты',
   },
   home: {
     heroTitle: 'Церковь Святителя Николая',
@@ -223,6 +224,18 @@ const ru: Translations = {
     enterTerm: 'Введите запрос для поиска по всему сайту.',
   },
   common: { loading: 'Загрузка...', backToTop: 'Наверх', gallery: 'Фотогалерея', backTo: 'Назад к', allCategories: 'Все категории →' },
+  contactPage: {
+    title: 'Связаться с нами', subtitle: 'Мы рады ответить на ваши вопросы',
+    addressLabel: 'Адрес', hramLabel: 'Престольный праздник', hramValue: 'Святитель Николай (19 декабря / 22 мая)',
+    phoneLabel: 'Телефон', emailLabel: 'Эл. почта', facebookLabel: 'Facebook',
+    scheduleTitle: 'Расписание служб',
+    mapTitle: 'Как нас найти',
+    formTitle: 'Отправить сообщение', nameLabel: 'Имя', emailLabel2: 'Эл. почта', messageLabel: 'Сообщение',
+    namePlaceholder: 'Ваше имя', emailPlaceholder: 'email@example.com', messagePlaceholder: 'Напишите ваше сообщение...',
+    submitBtn: 'Отправить сообщение', sendingBtn: 'Отправка...',
+    successMsg: '✓ Сообщение успешно отправлено! Мы ответим вам в ближайшее время.',
+    errorMsg: '✗ Произошла ошибка. Пожалуйста, попробуйте снова или свяжитесь с нами напрямую.',
+  },
 }
 
 export default ru

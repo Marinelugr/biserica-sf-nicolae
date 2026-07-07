@@ -5,6 +5,7 @@ const en: Translations = {
     home: 'Home', bible: 'Bible', calendar: 'Calendar', books: 'Library',
     churchHistory: 'Church History', saintNicholas: 'Saint Nicholas', priest: 'Our Parish Priest',
     video: 'Video', live: 'Live', shop: 'Shop', donate: 'Donate',
+    contact: 'Contact',
   },
   home: {
     heroTitle: 'Church of Saint Nicholas the Hierarch',
@@ -223,6 +224,18 @@ const en: Translations = {
     enterTerm: 'Enter a term to search the entire site.',
   },
   common: { loading: 'Loading...', backToTop: 'Top', gallery: 'Photo Gallery', backTo: 'Back to', allCategories: 'All categories →' },
+  contactPage: {
+    title: 'Contact Us', subtitle: 'We are happy to answer your questions',
+    addressLabel: 'Address', hramLabel: 'Patron Feast', hramValue: 'Saint Nicholas the Hierarch (December 19 / May 22)',
+    phoneLabel: 'Phone', emailLabel: 'Email', facebookLabel: 'Facebook',
+    scheduleTitle: 'Service Schedule',
+    mapTitle: 'How to find us',
+    formTitle: 'Send a message', nameLabel: 'Name', emailLabel2: 'Email', messageLabel: 'Message',
+    namePlaceholder: 'Your name', emailPlaceholder: 'email@example.com', messagePlaceholder: 'Write your message...',
+    submitBtn: 'Send message', sendingBtn: 'Sending...',
+    successMsg: '✓ Message sent successfully! We will reply as soon as possible.',
+    errorMsg: '✗ An error occurred. Please try again or contact us directly.',
+  },
 }
 
 export default en

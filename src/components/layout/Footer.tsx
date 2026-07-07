@@ -3,8 +3,8 @@ import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localizedHref } from '@/lib/i18n/href'
 
 const CONTACT_INFO = {
-  phone: '+373 XXX XXXXX',
-  email: 'parohie@hirtopul-mic.md',
+  phone: '+373 67 306 191',
+  email: 'parinte.marin@biserica-sf-nicolae.org',
 }
 
 export default async function Footer() {

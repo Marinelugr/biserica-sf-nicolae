@@ -24,19 +24,24 @@ interface LibraryItem {
 interface NewsAndLibraryProps {
   articles: Article[]
   libraryBooks: LibraryItem[]
+  showNews: boolean
+  showLibrary: boolean
 }
 
-export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibraryProps) {
+export default function NewsAndLibrary({ articles, libraryBooks, showNews, showLibrary }: NewsAndLibraryProps) {
   const { t, locale } = useI18n()
   const typeLabels: Record<string, string> = t.books.categories
+
+  if (!showNews && !showLibrary) return null
 
   return (
     <section style={{ backgroundColor: '#FFFFFF' }} className="py-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
 
-          {/* ─── Ultimele Știri (3 coloane) ─── */}
-          <div className="lg:col-span-3">
+          {/* ─── Ultimele Știri ─── */}
+          {showNews && (
+          <div className={showLibrary ? 'lg:col-span-3' : 'lg:col-span-5'}>
             <div className="flex items-end justify-between mb-8">
               <div>
                 <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
@@ -127,14 +132,18 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
               </div>
             )}
           </div>
+          )}
 
           {/* ─── Divider vertical ─── */}
+          {showNews && showLibrary && (
           <div className="hidden lg:flex justify-center">
             <div className="w-px" style={{ backgroundColor: '#E8E5E0' }} />
           </div>
+          )}
 
-          {/* ─── Biblioteca Ortodoxă (2 coloane) ─── */}
-          <div className="lg:col-span-1">
+          {/* ─── Biblioteca Ortodoxă ─── */}
+          {showLibrary && (
+          <div className={showNews ? 'lg:col-span-1' : 'lg:col-span-5'}>
             <div className="flex items-end justify-between mb-8">
               <div>
                 <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
@@ -216,6 +225,7 @@ export default function NewsAndLibrary({ articles, libraryBooks }: NewsAndLibrar
               </Link>
             </div>
           </div>
+          )}
         </div>
       </div>
     </section>

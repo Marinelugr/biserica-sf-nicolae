@@ -29,6 +29,13 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
 
   if (isLocale(maybeLocale)) {
     const rest = '/' + segments.slice(2).join('/')
+
+    if (maybeLocale === defaultLocale) {
+      const url = request.nextUrl.clone()
+      url.pathname = rest
+      return NextResponse.redirect(url, 301)
+    }
+
     const url = request.nextUrl.clone()
     url.pathname = rest
     const res = NextResponse.rewrite(url)
