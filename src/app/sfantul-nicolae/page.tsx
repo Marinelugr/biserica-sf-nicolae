@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   title: 'Sfântul Ierarh Nicolae',
   description:
     'Viața Sfântului Ierarh Nicolae — Arhiepiscopul Mirelor Lichiei. Tropar, Condac, date ale prăznuirii și Acatistul Sfântului Nicolae.',
+  alternates: buildAlternates('/sfantul-nicolae'),
 }
 
 function renderPoem(text: string) {

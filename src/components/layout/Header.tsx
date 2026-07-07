@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useI18n, type Locale } from '@/lib/i18n/context'
 import { localizedHref } from '@/lib/i18n/href'
+import { untranslatePath } from '@/lib/i18n/slugs'
 import { useLiveStatus } from '@/lib/hooks/useLiveStatus'
 
 const LOCALES: Locale[] = ['ro', 'ru', 'en']
@@ -66,8 +67,9 @@ export default function Header() {
   function changeLocale(l: Locale) {
     if (l === locale) return
     const currentPath = window.location.pathname
-    const cleanPath = currentPath.replace(/^\/(ro|ru|en)(?=\/|$)/, '') || '/'
-    window.location.href = localizedHref(cleanPath, l)
+    const localizedRest = currentPath.replace(/^\/(ro|ru|en)(?=\/|$)/, '') || '/'
+    const canonicalPath = untranslatePath(localizedRest, locale)
+    window.location.href = localizedHref(canonicalPath, l)
   }
 
   const navLinks = [

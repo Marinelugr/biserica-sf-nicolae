@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Căutare',
   description: 'Caută pe site-ul Parohiei Sfântul Ierarh Nicolae: versete Biblie, articole, rugăciuni, cărți, vieți de sfinți.',
+  alternates: buildAlternates('/cautare'),
 }
 
 const CATEGORIES = [

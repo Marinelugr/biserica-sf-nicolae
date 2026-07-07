@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const metadata: Metadata = {
   title: 'Despre Biserică',
   description:
     'Istoria Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Moldova. Ctitorire, arhitectură, paroh și galerie foto.',
+  alternates: buildAlternates('/despre'),
   openGraph: {
     title: 'Despre Biserică — Parohia Sfântul Nicolae',
     description: 'Istoria și prezentul Parohiei Ortodoxe din Hîrtopul Mic, Criuleni.',

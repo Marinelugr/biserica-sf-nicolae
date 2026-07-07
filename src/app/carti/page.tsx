@@ -2,12 +2,14 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Bibliotecă Ortodoxă',
   description: 'Acatiste, canoane, rugăciuni, slujbe și cărți ortodoxe. Biblioteca digitală a Parohiei Sfântul Ierarh Nicolae.',
+  alternates: buildAlternates('/carti'),
 }
 
 const CATEGORY_META = [

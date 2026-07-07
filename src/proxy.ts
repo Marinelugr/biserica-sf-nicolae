@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest, NextFetchEvent } from 'next/server'
 import { auth } from '@/auth'
+import { untranslatePath } from '@/lib/i18n/slugs'
 
 // next-auth's `auth` export is typed via a rest-tuple union (NextApiRequest, GetServerSidePropsContext, etc.)
 // that TS can't resolve against a plain (request, event) call; narrow it to the proxy-shaped overload it's actually used as.
@@ -28,16 +29,17 @@ export function proxy(request: NextRequest, event: NextFetchEvent) {
   const maybeLocale = segments[1]
 
   if (isLocale(maybeLocale)) {
-    const rest = '/' + segments.slice(2).join('/')
+    const localizedRest = '/' + segments.slice(2).join('/')
+    const canonicalRest = untranslatePath(localizedRest, maybeLocale)
 
     if (maybeLocale === defaultLocale) {
       const url = request.nextUrl.clone()
-      url.pathname = rest
+      url.pathname = canonicalRest
       return NextResponse.redirect(url, 301)
     }
 
     const url = request.nextUrl.clone()
-    url.pathname = rest
+    url.pathname = canonicalRest
     const res = NextResponse.rewrite(url)
     res.cookies.set('locale', maybeLocale, { path: '/', maxAge: 31536000, sameSite: 'lax' })
     return res

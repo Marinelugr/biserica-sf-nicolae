@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
 import { getServerT } from '@/lib/i18n/server'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const metadata: Metadata = {
   title: 'Contact',
   description:
     'Contactează Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Formular de contact, adresă, telefon și program de slujbe.',
+  alternates: buildAlternates('/contact'),
 }
 
 const MAP_EMBED_SRC = 'https://www.google.com/maps?q=47.2469,28.9283&z=15&output=embed'

@@ -4,12 +4,14 @@ import { getLiturgicalDates, formatDate } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
 import { getFixedFeasts, FIXED_FASTS, isApostlesFast } from '@/lib/constants/oldCalendarFeasts'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Calendarul Sfinților',
   description: 'Calendarul Sfinților Ortodocși cu stil vechi (Julian). Sărbători fixe și schimbătoare, posturi, sfinții zilei.',
+  alternates: buildAlternates('/calendar'),
 }
 
 function daysInMonth(month: number, year: number) {

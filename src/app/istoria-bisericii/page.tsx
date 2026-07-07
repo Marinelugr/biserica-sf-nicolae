@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   title: 'Istoria Bisericii',
   description:
     'Istoria Bisericii Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Ctitorii, etapele de construcție și restaurare a lăcașului de cult de la întemeierea sa în secolul al XIX-lea.',
+  alternates: buildAlternates('/istoria-bisericii'),
 }
 
 function extractYouTubeId(url: string): string | null {

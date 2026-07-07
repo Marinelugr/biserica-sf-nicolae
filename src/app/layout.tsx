@@ -59,8 +59,11 @@ export const metadata: Metadata = {
     canonical: 'https://biserica-sf-nicolae.org',
     languages: {
       'ro': 'https://biserica-sf-nicolae.org',
+      'ro-MD': 'https://biserica-sf-nicolae.org',
       'ru': 'https://biserica-sf-nicolae.org/ru',
+      'ru-MD': 'https://biserica-sf-nicolae.org/ru',
       'en': 'https://biserica-sf-nicolae.org/en',
+      'x-default': 'https://biserica-sf-nicolae.org',
     },
   },
 }

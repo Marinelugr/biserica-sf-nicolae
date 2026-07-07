@@ -4,12 +4,14 @@ import Image from 'next/image'
 import { formatDate } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Știri & Articole',
   description: 'Ultimele noutăți și articole de la Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic, Criuleni.',
+  alternates: buildAlternates('/stiri'),
 }
 
 async function getArticles() {

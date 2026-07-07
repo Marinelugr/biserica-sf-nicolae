@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getCombinedLiveStatus, getLastArchivedLive } from '@/lib/live-stream'
 import LiveView from '@/components/live/LiveView'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -19,6 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
+    alternates: buildAlternates('/live'),
     openGraph: {
       title,
       description,

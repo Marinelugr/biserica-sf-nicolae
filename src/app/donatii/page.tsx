@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { DONATII_DEFAULTS, type DonationConfigData, type DonationLocalAccount, type DonationIbanAccount, type DonationVideoLink } from '@/lib/donatii-defaults'
 import PublicGallery from '@/components/PublicGallery'
 import CopyButton from '@/components/CopyButton'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
   title: 'Donații — Susțineți lucrările Bisericii',
   description:
     'Susține Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni. Donații pentru renovarea acoperișului, turnului clopotniță, pictura interiorului și alte lucrări.',
+  alternates: buildAlternates('/donatii'),
 }
 
 function facebookEmbedSrc(url: string) {

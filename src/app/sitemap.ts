@@ -1,24 +1,44 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
+import { translatePath } from '@/lib/i18n/slugs'
 
 const BASE = 'https://biserica-sf-nicolae.org'
 
+function langAlternates(path: string) {
+  const clean = (p: string) => (p === '/' ? '' : p)
+  return {
+    languages: {
+      ro: `${BASE}${clean(path)}`,
+      ru: `${BASE}/ru${clean(translatePath(path, 'ru'))}`,
+      en: `${BASE}/en${clean(translatePath(path, 'en'))}`,
+    },
+  }
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const staticRoutes: MetadataRoute.Sitemap = [
-    { url: BASE, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
-    { url: `${BASE}/despre`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE}/paroh`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE}/biblie`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${BASE}/calendar`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
-    { url: `${BASE}/carti`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
-    { url: `${BASE}/sfantul-nicolae`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.9 },
-    { url: `${BASE}/istoria-bisericii`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
-    { url: `${BASE}/video`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
-    { url: `${BASE}/stiri`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.8 },
-    { url: `${BASE}/donatii`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${BASE}/magazin`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${BASE}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+  const staticPaths: { path: string; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }[] = [
+    { path: '/', changeFrequency: 'daily', priority: 1 },
+    { path: '/despre', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/paroh', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/biblie', changeFrequency: 'monthly', priority: 0.9 },
+    { path: '/calendar', changeFrequency: 'daily', priority: 0.9 },
+    { path: '/carti', changeFrequency: 'weekly', priority: 0.8 },
+    { path: '/sfantul-nicolae', changeFrequency: 'monthly', priority: 0.9 },
+    { path: '/istoria-bisericii', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/video', changeFrequency: 'weekly', priority: 0.7 },
+    { path: '/stiri', changeFrequency: 'daily', priority: 0.8 },
+    { path: '/donatii', changeFrequency: 'monthly', priority: 0.7 },
+    { path: '/magazin', changeFrequency: 'weekly', priority: 0.6 },
+    { path: '/contact', changeFrequency: 'monthly', priority: 0.6 },
   ]
+
+  const staticRoutes: MetadataRoute.Sitemap = staticPaths.map(({ path, changeFrequency, priority }) => ({
+    url: `${BASE}${path === '/' ? '' : path}`,
+    lastModified: new Date(),
+    changeFrequency,
+    priority,
+    alternates: langAlternates(path),
+  }))
 
   let articleRoutes: MetadataRoute.Sitemap = []
   try {
@@ -32,6 +52,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: a.publishedAt ?? a.createdAt,
       changeFrequency: 'monthly' as const,
       priority: 0.7,
+      alternates: langAlternates(`/stiri/${a.slug}`),
     }))
   } catch { /* skip */ }
 
@@ -45,6 +66,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: b.createdAt,
       changeFrequency: 'yearly' as const,
       priority: 0.6,
+      alternates: langAlternates(`/carti/${b.slug}`),
     }))
   } catch { /* skip */ }
 
@@ -57,6 +79,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${BASE}/biblie/${b.slug}/1`,
       changeFrequency: 'yearly' as const,
       priority: 0.6,
+      alternates: langAlternates(`/biblie/${b.slug}/1`),
     }))
   } catch { /* skip */ }
 

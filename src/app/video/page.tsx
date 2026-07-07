@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, type Locale } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Video Ortodox',
   description: 'Filme ortodoxe, acatiste video, conferințe, predici și rugăciuni. Colecția video a Parohiei Sfântul Ierarh Nicolae.',
+  alternates: buildAlternates('/video'),
 }
 
 type VideoItem = { id: string; titleRo: string; titleRu: string; titleEn: string; duration: string; thumb: null }

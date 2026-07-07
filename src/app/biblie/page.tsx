@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Sfânta Scriptură — Biblia Ortodoxă',
   description: 'Citește Sfânta Scriptură online. Biblia Ortodoxă — Vechiul Testament și Noul Testament, în limba română, conform ediției Sfântului Sinod.',
+  alternates: buildAlternates('/biblie'),
 }
 
 // ─── VECHIUL TESTAMENT — 53 cărți ────────────────────────────────────────────
