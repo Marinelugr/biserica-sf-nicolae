@@ -219,6 +219,21 @@ const en: Translations = {
     searchInBible: 'Search in Bible', searchInLibrary: 'Search in Library',
     enterTerm: 'Enter a term to search the entire site.',
   },
+  saints: {
+    subtitle: 'Orthodox Calendar', title: 'Saints',
+    searchPlaceholder: 'Search for a saint...', searchBtn: 'Search',
+    noSaintsInMonth: 'No saints registered for this month.',
+    inProgress: 'The saints calendar is being completed.',
+    feastTypes: { MARE: 'Great feast', MIJLOCIE: 'Middle feast', MIC: 'Saint' },
+    readLife: "Read the saint's life →", backToList: '← Back to saints',
+    noLifeText: "This saint's life will be added soon.",
+  },
+  shop: {
+    subtitle: 'Church items', title: 'Shop',
+    inProgress: 'The shop is being completed.', comingSoon: 'Coming soon',
+    inStock: 'In stock', outOfStock: 'Out of stock',
+    contactToOrder: 'Contact to order', priceLabel: 'Price',
+  },
   common: { loading: 'Loading...', backToTop: 'Top', gallery: 'Photo Gallery', backTo: 'Back to', allCategories: 'All categories →' },
   contactPage: {
     title: 'Contact Us', subtitle: 'We are happy to answer your questions',

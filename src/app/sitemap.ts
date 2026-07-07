@@ -29,6 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/stiri', changeFrequency: 'daily', priority: 0.8 },
     { path: '/donatii', changeFrequency: 'monthly', priority: 0.7 },
     { path: '/magazin', changeFrequency: 'weekly', priority: 0.6 },
+    { path: '/sfintii', changeFrequency: 'monthly', priority: 0.7 },
     { path: '/contact', changeFrequency: 'monthly', priority: 0.6 },
   ]
 
@@ -70,6 +71,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch { /* skip */ }
 
+  let saintRoutes: MetadataRoute.Sitemap = []
+  try {
+    const saints = await prisma.saint.findMany({
+      select: { slug: true },
+    })
+    saintRoutes = saints.map(s => ({
+      url: `${BASE}/sfintii/${s.slug}`,
+      changeFrequency: 'yearly' as const,
+      priority: 0.5,
+      alternates: langAlternates(`/sfintii/${s.slug}`),
+    }))
+  } catch { /* skip */ }
+
   let bibleRoutes: MetadataRoute.Sitemap = []
   try {
     const bibleBooks = await prisma.bibleBook.findMany({
@@ -83,5 +97,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch { /* skip */ }
 
-  return [...staticRoutes, ...articleRoutes, ...bookRoutes, ...bibleRoutes]
+  return [...staticRoutes, ...articleRoutes, ...bookRoutes, ...saintRoutes, ...bibleRoutes]
 }

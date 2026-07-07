@@ -219,6 +219,21 @@ const ru: Translations = {
     searchInBible: 'Поиск в Библии', searchInLibrary: 'Поиск в библиотеке',
     enterTerm: 'Введите запрос для поиска по всему сайту.',
   },
+  saints: {
+    subtitle: 'Православный календарь', title: 'Святые',
+    searchPlaceholder: 'Поиск святого...', searchBtn: 'Искать',
+    noSaintsInMonth: 'В этом месяце святые не зарегистрированы.',
+    inProgress: 'Календарь святых находится в процессе пополнения.',
+    feastTypes: { MARE: 'Великий праздник', MIJLOCIE: 'Средний праздник', MIC: 'Святой' },
+    readLife: 'Читать житие святого →', backToList: '← Назад к святым',
+    noLifeText: 'Житие этого святого будет добавлено позже.',
+  },
+  shop: {
+    subtitle: 'Церковные товары', title: 'Магазин',
+    inProgress: 'Магазин находится в процессе пополнения.', comingSoon: 'Скоро',
+    inStock: 'В наличии', outOfStock: 'Нет в наличии',
+    contactToOrder: 'Связаться для заказа', priceLabel: 'Цена',
+  },
   common: { loading: 'Загрузка...', backToTop: 'Наверх', gallery: 'Фотогалерея', backTo: 'Назад к', allCategories: 'Все категории →' },
   contactPage: {
     title: 'Связаться с нами', subtitle: 'Мы рады ответить на ваши вопросы',

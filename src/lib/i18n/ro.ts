@@ -128,6 +128,19 @@ export interface Translations {
     noResults: string; noResultsHint: string
     searchInBible: string; searchInLibrary: string; enterTerm: string
   }
+  saints: {
+    subtitle: string; title: string
+    searchPlaceholder: string; searchBtn: string
+    noSaintsInMonth: string; inProgress: string
+    feastTypes: { MARE: string; MIJLOCIE: string; MIC: string }
+    readLife: string; backToList: string; noLifeText: string
+  }
+  shop: {
+    subtitle: string; title: string
+    inProgress: string; comingSoon: string
+    inStock: string; outOfStock: string
+    contactToOrder: string; priceLabel: string
+  }
   common: { loading: string; backToTop: string; gallery: string; backTo: string; allCategories: string }
   contactPage: {
     title: string; subtitle: string
@@ -360,6 +373,21 @@ const ro: Translations = {
     noResultsHint: 'Încercați cu Sfânta Scriptură sau navigați prin categorii.',
     searchInBible: 'Caută în Biblie', searchInLibrary: 'Caută în Bibliotecă',
     enterTerm: 'Introduceți un termen pentru a căuta în întregul site.',
+  },
+  saints: {
+    subtitle: 'Calendarul Ortodox', title: 'Sfinții',
+    searchPlaceholder: 'Caută un sfânt...', searchBtn: 'Caută',
+    noSaintsInMonth: 'Niciun sfânt înregistrat în această lună.',
+    inProgress: 'Calendarul sfinților este în curs de completare.',
+    feastTypes: { MARE: 'Sărbătoare mare', MIJLOCIE: 'Sărbătoare mijlocie', MIC: 'Sfânt' },
+    readLife: 'Citește viața sfântului →', backToList: '← Înapoi la sfinți',
+    noLifeText: 'Viața acestui sfânt va fi adăugată în curând.',
+  },
+  shop: {
+    subtitle: 'Obiecte bisericești', title: 'Magazin',
+    inProgress: 'Magazinul este în curs de completare.', comingSoon: 'Reveniți curând',
+    inStock: 'În stoc', outOfStock: 'Stoc epuizat',
+    contactToOrder: 'Contactează pentru comandă', priceLabel: 'Preț',
   },
   common: { loading: 'Se încarcă...', backToTop: 'Sus', gallery: 'Galerie foto', backTo: 'Înapoi la', allCategories: 'Toate categoriile →' },
   contactPage: {
