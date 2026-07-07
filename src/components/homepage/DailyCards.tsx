@@ -6,8 +6,7 @@ import { useI18n } from '@/lib/i18n/context'
 interface DailyData {
   saints: string[]
   gospel: { reference: string; text: string }
-  prayer: { title: string; text: string }
-  schedule: { time: string; service: string }[]
+  prayer: { title: string; text: string; slug: string | null }
 }
 
 interface DailyCardsProps {
@@ -92,41 +91,8 @@ export default function DailyCards({ data, todayLabel, enabled, order }: DailyCa
           </p>
         </div>
       ),
-      link: '/carti',
-      linkLabel: t.home.allPrayersLink,
-    },
-    {
-      key: 'program_slujbe',
-      dot: '#4A6A2A',
-      icon: '✦',
-      label: t.home.serviceSchedule,
-      content: (
-        <div>
-          {data.schedule.length > 0 ? (
-            <ul className="space-y-2">
-              {data.schedule.map((item, i) => (
-                <li key={i} className="flex items-start gap-3">
-                  <span
-                    className="font-heading text-sm font-semibold shrink-0 mt-0.5"
-                    style={{ color: '#4A6A2A', minWidth: '3.5rem' }}
-                  >
-                    {item.time}
-                  </span>
-                  <span className="font-body text-sm" style={{ color: '#3A1A1A' }}>
-                    {item.service}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="font-body text-sm italic" style={{ color: '#8A7050' }}>
-              {t.home.noSchedule}
-            </p>
-          )}
-        </div>
-      ),
-      link: '/calendar',
-      linkLabel: t.home.fullCalendarLink,
+      link: data.prayer.slug ? `/carti/${data.prayer.slug}` : '/carti',
+      linkLabel: t.home.readFullPrayer,
     },
   ]
 
@@ -140,7 +106,13 @@ export default function DailyCards({ data, todayLabel, enabled, order }: DailyCa
     <section style={{ backgroundColor: '#F2EBD9' }} className="py-14">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header secțiune */}
-        <div className="text-center mb-10">
+        <motion.div
+          className="text-center mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-50px' }}
+          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+        >
           <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: '#8A7050' }}>
             {todayLabel}
           </p>
@@ -152,7 +124,7 @@ export default function DailyCards({ data, todayLabel, enabled, order }: DailyCa
             <span style={{ color: '#C9A84C', fontSize: '16px' }} aria-hidden="true">☦</span>
             <span className="h-px w-20 block" style={{ backgroundColor: '#D4C8A0' }} />
           </div>
-        </div>
+        </motion.div>
 
         {/* Grid carduri */}
         <div className={`grid grid-cols-1 ${GRID_COLS[cards.length] || GRID_COLS[4]} gap-4`}>

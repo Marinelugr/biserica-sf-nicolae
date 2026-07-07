@@ -8,16 +8,15 @@ export interface Translations {
     heroTitle: string; heroSubtitle: string; heroMitropolia: string; heroImageAlt: string
     searchPlaceholder: string; searchBtn: string; aboutBtn: string; donateBtn: string
     liturgicalLife: string; saintsToday: string; gospelToday: string
-    prayerToday: string; serviceSchedule: string; latestNews: string; allNews: string
-    orthodoxLibrary: string; allBooks: string; noSchedule: string; noSaints: string
+    prayerToday: string; latestNews: string; allNews: string
+    orthodoxLibrary: string; allBooks: string; noSaints: string
     liveNow: string; watchLiveService: string; openOnYoutube: string
     liveStreamTitle: string; liveFooterNote: string
-    allSaintsLink: string; readFullGospel: string; allPrayersLink: string; fullCalendarLink: string
+    allSaintsLink: string; readFullGospel: string; allPrayersLink: string; readFullPrayer: string; fullCalendarLink: string
     ourParish: string; noNews: string; sacredTexts: string; libraryLabel: string
     libraryInProgress: string; viewAllLink: string
     searchInScripture: string; orthodoxBibleBtn: string
-    todayInCalendar: string; oldStyleJulian: string; toneLabel: string
-    ordinaryDay: string; oldCalendarFooter: string; openCalendarLink: string
+    openCalendarLink: string
   }
   bible: {
     pageSubtitle: string; title: string; searchPlaceholder: string; searchBtn: string
@@ -159,24 +158,21 @@ const ro: Translations = {
     aboutBtn: 'Despre Biserică', donateBtn: 'Susține Biserica',
     liturgicalLife: 'Viața liturgică a zilei',
     saintsToday: 'Sfinții zilei', gospelToday: 'Evanghelia zilei',
-    prayerToday: 'Rugăciunea zilei', serviceSchedule: 'Program slujbe',
+    prayerToday: 'Rugăciunea zilei',
     latestNews: 'Ultimele știri', allNews: 'Toate știrile →',
     orthodoxLibrary: 'Bibliotecă Ortodoxă', allBooks: 'Toate cărțile →',
-    noSchedule: 'Nu există slujbe programate pentru astăzi.',
     noSaints: 'Nu sunt sfinți înregistrați pentru astăzi.',
     liveNow: 'Live acum', watchLiveService: 'Urmărește slujba în direct',
     openOnYoutube: 'Deschide pe YouTube ↗',
     liveStreamTitle: 'Transmisiune live — Parohia Sfântul Ierarh Nicolae',
     liveFooterNote: '☦ Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic — transmisiune în direct',
     allSaintsLink: 'Toți sfinții zilei →', readFullGospel: 'Citește integral →',
-    allPrayersLink: 'Toate rugăciunile →', fullCalendarLink: 'Calendar complet →',
+    allPrayersLink: 'Toate rugăciunile →', readFullPrayer: 'Citește integral →',
+    fullCalendarLink: 'Calendar complet →',
     ourParish: 'Parohia noastră', noNews: 'Nu există știri publicate momentan.',
     sacredTexts: 'Texte sacre', libraryLabel: 'Bibliotecă',
     libraryInProgress: 'Biblioteca este în curs de completare.', viewAllLink: 'Toate →',
     searchInScripture: 'Caută în Sfânta Scriptură', orthodoxBibleBtn: '☦ Biblia Ortodoxă',
-    todayInCalendar: 'Astăzi în calendar', oldStyleJulian: 'Stil vechi (iulian):',
-    toneLabel: 'Glasul', ordinaryDay: 'Zi obișnuită',
-    oldCalendarFooter: 'Calendar Ortodox Stil Vechi (Julian) · Algoritmul Gauss',
     openCalendarLink: 'Deschide calendarul →',
   },
   bible: {

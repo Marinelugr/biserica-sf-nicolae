@@ -10,7 +10,6 @@ const LABELS: Record<string, { label: string; icon: string; desc: string }> = {
   sfintii_zilei:       { label: 'Sfinții zilei',        icon: '☦',  desc: 'Calendar ortodox cu sfinții prăznuiți în ziua curentă' },
   evanghelia_zilei:    { label: 'Evanghelia zilei',     icon: '📖', desc: 'Pericopa evanghelică a zilei din calendarul ortodox' },
   rugaciunea_zilei:    { label: 'Rugăciunea zilei',     icon: '🙏', desc: 'Rugăciune zilnică pentru credincioșii parohiei' },
-  program_slujbe:      { label: 'Program slujbe',       icon: '⛪', desc: 'Orarul slujbelor din luna curentă' },
   stiri_recente:       { label: 'Știri recente',        icon: '📰', desc: 'Ultimele articole și anunțuri publicate' },
   biblioteca_ortodoxa: { label: 'Biblioteca ortodoxă',  icon: '📚', desc: 'Cărți și texte din biblioteca digitală a parohiei' },
 }

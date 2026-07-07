@@ -106,7 +106,7 @@ export default async function CartiPage() {
                   <Link
                     key={cat.key}
                     href={`/carti/categorie/${cat.key.toLowerCase()}`}
-                    className="group flex flex-col items-center text-center p-6 rounded-xl transition-all hover:shadow-md hover:-translate-y-0.5"
+                    className="category-card group flex flex-col items-center text-center p-6 rounded-xl"
                     style={{ backgroundColor: cat.bg, border: `1px solid ${cat.border}` }}
                   >
                     <span
@@ -116,12 +116,9 @@ export default async function CartiPage() {
                     >
                       {cat.icon}
                     </span>
-                    <h2 className="font-heading text-lg mb-1" style={{ color: '#1C1B3A' }}>
+                    <h2 className="font-heading text-lg mb-3" style={{ color: '#1C1B3A' }}>
                       {t.books.categories[cat.key as CategoryKey]}
                     </h2>
-                    <p className="font-body text-xs mb-3" style={{ color: '#8A7050' }}>
-                      {t.books.categoryDescriptions[cat.key]}
-                    </p>
                     {count > 0 && (
                       <span
                         className="font-body text-xs px-2 py-0.5 rounded-full"

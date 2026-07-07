@@ -5,6 +5,7 @@ import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
 import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
 import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
+import NextServiceWidget from '@/components/NextServiceWidget'
 import { getTodayDate } from '@/lib/utils'
 import { getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl, type Locale } from '@/lib/i18n/pick'
@@ -13,10 +14,23 @@ const DEFAULT_WIDGETS = [
   { section: 'sfintii_zilei', order: 0, enabled: true },
   { section: 'evanghelia_zilei', order: 1, enabled: true },
   { section: 'rugaciunea_zilei', order: 2, enabled: true },
-  { section: 'program_slujbe', order: 3, enabled: true },
-  { section: 'stiri_recente', order: 4, enabled: true },
-  { section: 'biblioteca_ortodoxa', order: 5, enabled: true },
+  { section: 'stiri_recente', order: 3, enabled: true },
+  { section: 'biblioteca_ortodoxa', order: 4, enabled: true },
 ]
+
+const RUGACIUNI_ZILE: Record<number, string> = {
+  0: 'duminica',
+  1: 'luni',
+  2: 'marti',
+  3: 'miercuri',
+  4: 'joi',
+  5: 'vineri',
+  6: 'sambata',
+}
+
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+}
 
 async function getWidgetConfig() {
   try {
@@ -50,49 +64,44 @@ const FALLBACK_GOSPEL = {
 const FALLBACK_PRAYER = {
   title: 'Rugăciunea dimineții',
   text: 'Doamne Iisuse Hristoase, Fiul lui Dumnezeu, miluiește-mă pe mine păcătosul.',
+  slug: null as string | null,
 }
 
 async function getDailyData(locale: Locale) {
   const { day, month } = getTodayDate()
+  const prayerSlug = RUGACIUNI_ZILE[new Date().getDay()]
 
   try {
     const { prisma } = await import('@/lib/prisma')
 
-    const [saints, prayer, schedule] = await Promise.all([
+    const [saints, prayerBook] = await Promise.all([
       prisma.saint.findMany({
         where: { month, day },
         select: { nameRo: true, nameRu: true, nameEn: true },
         take: 5,
       }),
-      prisma.prayer.findFirst({
-        where: { type: 'RUGACIUNE_ZILEI' },
-        select: { titleRo: true, titleRu: true, titleEn: true, textRo: true, textRu: true, textEn: true },
-      }),
-      prisma.serviceSchedule.findMany({
-        where: { year: new Date().getFullYear(), month, day },
-        select: { time: true, serviceRo: true, serviceRu: true },
-        orderBy: { time: 'asc' },
-        take: 5,
+      prisma.libraryBook.findUnique({
+        where: { slug: prayerSlug },
+        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, contentRo: true, contentRu: true, contentEn: true },
       }),
     ])
 
     return {
       saints: saints.map(s => pick(locale, s.nameRo, s.nameRu, s.nameEn)),
       gospel: FALLBACK_GOSPEL,
-      prayer: prayer
+      prayer: prayerBook
         ? {
-            title: pick(locale, prayer.titleRo, prayer.titleRu, prayer.titleEn),
-            text: pick(locale, prayer.textRo, prayer.textRu, prayer.textEn).slice(0, 220) + '…',
+            title: pick(locale, prayerBook.titleRo, prayerBook.titleRu, prayerBook.titleEn),
+            text: stripHtml(pick(locale, prayerBook.contentRo, prayerBook.contentRu, prayerBook.contentEn)).slice(0, 200) + '…',
+            slug: prayerBook.slug,
           }
         : FALLBACK_PRAYER,
-      schedule: schedule.map(s => ({ time: s.time, service: pick(locale, s.serviceRo, s.serviceRu, null) })),
     }
   } catch {
     return {
       saints: [],
       gospel: FALLBACK_GOSPEL,
       prayer: FALLBACK_PRAYER,
-      schedule: [],
     }
   }
 }
@@ -140,7 +149,7 @@ function getTodayLabel(locale: Locale): string {
   })
 }
 
-const DAILY_CARD_SECTIONS = ['sfintii_zilei', 'evanghelia_zilei', 'rugaciunea_zilei', 'program_slujbe']
+const DAILY_CARD_SECTIONS = ['sfintii_zilei', 'evanghelia_zilei', 'rugaciunea_zilei']
 
 export default async function HomePage() {
   const locale = await getServerLocale()
@@ -160,6 +169,7 @@ export default async function HomePage() {
       <Hero />
       <LiveStreamCard />
       <LiturgicalTodayWidget />
+      <NextServiceWidget />
       {showDailyCards && (
         <DailyCards data={dailyData} todayLabel={getTodayLabel(locale)} enabled={enabled} order={order} />
       )}

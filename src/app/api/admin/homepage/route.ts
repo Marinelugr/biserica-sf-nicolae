@@ -6,9 +6,8 @@ const DEFAULT_WIDGETS = [
   { section: 'sfintii_zilei',     order: 0, enabled: true },
   { section: 'evanghelia_zilei',  order: 1, enabled: true },
   { section: 'rugaciunea_zilei',  order: 2, enabled: true },
-  { section: 'program_slujbe',    order: 3, enabled: true },
-  { section: 'stiri_recente',     order: 4, enabled: true },
-  { section: 'biblioteca_ortodoxa', order: 5, enabled: true },
+  { section: 'stiri_recente',     order: 3, enabled: true },
+  { section: 'biblioteca_ortodoxa', order: 4, enabled: true },
 ]
 
 export async function GET() {

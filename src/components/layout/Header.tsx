@@ -93,10 +93,10 @@ export default function Header() {
       className="sticky top-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-3">
+        <div className="relative flex items-center h-16">
 
-          {/* Logo — DOAR cruce + titlu */}
-          <Link href={homeHref} className="flex items-center gap-2 shrink-0 group" aria-label="Acasă">
+          {/* Logo — DOAR cruce + titlu — stânga */}
+          <Link href={homeHref} className="flex items-center gap-2 shrink-0 group xl:absolute xl:left-0" aria-label="Acasă">
             <span
               aria-hidden="true"
               style={{ color: '#C9A84C', fontSize: '26px', lineHeight: 1 }}
@@ -117,8 +117,8 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Nav desktop — totul pe o linie, doar >=1280px */}
-          <nav className="hidden xl:flex items-center gap-2.5 ml-2 min-w-0">
+          {/* Nav desktop — centrat, doar >=1280px */}
+          <nav className="hidden xl:flex items-center gap-2.5 mx-auto min-w-0">
             {navLinks.map(link => (
               <Link
                 key={link.href}
@@ -140,13 +140,15 @@ export default function Header() {
                 <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.6rem' }} aria-label="LIVE">●</span>
               )}
             </Link>
+          </nav>
 
+          {/* Donații + Limbi — dreapta, doar >=1280px */}
+          <div className="hidden xl:flex items-center gap-3 xl:absolute xl:right-0">
             <DonateButton href={donateHref} label={t.nav.donate} compact />
-
             <div className="border-l pl-3 shrink-0" style={{ borderColor: '#2A1A0A' }}>
               <LocaleSwitcher locale={locale} onChange={changeLocale} fontSize="12px" />
             </div>
-          </nav>
+          </div>
 
           {/* Bara tabletă (768–1280px): Donații + Limbi rămân vizibile, restul intră în hamburger */}
           <div className="hidden md:flex xl:hidden items-center gap-3 ml-auto">
@@ -159,7 +161,7 @@ export default function Header() {
           {/* Hamburger — vizibil sub 1280px */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="xl:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5 shrink-0"
+            className="xl:hidden flex flex-col justify-center items-center w-8 h-8 gap-1.5 shrink-0 ml-auto"
             aria-label="Meniu"
             aria-expanded={menuOpen}
           >

@@ -1,15 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import { useI18n } from '@/lib/i18n/context'
+import CandleParticles from '@/components/CandleParticles'
 
 export default function Hero() {
   const [query, setQuery] = useState('')
   const router = useRouter()
   const { t } = useI18n()
+  const heroRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!heroRef.current) return
+      const scrolled = window.scrollY
+      heroRef.current.style.transform = `translateY(${scrolled * 0.4}px)`
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -20,7 +32,11 @@ export default function Hero() {
 
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0">
+      <div
+        ref={heroRef}
+        className="absolute inset-x-0"
+        style={{ top: '-50%', height: '150%', willChange: 'transform' }}
+      >
         <Image
           src="/images/12.jpg"
           alt={t.home.heroImageAlt}
@@ -29,16 +45,17 @@ export default function Hero() {
           priority
           quality={90}
         />
-        <div className="absolute inset-0" style={{ backgroundColor: 'rgba(7, 4, 1, 0.73)' }} />
       </div>
+      <div className="absolute inset-0 hero-overlay" />
+      <CandleParticles />
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 text-center">
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
-          className="font-heading italic leading-tight mb-5"
-          style={{ color: '#C9A84C', fontSize: 'clamp(36px, 6vw, 56px)', fontWeight: 400 }}
+          className="font-heading italic leading-tight mb-5 hero-title"
+          style={{ fontSize: 'clamp(36px, 6vw, 56px)', fontWeight: 400 }}
         >
           {t.home.heroTitle}
         </motion.h1>

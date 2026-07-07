@@ -42,7 +42,13 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
           {/* ─── Ultimele Știri ─── */}
           {showNews && (
           <div className={showLibrary ? 'lg:col-span-3' : 'lg:col-span-5'}>
-            <div className="flex items-end justify-between mb-8">
+            <motion.div
+              className="flex items-end justify-between mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
               <div>
                 <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
                   {t.home.ourParish}
@@ -58,7 +64,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
               >
                 {t.home.viewAllLink}
               </Link>
-            </div>
+            </motion.div>
 
             {/* Divider */}
             <div className="h-px mb-8" style={{ backgroundColor: '#E8E5E0' }} />
@@ -144,7 +150,13 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
           {/* ─── Biblioteca Ortodoxă ─── */}
           {showLibrary && (
           <div className={showNews ? 'lg:col-span-1' : 'lg:col-span-5'}>
-            <div className="flex items-end justify-between mb-8">
+            <motion.div
+              className="flex items-end justify-between mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
               <div>
                 <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
                   {t.home.sacredTexts}
@@ -160,7 +172,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
               >
                 {t.home.viewAllLink}
               </Link>
-            </div>
+            </motion.div>
 
             {/* Divider */}
             <div className="h-px mb-8" style={{ backgroundColor: '#E8E5E0' }} />

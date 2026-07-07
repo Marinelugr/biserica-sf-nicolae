@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getLiturgicalDates, getWeeklyTone, toJulianDate } from '@/lib/utils'
+import { getLiturgicalDates } from '@/lib/utils'
 import { isApostlesFast, FIXED_FASTS } from '@/lib/constants/oldCalendarFeasts'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
@@ -26,70 +26,29 @@ export default async function LiturgicalTodayWidget() {
   const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
   const now = new Date()
   const year = now.getFullYear()
-  const julianDate = toJulianDate(now)
-  const tone = getWeeklyTone(now, year)
   const fastInfo = getFastInfo(now, t)
 
-  const gregorianStr = now.toLocaleDateString(localeToIntl(locale), { day: 'numeric', month: 'long', year: 'numeric' })
-  const julianStr = `${julianDate.day} ${t.calendar.months[julianDate.month - 1]}`
+  const dateStr = now.toLocaleDateString(localeToIntl(locale), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const dateLabel = dateStr.charAt(0).toUpperCase() + dateStr.slice(1)
 
   return (
-    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <Link
         href={`/calendar?zi=${now.getDate()}&luna=${now.getMonth() + 1}&an=${year}`}
-        className="block rounded-2xl p-6 sm:p-8 transition-opacity hover:opacity-90"
+        className="block rounded-2xl p-6 sm:p-8 text-center transition-opacity hover:opacity-90"
         style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', textDecoration: 'none' }}
       >
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-          {/* Left: dates */}
-          <div>
-            <p className="font-body text-xs tracking-[0.3em] uppercase mb-2" style={{ color: '#8A7050' }}>
-              {t.home.todayInCalendar}
-            </p>
-            <p className="font-heading text-xl mb-0.5" style={{ color: '#1C1B3A' }}>
-              {gregorianStr}
-            </p>
-            <p className="font-body text-sm" style={{ color: '#9B8050' }}>
-              {t.home.oldStyleJulian} <span style={{ color: '#8B1A1A' }}>{julianStr}</span>
-            </p>
-          </div>
-
-          {/* Right: tone + fast */}
-          <div className="flex flex-wrap gap-3 sm:justify-end">
-            <div
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-              style={{ backgroundColor: '#1C1B3A', color: '#F2EBD9' }}
-            >
-              <span style={{ fontSize: '0.9rem' }}>☦</span>
-              <span className="font-body text-sm">{t.home.toneLabel} {tone}</span>
-            </div>
-            {fastInfo ? (
-              <div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                style={{ backgroundColor: '#4A6A2A', color: '#F2EBD9' }}
-              >
-                <span style={{ fontSize: '0.9rem' }}>🍃</span>
-                <span className="font-body text-sm">{fastInfo}</span>
-              </div>
-            ) : (
-              <div
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full"
-                style={{ backgroundColor: '#F2EBD9', border: '1px solid #D4C8A0', color: '#8A7050' }}
-              >
-                <span className="font-body text-sm">{t.home.ordinaryDay}</span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="mt-4 pt-4 flex items-center justify-between" style={{ borderTop: '1px solid #E8DFC8' }}>
-          <span className="font-body text-xs" style={{ color: '#B0A080' }}>
-            {t.home.oldCalendarFooter}
-          </span>
-          <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
-            {t.home.openCalendarLink}
-          </span>
-        </div>
+        <p className="font-heading text-2xl sm:text-3xl mb-2" style={{ color: '#1C1B3A' }}>
+          {dateLabel}
+        </p>
+        {fastInfo && (
+          <p className="font-body text-sm mb-3" style={{ color: '#4A6A2A' }}>
+            🌿 {fastInfo}
+          </p>
+        )}
+        <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
+          {t.home.openCalendarLink}
+        </span>
       </Link>
     </section>
   )
