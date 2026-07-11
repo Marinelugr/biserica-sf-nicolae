@@ -13,6 +13,7 @@ interface Article {
   imageUrl: string | null
   publishedAt: Date | null
   category: string | null
+  excerpt: string
 }
 
 interface LibraryItem {
@@ -31,6 +32,7 @@ interface NewsAndLibraryProps {
 export default function NewsAndLibrary({ articles, libraryBooks, showNews, showLibrary }: NewsAndLibraryProps) {
   const { t, locale } = useI18n()
   const typeLabels: Record<string, string> = t.books.categories
+  const [featured, ...restArticles] = articles
 
   if (!showNews && !showLibrary) return null
 
@@ -74,68 +76,121 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                 {t.home.noNews}
               </p>
             ) : (
-              <div className="space-y-6">
-                {articles.map((article, i) => (
-                  <motion.article
-                    key={article.slug}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: i * 0.1, duration: 0.5 }}
-                    className="flex gap-4 group"
-                  >
-                    {/* Thumbnail */}
+              <>
+                {/* Featured — prima știre */}
+                <motion.article
+                  initial={{ opacity: 0, y: 10 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5 }}
+                  className="mb-10 group"
+                >
+                  <Link href={`/stiri/${featured.slug}`} className="flex flex-col sm:flex-row gap-5">
                     <div
-                      className="shrink-0 overflow-hidden rounded flex items-center justify-center"
-                      style={{ width: '90px', height: '68px', backgroundColor: '#F2EBD9' }}
+                      className="relative shrink-0 overflow-hidden rounded-lg sm:w-3/5"
+                      style={{ aspectRatio: '16/10', backgroundColor: '#F2EBD9' }}
                     >
-                      {article.imageUrl ? (
+                      {featured.imageUrl ? (
                         <Image
-                          src={article.imageUrl}
-                          alt={article.title}
-                          width={90}
-                          height={68}
-                          sizes="90px"
-                          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                          src={featured.imageUrl}
+                          alt={featured.title}
+                          fill
+                          sizes="(max-width: 640px) 100vw, 40vw"
+                          style={{ objectFit: 'cover' }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <span style={{ color: '#D4C8A0', fontSize: '24px' }} aria-hidden="true">☦</span>
+                          <span style={{ color: '#D4C8A0', fontSize: '36px' }} aria-hidden="true">☦</span>
                         </div>
                       )}
                     </div>
-
-                    {/* Text */}
-                    <div className="flex-1 min-w-0">
-                      {article.category && (
-                        <span
-                          className="font-body text-xs tracking-wide uppercase"
-                          style={{ color: '#8B1A1A' }}
-                        >
-                          {article.category}
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                      {featured.category && (
+                        <span className="font-body text-xs tracking-wide uppercase mb-1" style={{ color: '#8B1A1A' }}>
+                          {featured.category}
                         </span>
                       )}
-                      <Link href={`/stiri/${article.slug}`}>
-                        <h3
-                          className="font-heading text-lg leading-snug mt-0.5 group-hover:underline underline-offset-2 line-clamp-2"
-                          style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}
-                        >
-                          {article.title}
-                        </h3>
-                      </Link>
-                      {article.publishedAt && (
-                        <time
-                          dateTime={article.publishedAt.toISOString()}
-                          className="font-body text-xs mt-1 block"
-                          style={{ color: '#8A7050' }}
-                        >
-                          {formatDate(article.publishedAt, localeToIntl(locale))}
-                        </time>
+                      <h3
+                        className="font-heading leading-snug group-hover:underline underline-offset-2 line-clamp-3"
+                        style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', fontSize: 'clamp(22px, 2.6vw, 28px)' }}
+                      >
+                        {featured.title}
+                      </h3>
+                      {featured.excerpt && (
+                        <p className="font-body text-sm leading-relaxed mt-2 line-clamp-3" style={{ color: '#5A4020' }}>
+                          {featured.excerpt}…
+                        </p>
                       )}
+                      <div className="flex items-center gap-3 mt-3">
+                        {featured.publishedAt && (
+                          <time
+                            dateTime={featured.publishedAt.toISOString()}
+                            className="font-body text-xs"
+                            style={{ color: '#8A7050' }}
+                          >
+                            {formatDate(featured.publishedAt, localeToIntl(locale))}
+                          </time>
+                        )}
+                        <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
+                          Citește mai mult →
+                        </span>
+                      </div>
                     </div>
-                  </motion.article>
-                ))}
-              </div>
+                  </Link>
+                </motion.article>
+
+                {/* Restul știrilor — grid compact */}
+                {restArticles.length > 0 && (
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                    {restArticles.map((article, i) => (
+                      <motion.article
+                        key={article.slug}
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: i * 0.1, duration: 0.5 }}
+                        className="group"
+                      >
+                        <Link href={`/stiri/${article.slug}`}>
+                          <div
+                            className="relative overflow-hidden rounded mb-2"
+                            style={{ aspectRatio: '16/10', backgroundColor: '#F2EBD9' }}
+                          >
+                            {article.imageUrl ? (
+                              <Image
+                                src={article.imageUrl}
+                                alt={article.title}
+                                fill
+                                sizes="(max-width: 640px) 100vw, 20vw"
+                                style={{ objectFit: 'cover' }}
+                              />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <span style={{ color: '#D4C8A0', fontSize: '20px' }} aria-hidden="true">☦</span>
+                              </div>
+                            )}
+                          </div>
+                          <h3
+                            className="font-heading text-sm leading-snug group-hover:underline underline-offset-2 line-clamp-2"
+                            style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}
+                          >
+                            {article.title}
+                          </h3>
+                          {article.publishedAt && (
+                            <time
+                              dateTime={article.publishedAt.toISOString()}
+                              className="font-body text-xs mt-1 block"
+                              style={{ color: '#8A7050' }}
+                            >
+                              {formatDate(article.publishedAt, localeToIntl(locale))}
+                            </time>
+                          )}
+                        </Link>
+                      </motion.article>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
           )}

@@ -6,6 +6,7 @@ import DailyCards from '@/components/homepage/DailyCards'
 import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
 import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
 import NextServiceWidget from '@/components/NextServiceWidget'
+import PascalCard from '@/components/PascalCard'
 import { getTodayDate } from '@/lib/utils'
 import { getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl, type Locale } from '@/lib/i18n/pick'
@@ -70,6 +71,7 @@ const FALLBACK_PRAYER = {
 async function getDailyData(locale: Locale) {
   const { day, month } = getTodayDate()
   const prayerSlug = RUGACIUNI_ZILE[new Date().getDay()]
+  const prayerDay = new Date().toLocaleDateString(localeToIntl(locale), { weekday: 'long' })
 
   try {
     const { prisma } = await import('@/lib/prisma')
@@ -94,14 +96,15 @@ async function getDailyData(locale: Locale) {
             title: pick(locale, prayerBook.titleRo, prayerBook.titleRu, prayerBook.titleEn),
             text: stripHtml(pick(locale, prayerBook.contentRo, prayerBook.contentRu, prayerBook.contentEn)).slice(0, 200) + '…',
             slug: prayerBook.slug,
+            day: prayerDay,
           }
-        : FALLBACK_PRAYER,
+        : { ...FALLBACK_PRAYER, day: prayerDay },
     }
   } catch {
     return {
       saints: [],
       gospel: FALLBACK_GOSPEL,
-      prayer: FALLBACK_PRAYER,
+      prayer: { ...FALLBACK_PRAYER, day: prayerDay },
     }
   }
 }
@@ -113,7 +116,7 @@ async function getHomeContent(locale: Locale) {
     const [articles, libraryBooks] = await Promise.all([
       prisma.article.findMany({
         where: { published: true },
-        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true },
+        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true, contentRo: true, contentRu: true, contentEn: true },
         orderBy: { publishedAt: 'desc' },
         take: 4,
       }),
@@ -128,6 +131,7 @@ async function getHomeContent(locale: Locale) {
       articles: articles.map(a => ({
         slug: a.slug, title: pick(locale, a.titleRo, a.titleRu, a.titleEn),
         imageUrl: a.imageUrl, publishedAt: a.publishedAt, category: a.category,
+        excerpt: stripHtml(pick(locale, a.contentRo, a.contentRu, a.contentEn)).slice(0, 220),
       })),
       libraryBooks: libraryBooks.map(b => ({
         slug: b.slug, title: pick(locale, b.titleRo, b.titleRu, b.titleEn), type: b.type,
@@ -136,17 +140,6 @@ async function getHomeContent(locale: Locale) {
   } catch {
     return { articles: [], libraryBooks: [] }
   }
-}
-
-function getTodayLabel(locale: Locale): string {
-  const { day, month, year } = getTodayDate()
-  const date = new Date(year, month - 1, day)
-  return date.toLocaleDateString(localeToIntl(locale), {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  })
 }
 
 const DAILY_CARD_SECTIONS = ['sfintii_zilei', 'evanghelia_zilei', 'rugaciunea_zilei']
@@ -169,9 +162,14 @@ export default async function HomePage() {
       <Hero />
       <LiveStreamCard />
       <LiturgicalTodayWidget />
-      <NextServiceWidget />
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <PascalCard />
+          <NextServiceWidget />
+        </div>
+      </section>
       {showDailyCards && (
-        <DailyCards data={dailyData} todayLabel={getTodayLabel(locale)} enabled={enabled} order={order} />
+        <DailyCards data={dailyData} enabled={enabled} order={order} />
       )}
       {(showNews || showLibrary) && (
         <NewsAndLibrary

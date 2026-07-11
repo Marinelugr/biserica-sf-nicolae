@@ -2,9 +2,9 @@ import type { Translations } from './ro'
 
 const en: Translations = {
   nav: {
-    home: 'Home', bible: 'Bible', calendar: 'Calendar', books: 'Library',
+    home: 'Home', bible: 'Bible', calendar: 'Calendar', pascalCalendar: 'Paschal Calendar', books: 'Library',
     churchHistory: 'Church History', saintNicholas: 'Saint Nicholas', priest: 'Our Parish Priest',
-    video: 'Video', live: 'Live', shop: 'Shop', donate: 'Donate',
+    video: 'Video', news: 'News', live: 'Live', shop: 'Shop', donate: 'Donate',
     contact: 'Contact',
   },
   home: {

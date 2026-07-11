@@ -2,10 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { formatDate } from '@/lib/utils'
+import { formatDate, readingTime } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import ShareButtons from '@/components/shared/ShareButtons'
+
+const SITE_URL = 'https://biserica-sf-nicolae.org'
 
 export const dynamic = 'force-dynamic'
 
@@ -79,12 +82,16 @@ export default async function ArticolPage({ params }: Props) {
         {title}
       </h1>
 
-      {/* Dată */}
-      {article.publishedAt && (
-        <time className="font-body text-sm block mb-8" style={{ color: '#8A7050' }}>
-          {formatDate(article.publishedAt, localeToIntl(locale))}
-        </time>
-      )}
+      {/* Dată · timp de citire */}
+      <p className="font-body text-sm mb-8" style={{ color: '#8A7050' }}>
+        {article.publishedAt && (
+          <time dateTime={article.publishedAt.toISOString()}>
+            {formatDate(article.publishedAt, localeToIntl(locale))}
+          </time>
+        )}
+        {article.publishedAt && ' · '}
+        ~{readingTime(content)} min citire
+      </p>
 
       {/* Separator */}
       <div className="flex items-center gap-3 mb-10">
@@ -115,8 +122,13 @@ export default async function ArticolPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: content }}
       />
 
+      {/* Share */}
+      <div className="mt-10 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
+        <ShareButtons url={`${SITE_URL}/stiri/${slug}`} title={title} />
+      </div>
+
       {/* Back */}
-      <div className="mt-14 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
+      <div className="mt-8 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
         <Link
           href="/stiri"
           className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"

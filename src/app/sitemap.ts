@@ -22,6 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/paroh', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/biblie', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/calendar', changeFrequency: 'daily', priority: 0.9 },
+    { path: '/calendar-pascal', changeFrequency: 'yearly', priority: 0.6 },
     { path: '/carti', changeFrequency: 'weekly', priority: 0.8 },
     { path: '/sfantul-nicolae', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/istoria-bisericii', changeFrequency: 'monthly', priority: 0.8 },

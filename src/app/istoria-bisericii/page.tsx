@@ -60,7 +60,7 @@ export default async function IstoriaBisericiiPage() {
         <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
           {t.priest.badge}
         </p>
-        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(28px, 4vw, 48px)', fontWeight: 400 }}>
+        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}>
           {t.historyPage.pageTitle}
         </h1>
         <div className="flex items-center justify-center gap-3 mb-4">

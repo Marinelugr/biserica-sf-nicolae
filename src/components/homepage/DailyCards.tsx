@@ -6,18 +6,17 @@ import { useI18n } from '@/lib/i18n/context'
 interface DailyData {
   saints: string[]
   gospel: { reference: string; text: string }
-  prayer: { title: string; text: string; slug: string | null }
+  prayer: { title: string; text: string; slug: string | null; day: string }
 }
 
 interface DailyCardsProps {
   data: DailyData
-  todayLabel: string
   enabled: Record<string, boolean>
   order: string[]
 }
 
 const GRID_COLS: Record<number, string> = {
-  1: 'sm:grid-cols-1 lg:grid-cols-1',
+  1: 'sm:grid-cols-1 lg:grid-cols-1 max-w-md',
   2: 'sm:grid-cols-2 lg:grid-cols-2',
   3: 'sm:grid-cols-2 lg:grid-cols-3',
   4: 'sm:grid-cols-2 lg:grid-cols-4',
@@ -32,7 +31,7 @@ const cardVariants = {
   }),
 }
 
-export default function DailyCards({ data, todayLabel, enabled, order }: DailyCardsProps) {
+export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
   const { t } = useI18n()
   const allCards = [
     {
@@ -83,10 +82,13 @@ export default function DailyCards({ data, todayLabel, enabled, order }: DailyCa
       label: t.home.prayerToday,
       content: (
         <div>
+          <p className="font-body text-xs uppercase tracking-wide mb-1" style={{ color: '#8A7050' }}>
+            {data.prayer.day}
+          </p>
           <p className="font-heading text-sm font-semibold mb-2" style={{ color: '#6B4A2A' }}>
             {data.prayer.title}
           </p>
-          <p className="font-body text-sm leading-relaxed line-clamp-4 italic" style={{ color: '#3A1A1A' }}>
+          <p className="font-body text-sm leading-relaxed line-clamp-3 italic" style={{ color: '#3A1A1A' }}>
             {data.prayer.text}
           </p>
         </div>
@@ -105,29 +107,8 @@ export default function DailyCards({ data, todayLabel, enabled, order }: DailyCa
   return (
     <section style={{ backgroundColor: '#F2EBD9' }} className="py-14">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header secțiune */}
-        <motion.div
-          className="text-center mb-10"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-50px' }}
-          transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-        >
-          <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: '#8A7050' }}>
-            {todayLabel}
-          </p>
-          <h2 className="font-heading text-3xl" style={{ color: '#3A1A1A' }}>
-            {t.home.liturgicalLife}
-          </h2>
-          <div className="flex items-center justify-center gap-3 mt-3">
-            <span className="h-px w-20 block" style={{ backgroundColor: '#D4C8A0' }} />
-            <span style={{ color: '#C9A84C', fontSize: '16px' }} aria-hidden="true">☦</span>
-            <span className="h-px w-20 block" style={{ backgroundColor: '#D4C8A0' }} />
-          </div>
-        </motion.div>
-
         {/* Grid carduri */}
-        <div className={`grid grid-cols-1 ${GRID_COLS[cards.length] || GRID_COLS[4]} gap-4`}>
+        <div className={`grid grid-cols-1 ${GRID_COLS[cards.length] || GRID_COLS[4]} gap-4 ${cards.length === 1 ? 'mx-auto' : ''}`}>
           {cards.map((card, i) => (
             <motion.article
               key={card.label}

@@ -119,7 +119,7 @@ export default async function VideoPage() {
         </p>
         <h1
           className="font-heading italic leading-tight mb-5"
-          style={{ color: '#C9A84C', fontSize: 'clamp(30px, 5vw, 48px)', fontWeight: 400 }}
+          style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}
         >
           {t.video.title}
         </h1>

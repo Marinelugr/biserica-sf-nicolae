@@ -110,7 +110,7 @@ export default async function BibliePage() {
         <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
           {t.bible.pageSubtitle}
         </p>
-        <h1 className="font-heading text-4xl md:text-5xl mb-5" style={{ color: '#1C1B3A' }}>
+        <h1 className="font-heading mb-5" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
           {t.bible.title}
         </h1>
         <div className="flex items-center justify-center gap-3 mb-8">

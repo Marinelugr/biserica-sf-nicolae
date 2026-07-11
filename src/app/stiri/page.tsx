@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
-import { formatDate } from '@/lib/utils'
+import { formatDate, readingTime } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
@@ -19,7 +19,7 @@ async function getArticles() {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.article.findMany({
       where: { published: true },
-      select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true },
+      select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true, contentRo: true, contentRu: true, contentEn: true },
       orderBy: { publishedAt: 'desc' },
     })
   } catch {
@@ -36,7 +36,7 @@ export default async function StiriPage() {
         <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: '#8A7050' }}>
           {t.newsPage.badge}
         </p>
-        <h1 className="font-heading text-4xl md:text-5xl mb-4" style={{ color: '#1C1B3A' }}>
+        <h1 className="font-heading mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
           {t.newsPage.title}
         </h1>
         <div className="flex items-center justify-center gap-3">
@@ -92,11 +92,15 @@ export default async function StiriPage() {
                     {pick(locale, article.titleRo, article.titleRu, article.titleEn)}
                   </h2>
                 </Link>
-                {article.publishedAt && (
-                  <time className="font-body text-xs" style={{ color: '#8A7050' }}>
-                    {formatDate(article.publishedAt, localeToIntl(locale))}
-                  </time>
-                )}
+                <p className="font-body text-xs" style={{ color: '#8A7050' }}>
+                  {article.publishedAt && (
+                    <time dateTime={article.publishedAt.toISOString()}>
+                      {formatDate(article.publishedAt, localeToIntl(locale))}
+                    </time>
+                  )}
+                  {article.publishedAt && ' · '}
+                  ~{readingTime(pick(locale, article.contentRo, article.contentRu, article.contentEn))} min citire
+                </p>
               </div>
             </article>
           ))}

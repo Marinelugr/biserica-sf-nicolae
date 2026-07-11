@@ -68,7 +68,7 @@ export default async function SfantulNicolaePage() {
         <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
           {t.saintNicholasPage.badge}
         </p>
-        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(30px, 5vw, 52px)', fontWeight: 400 }}>
+        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}>
           {t.saintNicholasPage.pageTitle}
         </h1>
         <p className="font-body mb-6" style={{ color: '#6A5030', fontSize: '15px' }}>

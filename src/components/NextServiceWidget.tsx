@@ -29,6 +29,23 @@ const FALLBACK_SCHEDULE: FallbackEntry[] = [
   { day: 6, hour: 17, minute: 0, titlu: 'Vecernia și Utrenia', dayName: 'Sâmbătă' },
 ]
 
+function capitalize(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1)
+}
+
+function getDayLabel(date: Date): string {
+  const now = new Date()
+  const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  const diffDays = Math.round((startOfDay(date).getTime() - startOfDay(now).getTime()) / 86400000)
+  if (diffDays === 0) return 'Astăzi'
+  if (diffDays === 1) return 'Mâine'
+  return capitalize(date.toLocaleDateString('ro-RO', { weekday: 'long' }))
+}
+
+function getFullDate(date: Date): string {
+  return date.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 function getFallbackService(): ServiceInfo | null {
   const now = new Date()
   let minDiff = Infinity
@@ -109,18 +126,20 @@ export default function NextServiceWidget() {
   if (loading) return <div className="next-service-widget skeleton max-w-md mx-auto" />
   if (!service || !timeLeft) return null
 
+  const serviceDate = new Date(service.data)
+
   return (
     <div className="next-service-widget max-w-md mx-auto">
       <div className="widget-label">⛪ Următoarea slujbă</div>
       <div className="widget-service-name">{service.titlu}</div>
-      <div className="widget-service-time">{service.ora}</div>
+      <div className="widget-service-time">
+        {getDayLabel(serviceDate)} · {getFullDate(serviceDate)} · {service.ora}
+      </div>
       <div className="widget-countdown">
-        {timeLeft.zile > 0 && (
-          <div className="countdown-unit">
-            <span className="countdown-number">{timeLeft.zile}</span>
-            <span className="countdown-label">zile</span>
-          </div>
-        )}
+        <div className="countdown-unit">
+          <span className="countdown-number">{String(timeLeft.zile).padStart(2, '0')}</span>
+          <span className="countdown-label">zile</span>
+        </div>
         <div className="countdown-unit">
           <span className="countdown-number">{String(timeLeft.ore).padStart(2, '0')}</span>
           <span className="countdown-label">ore</span>

@@ -13,6 +13,7 @@ export default function ShareButtons({ url, title }: { url: string; title: strin
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(`${title} — ${url}`)}`
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
+  const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`
 
   const btn: React.CSSProperties = {
     fontFamily: 'inherit', fontSize: '0.85rem', color: '#8A7050',
@@ -28,6 +29,9 @@ export default function ShareButtons({ url, title }: { url: string; title: strin
       </a>
       <a href={facebookUrl} target="_blank" rel="noopener noreferrer" style={btn}>
         Facebook
+      </a>
+      <a href={telegramUrl} target="_blank" rel="noopener noreferrer" style={btn}>
+        Telegram
       </a>
       <div className="relative inline-block">
         <button onClick={handleCopy} style={btn}>

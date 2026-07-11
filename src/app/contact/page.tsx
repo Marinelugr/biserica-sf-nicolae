@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
 import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { getContactInfo } from '@/lib/contact-info'
 
 export const metadata: Metadata = {
   title: 'Contact',
@@ -10,25 +11,21 @@ export const metadata: Metadata = {
   alternates: buildAlternates('/contact'),
 }
 
-const MAP_EMBED_SRC = 'https://www.google.com/maps?q=47.2469,28.9283&z=15&output=embed'
-
 export default async function ContactPage() {
-  const t = await getServerT()
+  const [t, contact] = await Promise.all([getServerT(), getContactInfo()])
 
   const infoCards = [
-    { icon: '📍', label: t.contactPage.addressLabel, content: <>Hîrtopul Mic<br />Raionul Criuleni<br />Republica Moldova</> },
+    { icon: '📍', label: t.contactPage.addressLabel, content: contact.address.split('\n').map((line, i, arr) => <span key={i}>{line}{i < arr.length - 1 && <br />}</span>) },
     { icon: '⛪', label: t.contactPage.hramLabel, content: t.contactPage.hramValue },
-    { icon: '📞', label: t.contactPage.phoneLabel, content: <a href="tel:+37367306191" className="hover:underline" style={{ color: '#C9A84C' }}>+373 67 306 191</a> },
-    { icon: '✉️', label: t.contactPage.emailLabel, content: <a href="mailto:parinte.marin@biserica-sf-nicolae.org" className="hover:underline" style={{ color: '#C9A84C' }}>parinte.marin@biserica-sf-nicolae.org</a> },
-    { icon: '🌐', label: t.contactPage.facebookLabel, content: <a href="https://www.facebook.com/PreotMarin" target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: '#C9A84C' }}>facebook.com/PreotMarin</a> },
+    { icon: '📞', label: t.contactPage.phoneLabel, content: <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="hover:underline" style={{ color: '#C9A84C' }}>{contact.phone}</a> },
+    { icon: '✉️', label: t.contactPage.emailLabel, content: <a href={`mailto:${contact.email}`} className="hover:underline" style={{ color: '#C9A84C' }}>{contact.email}</a> },
+    { icon: '🌐', label: t.contactPage.facebookLabel, content: <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: '#C9A84C' }}>{contact.facebook.replace(/^https?:\/\/(www\.)?/, '')}</a> },
   ]
 
-  const scheduleItems = [
-    { zi: t.footer.schedule.sunday, ora: '09:00', slujba: t.footer.schedule.liturgy },
-    { zi: t.footer.schedule.saturday, ora: '17:00', slujba: t.footer.schedule.vespers },
-    { zi: t.footer.schedule.friday, ora: '08:00', slujba: t.footer.schedule.matins },
-    { zi: t.footer.schedule.feasts, ora: '09:00', slujba: t.footer.schedule.liturgy },
-  ]
+  const scheduleItems = contact.schedule.split('\n').filter(Boolean).map(line => {
+    const [zi, ora, ...rest] = line.split(' - ')
+    return { zi, ora, slujba: rest.join(' - ') }
+  })
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -38,7 +35,7 @@ export default async function ContactPage() {
         <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: '#8A7050' }}>
           {t.contactPage.subtitle}
         </p>
-        <h1 className="font-heading text-4xl md:text-5xl mb-4" style={{ color: '#1C1B3A' }}>
+        <h1 className="font-heading mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
           {t.contactPage.title}
         </h1>
         <div className="flex items-center justify-center gap-3">
@@ -47,6 +44,10 @@ export default async function ContactPage() {
           <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
         </div>
       </div>
+
+      {contact.message && (
+        <div className="tiptap-prose max-w-3xl mx-auto mb-14 text-center" dangerouslySetInnerHTML={{ __html: contact.message }} />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
 
@@ -98,7 +99,7 @@ export default async function ContactPage() {
               {t.contactPage.mapTitle}
             </p>
             <iframe
-              src={MAP_EMBED_SRC}
+              src={contact.mapEmbed}
               width="100%"
               height="300"
               style={{ border: 0, display: 'block' }}

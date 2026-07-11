@@ -57,7 +57,7 @@ export default async function SfintiiPage({ searchParams }: Props) {
         <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
           {t.saints.subtitle}
         </p>
-        <h1 className="font-heading text-4xl md:text-5xl mb-5" style={{ color: '#1C1B3A' }}>
+        <h1 className="font-heading mb-5" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
           {t.saints.title}
         </h1>
         <div className="flex items-center justify-center gap-3 mb-6">

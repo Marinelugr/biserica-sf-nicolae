@@ -16,6 +16,7 @@ const links = [
   { href: '/admin/video', label: '🎬 Video' },
   { href: '/admin/magazin', label: '🛒 Magazin' },
   { href: '/admin/donatii', label: '💰 Donații' },
+  { href: '/admin/contact', label: '📞 Contact' },
   { href: '/admin/media', label: '🖼️ Media' },
   { href: '/admin/setari', label: '⚙️ Setări' },
 ]

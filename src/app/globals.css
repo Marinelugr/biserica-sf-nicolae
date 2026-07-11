@@ -307,9 +307,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Cursor personalizat — cruce ortodoxă subtilă */
-body {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='3' fill='%23C9A96E' opacity='0.8'/%3E%3C/svg%3E") 12 12, auto;
+*, *::before, *::after {
+  cursor: url('/cursors/cursor-default.svg') 12 12, auto;
 }
-a, button {
-  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='5' fill='%23C9A96E' opacity='0.9'/%3E%3C/svg%3E") 12 12, pointer;
+a, button, [role="button"], input[type="submit"], label {
+  cursor: url('/cursors/cursor-pointer.svg') 14 14, pointer;
 }

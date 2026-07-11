@@ -6,7 +6,7 @@ import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { prisma } from '@/lib/prisma'
-import ShareButtons from '@/components/video/ShareButtons'
+import ShareButtons from '@/components/shared/ShareButtons'
 
 export const dynamic = 'force-dynamic'
 

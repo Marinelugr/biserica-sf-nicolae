@@ -64,7 +64,7 @@ export default async function DonationsPage() {
         </p>
         <h1
           className="font-heading italic mb-5 leading-tight"
-          style={{ color: '#C9A84C', fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 400 }}
+          style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}
         >
           {t.donate.title}
         </h1>

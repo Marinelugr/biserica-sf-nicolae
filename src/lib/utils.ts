@@ -13,6 +13,11 @@ export function slugify(text: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
+export function readingTime(html: string): number {
+  const words = html.replace(/<[^>]*>/g, ' ').trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.round(words / 200))
+}
+
 export function formatDate(date: Date | string, locale = 'ro-MD'): string {
   const d = typeof date === 'string' ? new Date(date) : date
   return d.toLocaleDateString(locale, {

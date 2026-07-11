@@ -37,7 +37,7 @@ export default function DesprePage() {
           <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: '#8A7050' }}>
             Parohia Ortodoxă
           </p>
-          <h1 className="font-heading text-4xl md:text-5xl mb-4" style={{ color: '#1C1B3A' }}>
+          <h1 className="font-heading mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
             Despre Biserică
           </h1>
           <div className="flex items-center justify-center gap-3">
