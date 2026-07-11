@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { slugify } from '@/lib/utils'
 
 const LIVE_CATEGORY_NAME = 'Sfânta Liturghie Live'
 
@@ -19,15 +20,20 @@ export async function POST(req: NextRequest) {
   })
   if (!category) {
     const last = await prisma.videoCategory.findFirst({ orderBy: { order: 'desc' } })
+    let catSlug = slugify(LIVE_CATEGORY_NAME)
+    if (await prisma.videoCategory.findUnique({ where: { slug: catSlug } })) catSlug = `${catSlug}-${Date.now()}`
     category = await prisma.videoCategory.create({
-      data: { name: LIVE_CATEGORY_NAME, order: (last?.order ?? -1) + 1 },
+      data: { name: LIVE_CATEGORY_NAME, slug: catSlug, order: (last?.order ?? -1) + 1 },
     })
   }
 
   const last = await prisma.video.findFirst({ orderBy: { order: 'desc' } })
+  let slug = slugify(title.trim())
+  if (await prisma.video.findUnique({ where: { slug } })) slug = `${slug}-${Date.now()}`
   const video = await prisma.video.create({
     data: {
       title: title.trim(),
+      slug,
       url: url?.trim() || `https://www.youtube.com/watch?v=${videoId}`,
       platform: platform || 'youtube',
       videoId: videoId.trim(),

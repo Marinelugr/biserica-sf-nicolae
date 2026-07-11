@@ -208,6 +208,7 @@ model Product {
 model VideoCategory {
   id        String   @id @default(cuid())
   name      String
+  slug      String   @unique
   order     Int      @default(0)
   videos    Video[]
   createdAt DateTime @default(now())
@@ -216,6 +217,7 @@ model VideoCategory {
 model Video {
   id          String         @id @default(cuid())
   title       String
+  slug        String         @unique
   url         String
   platform    String         @default("youtube")
   videoId     String

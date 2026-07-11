@@ -3,10 +3,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
+import { slugify } from '@/lib/utils'
 
-interface VideoCategory { id: string; name: string; order: number; _count: { videos: number } }
+interface VideoCategory { id: string; name: string; slug: string; order: number; _count: { videos: number } }
 interface Video {
-  id: string; title: string; url: string; platform: string; videoId: string
+  id: string; title: string; slug: string; url: string; platform: string; videoId: string
   categoryId: string | null; description: string | null; order: number; createdAt: string
   category: { id: string; name: string } | null
 }
@@ -65,7 +66,7 @@ function ConfirmModal({ message, onConfirm, onCancel, loading }: { message: stri
   )
 }
 
-const emptyForm = { title: '', url: '', categoryId: '', description: '' }
+const emptyForm = { title: '', slug: '', url: '', categoryId: '', description: '' }
 
 // ─── Main page ────────────────────────────────────────────────────────────────
 
@@ -87,6 +88,7 @@ export default function AdminVideoPage() {
   const [showForm, setShowForm] = useState(false)
   const [editVideo, setEditVideo] = useState<Video | null>(null)
   const [form, setForm] = useState(emptyForm)
+  const [slugTouched, setSlugTouched] = useState(false)
   const [urlParsed, setUrlParsed] = useState<{ platform: string; videoId: string } | null>(null)
   const [saving, setSaving] = useState(false)
   const [deleteVideoId, setDeleteVideoId] = useState<string | null>(null)
@@ -161,13 +163,20 @@ export default function AdminVideoPage() {
   function openNew() {
     setEditVideo(null)
     setForm({ ...emptyForm, categoryId: selectedCat !== 'all' ? selectedCat : '' })
+    setSlugTouched(false)
     setShowForm(true)
   }
 
   function openEdit(v: Video) {
     setEditVideo(v)
-    setForm({ title: v.title, url: v.url, categoryId: v.categoryId || '', description: v.description || '' })
+    setForm({ title: v.title, slug: v.slug, url: v.url, categoryId: v.categoryId || '', description: v.description || '' })
+    setSlugTouched(true)
     setShowForm(true)
+  }
+
+  function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const title = e.target.value
+    setForm(f => ({ ...f, title, slug: slugTouched ? f.slug : slugify(title) }))
   }
 
   async function handleSave() {
@@ -176,7 +185,7 @@ export default function AdminVideoPage() {
     if (!parsed) { showToast('URL invalid. Suportat: YouTube și Vimeo', 'error'); return }
     setSaving(true)
     try {
-      const body = { title: form.title, url: form.url, platform: parsed.platform, videoId: parsed.videoId, categoryId: form.categoryId || null, description: form.description }
+      const body = { title: form.title, slug: form.slug || slugify(form.title), url: form.url, platform: parsed.platform, videoId: parsed.videoId, categoryId: form.categoryId || null, description: form.description }
       const url = editVideo ? `/api/admin/video/${editVideo.id}` : '/api/admin/video'
       const method = editVideo ? 'PATCH' : 'POST'
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -415,10 +424,24 @@ export default function AdminVideoPage() {
                 <label style={lbl}>Titlu *</label>
                 <input
                   value={form.title}
-                  onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                  onChange={handleTitleChange}
                   placeholder="Sfânta Liturghie — Duminica Floriilor 2024"
                   style={inp}
                 />
+              </div>
+
+              {/* Slug */}
+              <div>
+                <label style={lbl}>Slug (URL)</label>
+                <input
+                  value={form.slug}
+                  onChange={e => { setSlugTouched(true); setForm(f => ({ ...f, slug: e.target.value })) }}
+                  placeholder="duminica-a-5a-dupa-cincizecime"
+                  style={{ ...inp, color: '#9B8050' }}
+                />
+                <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', display: 'block', marginTop: '0.35rem' }}>
+                  /video/{categories.find(c => c.id === form.categoryId)?.slug || '…'}/{form.slug || '…'}
+                </span>
               </div>
 
               {/* Category */}
