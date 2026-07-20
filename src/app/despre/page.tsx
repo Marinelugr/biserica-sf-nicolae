@@ -1,17 +1,21 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { getServerT } from '@/lib/i18n/server'
 
-export const metadata: Metadata = {
-  title: 'Despre Biserică',
-  description:
-    'Istoria Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Moldova. Ctitorire, arhitectură, paroh și galerie foto.',
-  alternates: buildAlternates('/despre'),
-  openGraph: {
-    title: 'Despre Biserică — Parohia Sfântul Nicolae',
-    description: 'Istoria și prezentul Parohiei Ortodoxe din Hîrtopul Mic, Criuleni.',
-    images: ['/images/12.jpg'],
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  const m = t.meta.despre
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: buildAlternates('/despre'),
+    openGraph: {
+      title: m.ogTitle,
+      description: m.ogDescription,
+      images: ['/images/12.jpg'],
+    },
+  }
 }
 
 export default function DesprePage() {

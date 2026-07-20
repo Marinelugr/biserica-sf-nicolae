@@ -9,11 +9,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Donații — Susțineți lucrările Bisericii',
-  description:
-    'Susține Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni. Donații pentru renovarea acoperișului, turnului clopotniță, pictura interiorului și alte lucrări.',
-  alternates: buildAlternates('/donatii'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.donatii.title,
+    description: t.meta.donatii.description,
+    alternates: buildAlternates('/donatii'),
+  }
 }
 
 function facebookEmbedSrc(url: string) {

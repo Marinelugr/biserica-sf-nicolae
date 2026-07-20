@@ -6,10 +6,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Sfinții',
-  description: 'Calendarul sfinților ortodocși prăznuiți de-a lungul anului. Vieți de sfinți, icoane și date de prăznuire — Parohia Sfântul Ierarh Nicolae.',
-  alternates: buildAlternates('/sfintii'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.sfintii.title,
+    description: t.meta.sfintii.description,
+    alternates: buildAlternates('/sfintii'),
+  }
 }
 
 const MONTHS_FULL = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie']

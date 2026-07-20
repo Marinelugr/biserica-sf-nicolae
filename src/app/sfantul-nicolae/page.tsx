@@ -8,11 +8,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Sfântul Ierarh Nicolae',
-  description:
-    'Viața Sfântului Ierarh Nicolae — Arhiepiscopul Mirelor Lichiei. Tropar, Condac, date ale prăznuirii și Acatistul Sfântului Nicolae.',
-  alternates: buildAlternates('/sfantul-nicolae'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.sfantulNicolae.title,
+    description: t.meta.sfantulNicolae.description,
+    alternates: buildAlternates('/sfantul-nicolae'),
+  }
 }
 
 function renderPoem(text: string) {

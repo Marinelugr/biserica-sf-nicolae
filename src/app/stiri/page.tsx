@@ -8,10 +8,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Știri & Articole',
-  description: 'Ultimele noutăți și articole de la Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic, Criuleni.',
-  alternates: buildAlternates('/stiri'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.stiri.title,
+    description: t.meta.stiri.description,
+    alternates: buildAlternates('/stiri'),
+  }
 }
 
 async function getArticles() {

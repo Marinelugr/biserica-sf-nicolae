@@ -122,6 +122,7 @@ export interface Translations {
       sunday: string; saturday: string; friday: string; feasts: string
       liturgy: string; vespers: string; matins: string
     }
+    privacyPolicy: string
   }
   search: {
     title: string; placeholder: string; btn: string; results: string
@@ -153,6 +154,31 @@ export interface Translations {
     submitBtn: string; sendingBtn: string
     successMsg: string; errorMsg: string
   }
+  meta: {
+    site: { title: string; description: string; ogTitle: string; ogDescription: string; twitterTitle: string; twitterDescription: string }
+    despre: { title: string; description: string; ogTitle: string; ogDescription: string }
+    istoriaBisericii: { title: string; description: string }
+    sfantulNicolae: { title: string; description: string }
+    biblie: { title: string; description: string }
+    calendar: { title: string; description: string }
+    calendarPascal: { title: string; description: string }
+    carti: { title: string; description: string }
+    sfintii: { title: string; description: string }
+    stiri: { title: string; description: string }
+    video: { title: string; description: string }
+    magazin: { title: string; description: string }
+    donatii: { title: string; description: string }
+    contact: { title: string; description: string }
+    cautare: { title: string; description: string }
+    politicaConfidentialitate: { title: string; description: string }
+  }
+  privacyPage: {
+    title: string
+    lastUpdated: string
+    intro: string
+    sections: { title: string; text: string }[]
+  }
+  cookieBanner: { message: string; acceptBtn: string; policyLink: string }
 }
 
 const ro: Translations = {
@@ -366,6 +392,7 @@ const ro: Translations = {
       sunday: 'Duminică', saturday: 'Sâmbătă', friday: 'Vineri', feasts: 'Sărbători',
       liturgy: 'Sf. Liturghie', vespers: 'Vecernie', matins: 'Utrenie',
     },
+    privacyPolicy: 'Politica de confidențialitate',
   },
   search: {
     title: 'Căutare', placeholder: 'Caută pe site...', btn: 'Caută',
@@ -401,6 +428,110 @@ const ro: Translations = {
     submitBtn: 'Trimite mesajul', sendingBtn: 'Se trimite...',
     successMsg: '✓ Mesajul a fost trimis cu succes! Vă vom răspunde în cel mai scurt timp.',
     errorMsg: '✗ A apărut o eroare. Vă rugăm să încercați din nou sau să ne contactați direct.',
+  },
+  meta: {
+    site: {
+      title: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Criuleni',
+      description: 'Website oficial al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova. Biblie ortodoxă, calendar liturgic, transmisiuni live.',
+      ogTitle: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Moldova',
+      ogDescription: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Republica Moldova.',
+      twitterTitle: 'Biserica Sfântul Ierarh Nicolae',
+      twitterDescription: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Moldova.',
+    },
+    despre: {
+      title: 'Despre Biserică',
+      description: 'Istoria Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Moldova. Ctitorire, arhitectură, paroh și galerie foto.',
+      ogTitle: 'Despre Biserică — Parohia Sfântul Nicolae',
+      ogDescription: 'Istoria și prezentul Parohiei Ortodoxe din Hîrtopul Mic, Criuleni.',
+    },
+    istoriaBisericii: {
+      title: 'Istoria Bisericii',
+      description: 'Istoria Bisericii Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Ctitorii, etapele de construcție și restaurare a lăcașului de cult de la întemeierea sa în secolul al XIX-lea.',
+    },
+    sfantulNicolae: {
+      title: 'Sfântul Ierarh Nicolae',
+      description: 'Viața Sfântului Ierarh Nicolae — Arhiepiscopul Mirelor Lichiei. Tropar, Condac, date ale prăznuirii și Acatistul Sfântului Nicolae.',
+    },
+    biblie: {
+      title: 'Sfânta Scriptură — Biblia Ortodoxă',
+      description: 'Citește Sfânta Scriptură online. Biblia Ortodoxă — Vechiul Testament și Noul Testament, în limba română, conform ediției Sfântului Sinod.',
+    },
+    calendar: {
+      title: 'Calendarul Sfinților',
+      description: 'Calendarul Sfinților Ortodocși cu stil vechi (Julian). Sărbători fixe și schimbătoare, posturi, sfinții zilei.',
+    },
+    calendarPascal: {
+      title: 'Calendarul Pascal Ortodox',
+      description: 'Datele Sfintelor Paști, Floriilor, Duminicii Tomii, Înălțării, Rusaliilor și Postului Apostolilor pentru anii 2024-2034, calculate după calendarul iulian (stil vechi).',
+    },
+    carti: {
+      title: 'Bibliotecă Ortodoxă',
+      description: 'Acatiste, canoane, rugăciuni, slujbe și cărți ortodoxe. Biblioteca digitală a Parohiei Sfântul Ierarh Nicolae.',
+    },
+    sfintii: {
+      title: 'Sfinții',
+      description: 'Calendarul sfinților ortodocși prăznuiți de-a lungul anului. Vieți de sfinți, icoane și date de prăznuire — Parohia Sfântul Ierarh Nicolae.',
+    },
+    stiri: {
+      title: 'Știri & Articole',
+      description: 'Ultimele noutăți și articole de la Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic, Criuleni.',
+    },
+    video: {
+      title: 'Video Ortodox',
+      description: 'Filme ortodoxe, acatiste video, conferințe, predici și rugăciuni. Colecția video a Parohiei Sfântul Ierarh Nicolae.',
+    },
+    magazin: {
+      title: 'Magazin',
+      description: 'Lumânări, icoane, cărți și obiecte bisericești din magazinul Parohiei Sfântul Ierarh Nicolae, Hîrtopul Mic.',
+    },
+    donatii: {
+      title: 'Donații — Susțineți lucrările Bisericii',
+      description: 'Susține Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni. Donații pentru renovarea acoperișului, turnului clopotniță, pictura interiorului și alte lucrări.',
+    },
+    contact: {
+      title: 'Contact',
+      description: 'Contactează Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Formular de contact, adresă, telefon și program de slujbe.',
+    },
+    cautare: {
+      title: 'Căutare',
+      description: 'Caută pe site-ul Parohiei Sfântul Ierarh Nicolae: versete Biblie, articole, rugăciuni, cărți, vieți de sfinți.',
+    },
+    politicaConfidentialitate: {
+      title: 'Politica de Confidențialitate',
+      description: 'Politica de confidențialitate a Parohiei Sfântul Ierarh Nicolae: ce date colectăm prin formularul de contact, cum folosim cookie-urile și cum vă protejăm datele personale.',
+    },
+  },
+  privacyPage: {
+    title: 'Politica de Confidențialitate',
+    lastUpdated: 'Ultima actualizare: 20 iulie 2026',
+    intro: 'Parohia Sfântul Ierarh Nicolae respectă confidențialitatea vizitatorilor site-ului. Această pagină explică ce date colectăm, cum le folosim și ce drepturi aveți.',
+    sections: [
+      {
+        title: 'Ce date colectăm',
+        text: 'Prin formularul de contact colectăm numele, adresa de email și mesajul pe care ni le trimiteți. Aceste date sunt folosite exclusiv pentru a răspunde solicitării dumneavoastră și sunt transmise prin serviciul de email Resend.',
+      },
+      {
+        title: 'Cookie-uri',
+        text: 'Site-ul folosește un cookie tehnic pentru a reține limba aleasă (română, rusă sau engleză) și, doar pentru administratorii parohiei, un cookie de sesiune pentru autentificare în panoul de administrare. Nu folosim cookie-uri de urmărire sau publicitate și nu instalăm scripturi de analiză (Google Analytics etc.).',
+      },
+      {
+        title: 'Donații',
+        text: 'Donațiile se fac prin transfer bancar sau PayPal, direct către conturile parohiei. Site-ul nu procesează și nu stochează date de plată.',
+      },
+      {
+        title: 'Drepturile dumneavoastră',
+        text: 'Aveți dreptul de a solicita accesul, corectarea sau ștergerea datelor personale transmise prin formularul de contact. Pentru orice solicitare, ne puteți scrie la adresa de email afișată pe pagina de contact.',
+      },
+      {
+        title: 'Modificări ale acestei politici',
+        text: 'Această politică poate fi actualizată periodic. Data ultimei actualizări este afișată mai sus.',
+      },
+    ],
+  },
+  cookieBanner: {
+    message: 'Acest site folosește un cookie tehnic pentru a reține limba aleasă. Nu folosim cookie-uri de urmărire sau publicitate.',
+    acceptBtn: 'Am înțeles',
+    policyLink: 'Politica de confidențialitate',
   },
 }
 

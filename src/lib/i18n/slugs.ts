@@ -22,6 +22,7 @@ export const SLUG_MAP: Record<string, TranslatedSlugs> = {
   '/sfintii': { ru: '/svyatye', en: '/saints' },
   '/cautare': { ru: '/poisk', en: '/search' },
   '/magazin': { en: '/shop' },
+  '/politica-de-confidentialitate': { ru: '/politika-konfidentsialnosti', en: '/privacy-policy' },
 }
 
 // Longest canonical path first so nested routes (e.g. /carti/categorie) match

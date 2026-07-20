@@ -5,10 +5,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Sfânta Scriptură — Biblia Ortodoxă',
-  description: 'Citește Sfânta Scriptură online. Biblia Ortodoxă — Vechiul Testament și Noul Testament, în limba română, conform ediției Sfântului Sinod.',
-  alternates: buildAlternates('/biblie'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.biblie.title,
+    description: t.meta.biblie.description,
+    alternates: buildAlternates('/biblie'),
+  }
 }
 
 // ─── VECHIUL TESTAMENT — 53 cărți ────────────────────────────────────────────

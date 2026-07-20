@@ -4,10 +4,11 @@ import './globals.css'
 import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { I18nProvider } from '@/lib/i18n/context'
-import { getServerLocale } from '@/lib/i18n/server'
+import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import LoadingScreenLoader from '@/components/LoadingScreenLoader'
 import PageTransition from '@/components/PageTransition'
 import ScrollToTop from '@/components/ScrollToTop'
+import CookieNotice from '@/components/CookieNotice'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
@@ -24,48 +25,54 @@ const ebGaramond = EB_Garamond({
   display: 'swap',
 })
 
-export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://biserica-sf-nicolae.org'),
-  title: {
-    default: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Criuleni',
-    template: '%s | Biserica Sfântul Ierarh Nicolae',
-  },
-  description:
-    'Website oficial al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova. Biblie ortodoxă, calendar liturgic, transmisiuni live.',
-  keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online', 'transmisiune live'],
-  icons: {
-    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-    apple: '/favicon.svg',
-  },
-  manifest: '/manifest.json',
-  appleWebApp: { capable: true, title: 'Sf. Nicolae', statusBarStyle: 'black-translucent' },
-  openGraph: {
-    type: 'website',
-    locale: 'ro_RO',
-    url: 'https://biserica-sf-nicolae.org',
-    siteName: 'Biserica Sfântul Ierarh Nicolae',
-    title: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Moldova',
-    description: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Republica Moldova.',
-    images: [{ url: '/images/12.jpg', width: 1200, height: 800, alt: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Criuleni, Moldova' }],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Biserica Sfântul Ierarh Nicolae',
-    description: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Moldova.',
-  },
-  robots: { index: true, follow: true },
-  themeColor: '#0D0905',
-  alternates: {
-    canonical: 'https://biserica-sf-nicolae.org',
-    languages: {
-      'ro': 'https://biserica-sf-nicolae.org',
-      'ro-MD': 'https://biserica-sf-nicolae.org',
-      'ru': 'https://biserica-sf-nicolae.org/ru',
-      'ru-MD': 'https://biserica-sf-nicolae.org/ru',
-      'en': 'https://biserica-sf-nicolae.org/en',
-      'x-default': 'https://biserica-sf-nicolae.org',
+const OG_LOCALE: Record<'ro' | 'ru' | 'en', string> = { ro: 'ro_RO', ru: 'ru_RU', en: 'en_US' }
+
+export async function generateMetadata(): Promise<Metadata> {
+  const [locale, t] = await Promise.all([getServerLocale(), getServerT()])
+  const m = t.meta.site
+
+  return {
+    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://biserica-sf-nicolae.org'),
+    title: {
+      default: m.title,
+      template: `%s | ${m.twitterTitle}`,
     },
-  },
+    description: m.description,
+    keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online', 'transmisiune live'],
+    icons: {
+      icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+      apple: '/favicon.svg',
+    },
+    manifest: '/manifest.json',
+    appleWebApp: { capable: true, title: 'Sf. Nicolae', statusBarStyle: 'black-translucent' },
+    openGraph: {
+      type: 'website',
+      locale: OG_LOCALE[locale],
+      url: 'https://biserica-sf-nicolae.org',
+      siteName: m.twitterTitle,
+      title: m.ogTitle,
+      description: m.ogDescription,
+      images: [{ url: '/images/12.jpg', width: 1200, height: 800, alt: m.ogTitle }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: m.twitterTitle,
+      description: m.twitterDescription,
+    },
+    robots: { index: true, follow: true },
+    themeColor: '#0D0905',
+    alternates: {
+      canonical: 'https://biserica-sf-nicolae.org',
+      languages: {
+        'ro': 'https://biserica-sf-nicolae.org',
+        'ro-MD': 'https://biserica-sf-nicolae.org',
+        'ru': 'https://biserica-sf-nicolae.org/ru',
+        'ru-MD': 'https://biserica-sf-nicolae.org/ru',
+        'en': 'https://biserica-sf-nicolae.org/en',
+        'x-default': 'https://biserica-sf-nicolae.org',
+      },
+    },
+  }
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
@@ -117,6 +124,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </main>
           <Footer />
           <ScrollToTop />
+          <CookieNotice />
         </I18nProvider>
       </body>
     </html>

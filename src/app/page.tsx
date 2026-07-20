@@ -1,5 +1,6 @@
 export const dynamic = 'force-dynamic'
 
+import type { Metadata } from 'next'
 import Hero from '@/components/homepage/Hero'
 import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
@@ -8,8 +9,18 @@ import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
 import NextServiceWidget from '@/components/NextServiceWidget'
 import PascalCard from '@/components/PascalCard'
 import { getTodayDate } from '@/lib/utils'
-import { getServerLocale } from '@/lib/i18n/server'
+import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { pick, localeToIntl, type Locale } from '@/lib/i18n/pick'
+import { buildAlternates } from '@/lib/i18n/alternates'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: { absolute: t.meta.site.title },
+    description: t.meta.site.description,
+    alternates: buildAlternates('/'),
+  }
+}
 
 const DEFAULT_WIDGETS = [
   { section: 'sfintii_zilei', order: 0, enabled: true },

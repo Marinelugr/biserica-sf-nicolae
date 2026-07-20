@@ -211,6 +211,7 @@ const en: Translations = {
       sunday: 'Sunday', saturday: 'Saturday', friday: 'Friday', feasts: 'Feasts',
       liturgy: 'Holy Liturgy', vespers: 'Vespers', matins: 'Matins',
     },
+    privacyPolicy: 'Privacy Policy',
   },
   search: {
     title: 'Search', placeholder: 'Search the site...', btn: 'Search',
@@ -246,6 +247,110 @@ const en: Translations = {
     submitBtn: 'Send message', sendingBtn: 'Sending...',
     successMsg: '✓ Message sent successfully! We will reply as soon as possible.',
     errorMsg: '✗ An error occurred. Please try again or contact us directly.',
+  },
+  meta: {
+    site: {
+      title: 'Saint Nicholas Church — Hîrtopul Mic, Criuleni',
+      description: 'Official website of Saint Nicholas the Hierarch Parish in Hîrtopul Mic, Criuleni District, Republic of Moldova. Orthodox Bible, liturgical calendar, live streaming.',
+      ogTitle: 'Saint Nicholas Church — Hîrtopul Mic, Moldova',
+      ogDescription: 'Orthodox Parish in Hîrtopul Mic, Criuleni, Republic of Moldova.',
+      twitterTitle: 'Saint Nicholas Church',
+      twitterDescription: 'Orthodox Parish in Hîrtopul Mic, Criuleni, Moldova.',
+    },
+    despre: {
+      title: 'About the Church',
+      description: 'History of Saint Nicholas Parish in Hîrtopul Mic, Criuleni District, Moldova. Founding, architecture, priest, and photo gallery.',
+      ogTitle: 'About the Church — Saint Nicholas Parish',
+      ogDescription: 'The history and present life of the Orthodox Parish in Hîrtopul Mic, Criuleni.',
+    },
+    istoriaBisericii: {
+      title: 'Church History',
+      description: 'History of Saint Nicholas Church in Hîrtopul Mic, Criuleni, Moldova. Founders, construction stages, and restoration of the church since its founding in the 19th century.',
+    },
+    sfantulNicolae: {
+      title: 'Saint Nicholas the Wonderworker',
+      description: 'The life of Saint Nicholas the Hierarch, Archbishop of Myra in Lycia. Troparion, Kontakion, feast dates, and the Akathist to Saint Nicholas.',
+    },
+    biblie: {
+      title: 'Holy Scripture — Orthodox Bible',
+      description: 'Read the Holy Scripture online. Orthodox Bible — Old and New Testament.',
+    },
+    calendar: {
+      title: 'Calendar of Saints',
+      description: 'Orthodox calendar of saints, Old Style (Julian). Fixed and movable feasts, fasts, and the saints of the day.',
+    },
+    calendarPascal: {
+      title: 'Orthodox Paschal Calendar',
+      description: "Dates of Holy Pascha, Palm Sunday, Thomas Sunday, the Ascension, Pentecost, and the Apostles' Fast for 2024-2034, calculated according to the Julian (Old Style) calendar.",
+    },
+    carti: {
+      title: 'Orthodox Library',
+      description: 'Akathists, canons, prayers, services, and Orthodox books. The digital library of Saint Nicholas Parish.',
+    },
+    sfintii: {
+      title: 'Saints',
+      description: 'Calendar of Orthodox saints celebrated throughout the year. Lives of saints, icons, and feast dates — Saint Nicholas Parish.',
+    },
+    stiri: {
+      title: 'News & Articles',
+      description: 'Latest news and articles from Saint Nicholas Parish, Hîrtopul Mic, Criuleni.',
+    },
+    video: {
+      title: 'Orthodox Videos',
+      description: 'Orthodox films, video akathists, conferences, sermons, and prayers. The video collection of Saint Nicholas Parish.',
+    },
+    magazin: {
+      title: 'Shop',
+      description: 'Candles, icons, books, and church items from the Saint Nicholas Parish shop, Hîrtopul Mic.',
+    },
+    donatii: {
+      title: 'Donations — Support the Church',
+      description: 'Support Saint Nicholas Parish in Hîrtopul Mic, Criuleni. Donations for roof renovation, the bell tower, interior painting, and other works.',
+    },
+    contact: {
+      title: 'Contact',
+      description: 'Contact Saint Nicholas Parish in Hîrtopul Mic, Criuleni, Moldova. Contact form, address, phone number, and service schedule.',
+    },
+    cautare: {
+      title: 'Search',
+      description: 'Search the Saint Nicholas Parish website: Bible verses, articles, prayers, books, lives of saints.',
+    },
+    politicaConfidentialitate: {
+      title: 'Privacy Policy',
+      description: 'Privacy policy of Saint Nicholas Parish: what data we collect through the contact form, how we use cookies, and how we protect your personal data.',
+    },
+  },
+  privacyPage: {
+    title: 'Privacy Policy',
+    lastUpdated: 'Last updated: July 20, 2026',
+    intro: 'Saint Nicholas Parish respects the privacy of website visitors. This page explains what data we collect, how we use it, and what rights you have.',
+    sections: [
+      {
+        title: 'What data we collect',
+        text: 'Through the contact form we collect your name, email address, and message. This data is used solely to respond to your inquiry and is sent through the Resend email service.',
+      },
+      {
+        title: 'Cookies',
+        text: 'The website uses a technical cookie to remember your chosen language (Romanian, Russian, or English), and — only for parish administrators — a session cookie for logging into the admin panel. We do not use tracking or advertising cookies, and we do not install analytics scripts (such as Google Analytics).',
+      },
+      {
+        title: 'Donations',
+        text: 'Donations are made by bank transfer or PayPal, directly to the parish accounts. The website does not process or store payment data.',
+      },
+      {
+        title: 'Your rights',
+        text: 'You have the right to request access to, correction of, or deletion of personal data submitted through the contact form. For any request, you may write to us at the email address shown on the contact page.',
+      },
+      {
+        title: 'Changes to this policy',
+        text: 'This policy may be updated periodically. The date of the last update is shown above.',
+      },
+    ],
+  },
+  cookieBanner: {
+    message: 'This website uses a technical cookie to remember your chosen language. We do not use tracking or advertising cookies.',
+    acceptBtn: 'Got it',
+    policyLink: 'Privacy Policy',
   },
 }
 

@@ -8,11 +8,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Istoria Bisericii',
-  description:
-    'Istoria Bisericii Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Ctitorii, etapele de construcție și restaurare a lăcașului de cult de la întemeierea sa în secolul al XIX-lea.',
-  alternates: buildAlternates('/istoria-bisericii'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.istoriaBisericii.title,
+    description: t.meta.istoriaBisericii.description,
+    alternates: buildAlternates('/istoria-bisericii'),
+  }
 }
 
 function extractYouTubeId(url: string): string | null {

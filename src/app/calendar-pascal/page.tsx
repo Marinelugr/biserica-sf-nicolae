@@ -1,11 +1,15 @@
 import type { Metadata } from 'next'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getPascalData } from '@/lib/pascal'
+import { getServerT } from '@/lib/i18n/server'
 
-export const metadata: Metadata = {
-  title: 'Calendarul Pascal Ortodox',
-  description: 'Datele Sfintelor Paști, Floriilor, Duminicii Tomii, Înălțării, Rusaliilor și Postului Apostolilor pentru anii 2024-2034, calculate după calendarul iulian (stil vechi).',
-  alternates: buildAlternates('/calendar-pascal'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.calendarPascal.title,
+    description: t.meta.calendarPascal.description,
+    alternates: buildAlternates('/calendar-pascal'),
+  }
 }
 
 const START_YEAR = 2024

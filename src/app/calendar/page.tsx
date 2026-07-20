@@ -8,10 +8,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Calendarul Sfinților',
-  description: 'Calendarul Sfinților Ortodocși cu stil vechi (Julian). Sărbători fixe și schimbătoare, posturi, sfinții zilei.',
-  alternates: buildAlternates('/calendar'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.calendar.title,
+    description: t.meta.calendar.description,
+    alternates: buildAlternates('/calendar'),
+  }
 }
 
 function daysInMonth(month: number, year: number) {

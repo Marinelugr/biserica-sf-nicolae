@@ -1,13 +1,18 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { getServerLocale, getServerT } from '@/lib/i18n/server'
+import { pick, type Locale } from '@/lib/i18n/pick'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Căutare',
-  description: 'Caută pe site-ul Parohiei Sfântul Ierarh Nicolae: versete Biblie, articole, rugăciuni, cărți, vieți de sfinți.',
-  alternates: buildAlternates('/cautare'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.cautare.title,
+    description: t.meta.cautare.description,
+    alternates: buildAlternates('/cautare'),
+  }
 }
 
 const CATEGORIES = [
@@ -25,9 +30,10 @@ interface SearchResult {
   href: string
 }
 
-async function searchAll(query: string): Promise<Record<string, SearchResult[]>> {
+async function searchAll(query: string, locale: Locale): Promise<Record<string, SearchResult[]>> {
   if (!query) return {}
   const results: Record<string, SearchResult[]> = {}
+  const insensitive = { contains: query, mode: 'insensitive' as const }
 
   try {
     const { prisma } = await import('@/lib/prisma')
@@ -36,30 +42,36 @@ async function searchAll(query: string): Promise<Record<string, SearchResult[]>>
       prisma.libraryBook.findMany({
         where: {
           OR: [
-            { titleRo: { contains: query, mode: 'insensitive' } },
+            { titleRo: insensitive },
+            { titleRu: insensitive },
+            { titleEn: insensitive },
           ],
         },
-        select: { slug: true, titleRo: true, type: true },
+        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, type: true },
         take: 8,
       }),
       prisma.article.findMany({
         where: {
           published: true,
           OR: [
-            { titleRo: { contains: query, mode: 'insensitive' } },
+            { titleRo: insensitive },
+            { titleRu: insensitive },
+            { titleEn: insensitive },
           ],
         },
-        select: { slug: true, titleRo: true, category: true },
+        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, category: true },
         take: 8,
         orderBy: { publishedAt: 'desc' },
       }),
       prisma.saint.findMany({
         where: {
           OR: [
-            { nameRo: { contains: query, mode: 'insensitive' } },
+            { nameRo: insensitive },
+            { nameRu: insensitive },
+            { nameEn: insensitive },
           ],
         },
-        select: { nameRo: true, month: true, day: true },
+        select: { nameRo: true, nameRu: true, nameEn: true, month: true, day: true },
         take: 8,
       }),
     ])
@@ -67,7 +79,7 @@ async function searchAll(query: string): Promise<Record<string, SearchResult[]>>
     if (articles.length > 0) {
       results['articole'] = articles.map(a => ({
         category: 'articole',
-        title: a.titleRo,
+        title: pick(locale, a.titleRo, a.titleRu, a.titleEn),
         excerpt: a.category || '',
         href: `/stiri/${a.slug}`,
       }))
@@ -79,7 +91,7 @@ async function searchAll(query: string): Promise<Record<string, SearchResult[]>>
     if (rugs.length > 0) {
       results['rugaciuni'] = rugs.map(b => ({
         category: 'rugaciuni',
-        title: b.titleRo,
+        title: pick(locale, b.titleRo, b.titleRu, b.titleEn),
         excerpt: 'Rugăciune ortodoxă',
         href: `/carti/${b.slug}`,
       }))
@@ -88,7 +100,7 @@ async function searchAll(query: string): Promise<Record<string, SearchResult[]>>
     if (carti.length > 0) {
       results['carti'] = carti.map(b => ({
         category: 'carti',
-        title: b.titleRo,
+        title: pick(locale, b.titleRo, b.titleRu, b.titleEn),
         excerpt: b.type || '',
         href: `/carti/${b.slug}`,
       }))
@@ -97,7 +109,7 @@ async function searchAll(query: string): Promise<Record<string, SearchResult[]>>
     if (saints.length > 0) {
       results['sfinti'] = saints.map(s => ({
         category: 'sfinti',
-        title: s.nameRo,
+        title: pick(locale, s.nameRo, s.nameRu, s.nameEn),
         excerpt: `Prăznuit pe ${s.day} ${getMonthName(s.month)}`,
         href: '/calendar',
       }))
@@ -130,7 +142,8 @@ export default async function CautarePage({
 }) {
   const { q } = await searchParams
   const query = q?.trim() || ''
-  const results = await searchAll(query)
+  const locale = await getServerLocale()
+  const results = await searchAll(query, locale)
   const totalResults = Object.values(results).reduce((sum, arr) => sum + arr.length, 0)
 
   return (

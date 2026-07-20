@@ -4,11 +4,13 @@ import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getContactInfo } from '@/lib/contact-info'
 
-export const metadata: Metadata = {
-  title: 'Contact',
-  description:
-    'Contactează Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Formular de contact, adresă, telefon și program de slujbe.',
-  alternates: buildAlternates('/contact'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.contact.title,
+    description: t.meta.contact.description,
+    alternates: buildAlternates('/contact'),
+  }
 }
 
 export default async function ContactPage() {

@@ -7,10 +7,13 @@ import { localizedHref } from '@/lib/i18n/href'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Magazin',
-  description: 'Lumânări, icoane, cărți și obiecte bisericești din magazinul Parohiei Sfântul Ierarh Nicolae, Hîrtopul Mic.',
-  alternates: buildAlternates('/magazin'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.magazin.title,
+    description: t.meta.magazin.description,
+    alternates: buildAlternates('/magazin'),
+  }
 }
 
 function stripHtml(html: string): string {

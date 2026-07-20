@@ -6,10 +6,13 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Bibliotecă Ortodoxă',
-  description: 'Acatiste, canoane, rugăciuni, slujbe și cărți ortodoxe. Biblioteca digitală a Parohiei Sfântul Ierarh Nicolae.',
-  alternates: buildAlternates('/carti'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.carti.title,
+    description: t.meta.carti.description,
+    alternates: buildAlternates('/carti'),
+  }
 }
 
 const CATEGORY_META = [

@@ -159,6 +159,7 @@ export default async function Footer() {
               { href: '/contact',  label: t.footer.contact },
               { href: '/donatii', label: t.nav.donate },
               { href: '/magazin', label: t.nav.shop },
+              { href: '/politica-de-confidentialitate', label: t.footer.privacyPolicy },
             ].map(link => (
               <Link key={link.href} href={localizedHref(link.href, locale)} className="font-body text-xs transition-colors hover:text-amber-600" style={{ color: '#3A2010' }}>
                 {link.label}

@@ -6,10 +6,13 @@ import { prisma } from '@/lib/prisma'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Video Ortodox',
-  description: 'Filme ortodoxe, acatiste video, conferințe, predici și rugăciuni. Colecția video a Parohiei Sfântul Ierarh Nicolae.',
-  alternates: buildAlternates('/video'),
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerT()
+  return {
+    title: t.meta.video.title,
+    description: t.meta.video.description,
+    alternates: buildAlternates('/video'),
+  }
 }
 
 type VideoItem = {
