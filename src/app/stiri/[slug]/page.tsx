@@ -7,6 +7,8 @@ import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ShareButtons from '@/components/shared/ShareButtons'
+import ViewBadge from '@/components/ViewBadge'
+import ViewTracker from '@/components/ViewTracker'
 
 const SITE_URL = 'https://biserica-sf-nicolae.org'
 
@@ -60,6 +62,7 @@ export default async function ArticolPage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <ViewTracker type="articol" id={article.id} />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 mb-8 font-body text-sm" style={{ color: '#8A7050' }}>
@@ -91,6 +94,8 @@ export default async function ArticolPage({ params }: Props) {
         )}
         {article.publishedAt && ' · '}
         ~{readingTime(content)} min citire
+        {' · '}
+        <ViewBadge value={article.views} locale={locale} />
       </p>
 
       {/* Separator */}

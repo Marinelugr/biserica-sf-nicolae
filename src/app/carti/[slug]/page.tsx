@@ -3,6 +3,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import PublicGallery from '@/components/PublicGallery'
+import ViewBadge from '@/components/ViewBadge'
+import ViewTracker from '@/components/ViewTracker'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
@@ -31,9 +33,9 @@ async function getBook(slug: string) {
   return prisma.libraryBook.findUnique({
     where: { slug },
     select: {
-      slug: true, titleRo: true, titleRu: true, titleEn: true, type: true,
+      id: true, slug: true, titleRo: true, titleRu: true, titleEn: true, type: true,
       contentRo: true, contentRu: true, contentEn: true, author: true, source: true,
-      imageUrl: true, galleryUrls: true, videoUrl: true, videoTitle: true,
+      imageUrl: true, galleryUrls: true, videoUrl: true, videoTitle: true, views: true,
     },
   })
 }
@@ -82,6 +84,7 @@ export default async function CartePage({ params }: Props) {
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <ViewTracker type="carte" id={book.id} />
 
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 mb-10 font-body text-sm flex-wrap" style={{ color: '#8A7050' }}>
@@ -111,13 +114,13 @@ export default async function CartePage({ params }: Props) {
         <h1 className="font-heading leading-tight mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(22px, 4vw, 36px)' }}>
           {title}
         </h1>
-        {(book.author || book.source) && (
-          <p className="font-body text-sm" style={{ color: '#8A7050' }}>
-            {book.author && <span>{book.author}</span>}
-            {book.author && book.source && <span> · </span>}
-            {book.source && <span>{book.source}</span>}
-          </p>
-        )}
+        <p className="font-body text-sm" style={{ color: '#8A7050' }}>
+          {book.author && <span>{book.author}</span>}
+          {book.author && <span> · </span>}
+          {book.source && <span>{book.source}</span>}
+          {book.source && <span> · </span>}
+          <ViewBadge value={book.views} locale={locale} />
+        </p>
         <div className="flex items-center justify-center gap-3 mt-5">
           <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
           <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>

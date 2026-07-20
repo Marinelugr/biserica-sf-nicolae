@@ -7,6 +7,8 @@ import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { prisma } from '@/lib/prisma'
 import ShareButtons from '@/components/shared/ShareButtons'
+import ViewBadge from '@/components/ViewBadge'
+import ViewTracker from '@/components/ViewTracker'
 
 export const dynamic = 'force-dynamic'
 
@@ -89,6 +91,7 @@ export default async function VideoDetailPage({ params }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <ViewTracker type="video" id={video.id} />
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 mb-8 font-body text-sm flex-wrap" style={{ color: '#8A7050' }}>
         <Link href="/" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>{t.nav.home}</Link>
@@ -105,10 +108,14 @@ export default async function VideoDetailPage({ params }: Props) {
         {video.title}
       </h1>
 
-      {/* Dată */}
-      <time className="font-body text-sm block mb-8" style={{ color: '#8A7050' }}>
-        {formatDate(video.createdAt, localeToIntl(locale))}
-      </time>
+      {/* Dată · vizualizări */}
+      <p className="font-body text-sm mb-8" style={{ color: '#8A7050' }}>
+        <time dateTime={video.createdAt.toISOString()}>
+          {formatDate(video.createdAt, localeToIntl(locale))}
+        </time>
+        {' · '}
+        <ViewBadge value={video.views} locale={locale} />
+      </p>
 
       {/* Embed responsive */}
       {embedUrl ? (
