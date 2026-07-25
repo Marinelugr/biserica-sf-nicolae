@@ -39,7 +39,7 @@ export default function PascalCard() {
         backdropFilter: 'blur(10px)',
       }}
     >
-      <div style={{ fontSize: '11px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: '10px' }}>
+      <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: '10px' }}>
         ☦ Calendarul Pascal
       </div>
       <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '28px', color: '#1C1B3A', marginBottom: '2px' }}>
@@ -48,7 +48,7 @@ export default function PascalCard() {
       <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '22px', color: '#8B1A1A', marginBottom: '6px' }}>
         {fmt(data.pasti)} {data.year}
       </div>
-      <div style={{ fontSize: '12px', color: '#8A7050', marginBottom: '18px' }}>
+      <div style={{ fontSize: '14px', color: '#8A7050', marginBottom: '18px' }}>
         Floriile: {fmt(data.florii)}
       </div>
 
@@ -72,7 +72,7 @@ export default function PascalCard() {
         <button onClick={() => setBaseYear(y => y + 1)} aria-label="Anul următor" style={arrowStyle}>→</button>
       </div>
 
-      <Link href="/calendar-pascal" style={{ fontSize: '12px', color: '#C9A96E', textDecoration: 'none' }}>
+      <Link href="/calendar-pascal" style={{ fontSize: '13px', color: '#C9A96E', textDecoration: 'none' }}>
         Vezi calendarul pascal complet →
       </Link>
     </div>

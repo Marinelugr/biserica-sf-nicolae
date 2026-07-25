@@ -205,10 +205,10 @@ export default function LoadingV4({ onDone }: { onDone: () => void }) {
             transform: 'translateX(-50%)',
             whiteSpace: 'nowrap',
             fontFamily: 'Georgia, serif',
-            fontSize: 13,
+            fontSize: 20,
             color: '#C9A96E',
-            letterSpacing: '0.25em',
-            opacity: imgOpacity > 0.8 ? (imgScale > 1.5 ? 0 : 1) : 0,
+            letterSpacing: '0.15em',
+            opacity: imgOpacity > 0.8 ? (imgScale > 2.3 ? 0 : 1) : 0,
             transition: 'opacity 0.3s',
           }}>
             Sfântul Ierarh Nicolae
