@@ -205,15 +205,20 @@ export default function AdminSlujbePage() {
             <div style={{ display: 'flex', gap: '1.25rem' }}>
               {/* Calendar grid */}
               <div style={{ flex: '0 0 auto', width: '100%', maxWidth: '640px' }}>
-                <div style={{ backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px', overflow: 'hidden' }}>
+                <style>{`
+                  .slujbe-cal-cell { position: relative; transition: box-shadow 0.15s ease; }
+                  .slujbe-cal-cell:hover { overflow: visible; z-index: 5; background: #1A0F05; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+                  .slujbe-cal-cell:hover .slujbe-cal-service-text { -webkit-line-clamp: unset; overflow: visible; }
+                `}</style>
+                <div style={{ backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px' }}>
                   {/* Day headers */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid #2A1A0A' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', borderBottom: '1px solid #2A1A0A', position: 'sticky', top: 0, zIndex: 10, backgroundColor: '#110C07' }}>
                     {DAYS_SHORT.map(d => (
                       <div key={d} style={{ padding: '0.5rem 0.25rem', textAlign: 'center', color: d === 'Du' || d === 'Sâ' ? '#C9A84C' : '#5A4020', fontSize: '0.75rem', fontFamily: 'Georgia, serif', fontWeight: 600 }}>{d}</div>
                     ))}
                   </div>
                   {/* Days grid */}
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))' }}>
                     {Array.from({ length: totalCells }, (_, i) => {
                       const dayNum = i - firstDay + 1
                       const isValid = dayNum >= 1 && dayNum <= daysInMonth
@@ -223,13 +228,14 @@ export default function AdminSlujbePage() {
                       return (
                         <div
                           key={i}
+                          className="slujbe-cal-cell"
                           onClick={() => isValid && setSelectedDay(isSelected ? null : dayNum)}
                           style={{
-                            minHeight: '70px', padding: '0.4rem', cursor: isValid ? 'pointer' : 'default',
+                            minHeight: '90px', height: 'auto', padding: '6px', verticalAlign: 'top', cursor: isValid ? 'pointer' : 'default',
                             backgroundColor: isSelected ? '#1A0F05' : 'transparent',
+                            overflow: 'visible',
                             borderRight: (i + 1) % 7 !== 0 ? '1px solid #1A1008' : 'none',
                             borderBottom: i < totalCells - 7 ? '1px solid #1A1008' : 'none',
-                            position: 'relative',
                           }}
                         >
                           {isValid && (
@@ -241,7 +247,7 @@ export default function AdminSlujbePage() {
                               {dayServices.map(s => (
                                 <div key={s.id} style={{ backgroundColor: '#1E0F05', border: '1px solid #3A1A0A', borderRadius: '3px', padding: '0.15rem 0.3rem', marginBottom: '0.15rem', cursor: 'pointer' }} onClick={e => { e.stopPropagation(); openEdit(s) }}>
                                   <span style={{ color: '#C9A84C', fontSize: '0.65rem', fontFamily: 'Georgia, serif' }}>{s.time}</span>
-                                  <div style={{ color: '#D4C4A0', fontSize: '0.65rem', fontFamily: 'Georgia, serif', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{s.serviceRo}</div>
+                                  <div className="slujbe-cal-service-text" style={{ color: '#D4C4A0', fontSize: '11px', lineHeight: 1.4, fontFamily: 'Georgia, serif', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{s.serviceRo}</div>
                                 </div>
                               ))}
                             </>

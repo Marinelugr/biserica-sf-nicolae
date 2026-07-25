@@ -70,6 +70,7 @@ function getFallbackService(): ServiceInfo | null {
   }
 
   if (!next) return null
+  if (next.date.getTime() - now.getTime() > 7 * 24 * 60 * 60 * 1000) return null
   return {
     titlu: next.titlu,
     data: next.date.toISOString(),
@@ -79,7 +80,6 @@ function getFallbackService(): ServiceInfo | null {
 
 export default function NextServiceWidget() {
   const [service, setService] = useState<ServiceInfo | null>(null)
-  const [loading, setLoading] = useState(true)
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null)
 
   useEffect(() => {
@@ -94,8 +94,6 @@ export default function NextServiceWidget() {
         }
       } catch {
         setService(getFallbackService())
-      } finally {
-        setLoading(false)
       }
     }
     fetchNextService()
@@ -123,7 +121,6 @@ export default function NextServiceWidget() {
     return () => clearInterval(interval)
   }, [service])
 
-  if (loading) return <div className="next-service-widget skeleton max-w-md mx-auto" />
   if (!service || !timeLeft) return null
 
   const serviceDate = new Date(service.data)

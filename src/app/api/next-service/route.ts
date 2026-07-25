@@ -6,6 +6,7 @@ export async function GET() {
   const year = now.getFullYear()
   const month = now.getMonth() + 1
   const day = now.getDate()
+  const maxDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
 
   try {
     const candidates = await prisma.serviceSchedule.findMany({
@@ -26,7 +27,7 @@ export async function GET() {
         const date = new Date(s.year, s.month - 1, s.day, h || 0, m || 0, 0, 0)
         return { titlu: s.serviceRo, time: s.time, date }
       })
-      .filter(s => s.date.getTime() > now.getTime())
+      .filter(s => s.date.getTime() > now.getTime() && s.date.getTime() <= maxDate.getTime())
       .sort((a, b) => a.date.getTime() - b.date.getTime())
 
     const next = upcoming[0]
