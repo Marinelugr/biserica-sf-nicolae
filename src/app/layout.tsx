@@ -5,7 +5,6 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import { I18nProvider } from '@/lib/i18n/context'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
-import LoadingScreenLoader from '@/components/LoadingScreenLoader'
 import PageTransition from '@/components/PageTransition'
 import ScrollToTop from '@/components/ScrollToTop'
 import CookieNotice from '@/components/CookieNotice'
@@ -117,7 +116,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         style={{ fontFamily: 'var(--font-eb-garamond), Georgia, serif' }}
       >
         <I18nProvider initialLocale={initialLocale}>
-          <LoadingScreenLoader />
           <Header />
           <main className="flex-1">
             <PageTransition>{children}</PageTransition>

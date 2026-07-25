@@ -16,6 +16,19 @@ export default function LoadingV4({ onDone }: { onDone: () => void }) {
   const [imgScale, setImgScale] = useState(0.08)
   const [imgOpacity, setImgOpacity] = useState(0)
   const [imgBlur, setImgBlur] = useState(20)
+  const doneRef = useRef(false)
+
+  const callDone = () => {
+    if (doneRef.current) return
+    doneRef.current = true
+    onDone()
+  }
+
+  useEffect(() => {
+    const safetyTimer = setTimeout(callDone, 4000) // forțează onDone după 4s maxim, indiferent de starea particulelor
+    return () => clearTimeout(safetyTimer)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const start = Date.now()
@@ -118,10 +131,11 @@ export default function LoadingV4({ onDone }: { onDone: () => void }) {
         ctx.globalAlpha = 1
       }
 
-      if (allDead) {
+      if (allDead || particles.every(p => p.opacity <= 0)) {
         alive = false
+        cancelAnimationFrame(animRef.current)
         setPhase('done')
-        onDone()
+        callDone()
         return
       }
 
@@ -130,7 +144,8 @@ export default function LoadingV4({ onDone }: { onDone: () => void }) {
 
     drawParticles()
     return () => { alive = false; cancelAnimationFrame(animRef.current) }
-  }, [phase, onDone])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
 
   if (phase === 'done') return null
 
