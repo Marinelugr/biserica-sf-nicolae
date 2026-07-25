@@ -2,14 +2,7 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
-
-const FALLBACK_MESAJ = 'Bine ați venit la pagina oficială a bisericii cu hramul Sfântul Ierarh Nicolae din Hîrtopul Mic, raionul Criuleni, Republica Moldova. Îmi doresc ca toată informația care o găsiți aici să fie izvor de lumină și de întărire duhovnicească pentru sufletele voastre. Dragi creștini, vă punem la dispoziție Sfânta Scriptură, calendarul ortodox, rugăciuni pentru toate trebuințele, cărți ortodoxe, filme ortodoxe, noutăți din viața parohiei și din viața Bisericii lui Hristos din toată lumea. Hristos în mijlocul nostru!'
-const FALLBACK_SEMNATURA = 'Pr. Marin Grigoriță, Parohul Bisericii'
-
-function firstSentences(text: string, count: number): string {
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text]
-  return sentences.slice(0, count).join(' ').trim()
-}
+import { FALLBACK_MESAJ, FALLBACK_SEMNATURA, firstSentences } from '@/lib/priestMessage'
 
 export default async function PriestMessageSection() {
   const locale = await getServerLocale()

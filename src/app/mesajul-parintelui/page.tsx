@@ -5,15 +5,13 @@ import { getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ShareButtons from '@/components/shared/ShareButtons'
+import { FALLBACK_MESAJ, FALLBACK_SEMNATURA } from '@/lib/priestMessage'
 
 export const dynamic = 'force-dynamic'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://biserica-sf-nicolae.org'
 const SHARE_URL = `${SITE_URL}/mesajul-parintelui`
 const SHARE_TEXT = 'Mesajul Părintelui Marin Grigoriță, Parohul Bisericii Sfântul Ierarh Nicolae din Hîrtopul Mic'
-
-const FALLBACK_MESAJ = 'Bine ați venit la pagina oficială a bisericii cu hramul Sfântul Ierarh Nicolae din Hîrtopul Mic, raionul Criuleni, Republica Moldova. Îmi doresc ca toată informația care o găsiți aici să fie izvor de lumină și de întărire duhovnicească pentru sufletele voastre. Dragi creștini, vă punem la dispoziție Sfânta Scriptură, calendarul ortodox, rugăciuni pentru toate trebuințele, cărți ortodoxe, filme ortodoxe, noutăți din viața parohiei și din viața Bisericii lui Hristos din toată lumea. Hristos în mijlocul nostru!'
-const FALLBACK_SEMNATURA = 'Pr. Marin Grigoriță, Parohul Bisericii'
 
 export async function generateMetadata(): Promise<Metadata> {
   const mesaj = await prisma.priestMessage.findFirst({ where: { active: true } })
