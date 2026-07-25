@@ -13,6 +13,7 @@ const links = [
   { href: '/admin/istoria-bisericii', label: '🏛️ Istoria bisericii' },
   { href: '/admin/sfantul-nicolae', label: '✦ Sfântul Nicolae' },
   { href: '/admin/paroh', label: '⛪ Parohul Bisericii' },
+  { href: '/admin/mesaj-parinte', label: '✉️ Mesajul Părintelui' },
   { href: '/admin/video', label: '🎬 Video' },
   { href: '/admin/magazin', label: '🛒 Magazin' },
   { href: '/admin/donatii', label: '💰 Donații' },

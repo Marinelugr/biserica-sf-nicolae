@@ -316,6 +316,22 @@ model DonationProject {
   createdAt     DateTime @default(now())
 }
 
+// ─── Mesajul Părintelui ──────────────────────────────────────────────────
+
+model PriestMessage {
+  id           String   @id @default(cuid())
+  photoUrl     String?
+  mesajRo      String   @db.Text
+  mesajRu      String?  @db.Text
+  mesajEn      String?  @db.Text
+  semnaturaRo  String   @default("Pr. Marin Grigoriță, Parohul Bisericii")
+  semnaturaRu  String?
+  semnaturaEn  String?
+  active       Boolean  @default(true)
+  updatedAt    DateTime @updatedAt
+  createdAt    DateTime @default(now())
+}
+
 model DonationConfig {
   id            String   @id @default(cuid())
   localAccounts Json

@@ -20,6 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/', changeFrequency: 'daily', priority: 1 },
     { path: '/despre', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/paroh', changeFrequency: 'monthly', priority: 0.8 },
+    { path: '/mesajul-parintelui', changeFrequency: 'monthly', priority: 0.8 },
     { path: '/biblie', changeFrequency: 'monthly', priority: 0.9 },
     { path: '/calendar', changeFrequency: 'daily', priority: 0.9 },
     { path: '/calendar-pascal', changeFrequency: 'yearly', priority: 0.6 },

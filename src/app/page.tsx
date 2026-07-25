@@ -9,6 +9,7 @@ import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
 import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
 import NextServiceWidget from '@/components/NextServiceWidget'
 import PascalCard from '@/components/PascalCard'
+import PriestMessageSection from '@/components/homepage/PriestMessageSection'
 import { getTodayDate } from '@/lib/utils'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { pick, localeToIntl, type Locale } from '@/lib/i18n/pick'
@@ -181,6 +182,7 @@ export default async function HomePage() {
           <NextServiceWidget />
         </div>
       </section>
+      <PriestMessageSection />
       {showDailyCards && (
         <DailyCards data={dailyData} enabled={enabled} order={order} />
       )}
