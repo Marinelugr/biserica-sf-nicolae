@@ -97,7 +97,7 @@ export default function LoadingV4({ onDone }: { onDone: () => void }) {
         p.y += p.vy
         p.vy += 0.08 // gravitate ușoară
         p.vx *= 0.98 // frecare
-        p.opacity -= p.decay
+        p.opacity = Math.max(0, p.opacity - p.decay)
         p.size *= 0.995
 
         // Glow effect
