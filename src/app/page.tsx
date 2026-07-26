@@ -1,7 +1,6 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
-import HomeLoadingGate from '@/components/loading/HomeLoadingGate'
 import Hero from '@/components/homepage/Hero'
 import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
@@ -172,7 +171,6 @@ export default async function HomePage() {
 
   return (
     <>
-      <HomeLoadingGate />
       <Hero />
       <LiveStreamCard />
       <LiturgicalTodayWidget />
