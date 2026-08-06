@@ -81,13 +81,16 @@ function getFallbackService(): ServiceInfo | null {
 export default function NextServiceWidget() {
   const [service, setService] = useState<ServiceInfo | null>(null)
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null)
+  const [paused, setPaused] = useState(false)
 
   useEffect(() => {
     async function fetchNextService() {
       try {
         const res = await fetch('/api/next-service')
         const result = await res.json()
-        if (result.found) {
+        if (result.paused) {
+          setPaused(true)
+        } else if (result.found) {
           setService({ titlu: result.titlu, data: result.data, ora: result.ora })
         } else {
           setService(getFallbackService())
@@ -121,7 +124,7 @@ export default function NextServiceWidget() {
     return () => clearInterval(interval)
   }, [service])
 
-  if (!service || !timeLeft) return null
+  if (paused || !service || !timeLeft) return null
 
   const serviceDate = new Date(service.data)
 

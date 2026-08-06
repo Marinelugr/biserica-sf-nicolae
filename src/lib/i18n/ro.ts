@@ -380,7 +380,7 @@ const ro: Translations = {
     country: 'Republica Moldova', metropolis: 'Mitropolia Chișinăului și a întregii Moldove',
     pagesTitle: 'PAGINI', scheduleTitle: 'PROGRAM SLUJBE', contactTitle: 'CONTACT & SOCIAL',
     support: '❤ Susține parohia', contact: 'Formular contact',
-    blessing: 'Site realizat cu binecuvântare',
+    blessing: 'Website realizat de Marin Grigoriță — creator și dezvoltator web',
     copyright: 'Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic',
     phone: 'Telefon', email: 'Email',
     pages: {

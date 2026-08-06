@@ -5,7 +5,7 @@ import { getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ShareButtons from '@/components/shared/ShareButtons'
-import { FALLBACK_MESAJ, FALLBACK_SEMNATURA } from '@/lib/priestMessage'
+import { FALLBACK_MESAJ, FALLBACK_SEMNATURA, FALLBACK_PHOTO_URL } from '@/lib/priestMessage'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,7 +38,7 @@ export default async function MesajulParinteluiPage() {
   const locale = await getServerLocale()
   const mesaj = await prisma.priestMessage.findFirst({ where: { active: true } })
 
-  const photoUrl = mesaj?.photoUrl ?? null
+  const photoUrl = mesaj?.photoUrl ?? FALLBACK_PHOTO_URL
   const mesajText = mesaj ? pick(locale, mesaj.mesajRo, mesaj.mesajRu, mesaj.mesajEn) : FALLBACK_MESAJ
   const semnatura = mesaj ? pick(locale, mesaj.semnaturaRo, mesaj.semnaturaRu, mesaj.semnaturaEn) : FALLBACK_SEMNATURA
   const updatedAt = mesaj ? mesaj.updatedAt.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }) : null

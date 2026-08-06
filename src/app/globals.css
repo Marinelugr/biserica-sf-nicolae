@@ -305,11 +305,3 @@ h1, h2, h3, h4, h5, h6 {
   0%, 100% { opacity: 0.5; }
   50%       { opacity: 0.9; }
 }
-
-/* Cursor personalizat — cruce ortodoxă subtilă */
-*, *::before, *::after {
-  cursor: url('/cursors/cursor-default.svg') 12 12, auto;
-}
-a, button, [role="button"], input[type="submit"], label {
-  cursor: url('/cursors/cursor-pointer.svg') 14 14, pointer;
-}

@@ -91,6 +91,9 @@ export default function Header() {
   const donateHref = localizedHref('/donatii', locale)
   const homeHref = localizedHref('/', locale)
 
+  const navRow1 = navLinks.slice(0, 7)
+  const navRow2 = navLinks.slice(7)
+
   return (
     <header
       style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}
@@ -100,7 +103,7 @@ export default function Header() {
         <div className="relative flex items-center h-16">
 
           {/* Logo — DOAR cruce + titlu — stânga */}
-          <Link href={homeHref} className="flex items-center gap-2 shrink-0 group xl:absolute xl:left-0" aria-label="Acasă">
+          <Link href={homeHref} className="flex items-center gap-2 shrink-0 group" aria-label="Acasă">
             <span
               aria-hidden="true"
               style={{ color: '#C9A84C', fontSize: '26px', lineHeight: 1 }}
@@ -121,33 +124,8 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Nav desktop — centrat, doar >=1280px */}
-          <nav className="hidden xl:flex items-center gap-2.5 mx-auto min-w-0">
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="font-body whitespace-nowrap transition-colors duration-200 hover:text-amber-400"
-                style={{ color: '#9B8050', fontSize: '12px' }}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            <Link
-              href={liveHref}
-              className="font-body whitespace-nowrap flex items-center gap-1 transition-colors duration-200 hover:text-amber-400"
-              style={{ color: '#9B8050', fontSize: '12px' }}
-            >
-              {t.nav.live}
-              {isLive && (
-                <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.6rem' }} aria-label="LIVE">●</span>
-              )}
-            </Link>
-          </nav>
-
           {/* Donații + Limbi — dreapta, doar >=1280px */}
-          <div className="hidden xl:flex items-center gap-3 xl:absolute xl:right-0">
+          <div className="hidden xl:flex items-center gap-3 ml-auto">
             <DonateButton href={donateHref} label={t.nav.donate} compact />
             <div className="border-l pl-3 shrink-0" style={{ borderColor: '#2A1A0A' }}>
               <LocaleSwitcher locale={locale} onChange={changeLocale} fontSize="12px" />
@@ -177,6 +155,44 @@ export default function Header() {
               style={{ backgroundColor: '#9B8050', transform: menuOpen ? 'translateY(-8px) rotate(-45deg)' : 'none' }} />
           </button>
         </div>
+
+        {/* Nav desktop — 2 rânduri egale, centrate, doar >=1280px */}
+        <nav className="hidden xl:flex flex-col items-center gap-2 pb-3.5">
+          <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-1.5">
+            {navRow1.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-body whitespace-nowrap transition-colors duration-200 hover:text-amber-400"
+                style={{ color: '#9B8050', fontSize: '15px' }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-1.5">
+            {navRow2.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-body whitespace-nowrap transition-colors duration-200 hover:text-amber-400"
+                style={{ color: '#9B8050', fontSize: '15px' }}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href={liveHref}
+              className="font-body whitespace-nowrap flex items-center gap-1 transition-colors duration-200 hover:text-amber-400"
+              style={{ color: '#9B8050', fontSize: '15px' }}
+            >
+              {t.nav.live}
+              {isLive && (
+                <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.65rem' }} aria-label="LIVE">●</span>
+              )}
+            </Link>
+          </div>
+        </nav>
       </div>
 
       {/* Overlay meniu — tabletă + mobil (sub 1280px) */}
