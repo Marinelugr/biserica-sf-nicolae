@@ -100,7 +100,7 @@ export default function Header() {
       className="sticky top-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center h-16">
+        <div className="relative flex items-center h-14">
 
           {/* Logo — DOAR cruce + titlu — stânga */}
           <Link href={homeHref} className="flex items-center gap-2 shrink-0 group" aria-label="Acasă">
@@ -157,7 +157,7 @@ export default function Header() {
         </div>
 
         {/* Nav desktop — 2 rânduri egale, centrate, doar >=1280px */}
-        <nav className="hidden xl:flex flex-col items-center gap-2 pt-3 pb-3.5" style={{ borderTop: '1px solid #1A1008' }}>
+        <nav className="hidden xl:flex flex-col items-center gap-1.5 pt-2 pb-2.5" style={{ borderTop: '1px solid #1A1008' }}>
           <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-1.5">
             {navRow1.map(link => (
               <Link
@@ -199,7 +199,7 @@ export default function Header() {
       {menuOpen && (
         <div
           className="xl:hidden fixed inset-0 overflow-y-auto"
-          style={{ backgroundColor: '#0A0704', top: '64px', zIndex: 60 }}
+          style={{ backgroundColor: '#0A0704', top: '56px', zIndex: 60 }}
         >
           <nav className="flex flex-col gap-1 px-4 py-4 max-w-md mx-auto md:max-w-lg">
             {navLinks.map(link => (
