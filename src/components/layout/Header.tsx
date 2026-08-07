@@ -157,7 +157,7 @@ export default function Header() {
         </div>
 
         {/* Nav desktop — 2 rânduri egale, centrate, doar >=1280px */}
-        <nav className="hidden xl:flex flex-col items-center gap-2 pb-3.5">
+        <nav className="hidden xl:flex flex-col items-center gap-2 pt-3 pb-3.5" style={{ borderTop: '1px solid #1A1008' }}>
           <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-1.5">
             {navRow1.map(link => (
               <Link
