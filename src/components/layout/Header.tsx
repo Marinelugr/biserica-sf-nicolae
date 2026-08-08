@@ -40,6 +40,22 @@ function LocaleSwitcher({ locale, onChange, fontSize = '13px' }: { locale: Local
   )
 }
 
+function HeaderOrnament() {
+  return (
+    <svg
+      aria-hidden="true"
+      width="88"
+      height="14"
+      viewBox="0 0 88 14"
+      className="hidden xl:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+    >
+      <line x1="0" y1="7" x2="30" y2="7" stroke="#5A4020" strokeWidth="1" />
+      <text x="44" y="10.5" textAnchor="middle" fontSize="11" fill="#C9A84C">☦</text>
+      <line x1="58" y1="7" x2="88" y2="7" stroke="#5A4020" strokeWidth="1" />
+    </svg>
+  )
+}
+
 function DonateButton({ href, label, compact = false, block = false, onClick }: { href: string; label: string; compact?: boolean; block?: boolean; onClick?: () => void }) {
   return (
     <Link
@@ -124,6 +140,9 @@ export default function Header() {
             </span>
           </Link>
 
+          {/* Ornament decorativ — centrul golului dintre logo și Donații, doar >=1280px (sub asta bara e prea îngustă, s-ar suprapune) */}
+          <HeaderOrnament />
+
           {/* Donații + Limbi — dreapta, doar >=1280px */}
           <div className="hidden xl:flex items-center gap-3 ml-auto">
             <DonateButton href={donateHref} label={t.nav.donate} compact />
@@ -156,9 +175,9 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Nav desktop — 2 rânduri egale, întinse pe toată lățimea, doar >=1280px */}
+        {/* Nav desktop — 2 rânduri egale, centrate cu gap fix, doar >=1280px */}
         <nav className="hidden xl:flex flex-col gap-1.5 pt-2 pb-2.5" style={{ borderTop: '1px solid #1A1008' }}>
-          <div className="flex items-center justify-between flex-wrap gap-x-6 gap-y-1.5 w-full">
+          <div className="max-w-6xl mx-auto flex items-center justify-center flex-wrap gap-x-9 gap-y-1.5">
             {navRow1.map(link => (
               <Link
                 key={link.href}
@@ -170,7 +189,7 @@ export default function Header() {
               </Link>
             ))}
           </div>
-          <div className="flex items-center justify-between flex-wrap gap-x-6 gap-y-1.5 w-full">
+          <div className="max-w-6xl mx-auto flex items-center justify-center flex-wrap gap-x-9 gap-y-1.5">
             {navRow2.map(link => (
               <Link
                 key={link.href}
