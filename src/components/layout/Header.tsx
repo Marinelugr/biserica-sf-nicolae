@@ -99,7 +99,7 @@ export default function Header() {
       style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}
       className="sticky top-0 z-50"
     >
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl xl:max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex items-center h-14">
 
           {/* Logo — DOAR cruce + titlu — stânga */}
