@@ -99,7 +99,7 @@ export default function Header() {
       style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}
       className="sticky top-0 z-50"
     >
-      <div className="max-w-7xl xl:max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="px-4 sm:px-6 lg:px-8 xl:px-10">
         <div className="relative flex items-center h-14">
 
           {/* Logo — DOAR cruce + titlu — stânga */}
@@ -156,9 +156,9 @@ export default function Header() {
           </button>
         </div>
 
-        {/* Nav desktop — 2 rânduri egale, centrate, doar >=1280px */}
-        <nav className="hidden xl:flex flex-col items-center gap-1.5 pt-2 pb-2.5" style={{ borderTop: '1px solid #1A1008' }}>
-          <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-1.5">
+        {/* Nav desktop — 2 rânduri egale, întinse pe toată lățimea, doar >=1280px */}
+        <nav className="hidden xl:flex flex-col gap-1.5 pt-2 pb-2.5" style={{ borderTop: '1px solid #1A1008' }}>
+          <div className="flex items-center justify-between flex-wrap gap-x-6 gap-y-1.5 w-full">
             {navRow1.map(link => (
               <Link
                 key={link.href}
@@ -170,7 +170,7 @@ export default function Header() {
               </Link>
             ))}
           </div>
-          <div className="flex items-center justify-center flex-wrap gap-x-6 gap-y-1.5">
+          <div className="flex items-center justify-between flex-wrap gap-x-6 gap-y-1.5 w-full">
             {navRow2.map(link => (
               <Link
                 key={link.href}
