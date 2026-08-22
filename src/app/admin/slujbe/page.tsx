@@ -174,7 +174,7 @@ export default function AdminSlujbePage() {
           <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Program Slujbe</span>
         </div>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
           {/* Header row */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>⛪ Program Slujbe</h1>
@@ -187,13 +187,13 @@ export default function AdminSlujbePage() {
           </div>
 
           {/* Month navigation */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
             <button onClick={prevMonth} style={{ ...btnGhost, padding: '0.4rem 0.875rem' }}>‹ Anterior</button>
             <span style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.1rem', minWidth: '180px', textAlign: 'center' }}>
               {MONTHS_FULL[month - 1]} {year}
             </span>
             <button onClick={nextMonth} style={{ ...btnGhost, padding: '0.4rem 0.875rem' }}>Următor ›</button>
-            <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem' }}>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
               <button onClick={() => setViewMode('calendar')} style={{ ...btnGhost, padding: '0.4rem 0.875rem', borderColor: viewMode === 'calendar' ? '#C9A84C' : '#2A1A0A', color: viewMode === 'calendar' ? '#C9A84C' : '#9B8050' }}>📅 Calendar</button>
               <button onClick={() => setViewMode('list')} style={{ ...btnGhost, padding: '0.4rem 0.875rem', borderColor: viewMode === 'list' ? '#C9A84C' : '#2A1A0A', color: viewMode === 'list' ? '#C9A84C' : '#9B8050' }}>☰ Listă</button>
             </div>
@@ -202,9 +202,9 @@ export default function AdminSlujbePage() {
           {loading ? (
             <div style={{ padding: '3rem', textAlign: 'center', color: '#5A4020', fontFamily: 'Georgia, serif' }}>Se încarcă...</div>
           ) : viewMode === 'calendar' ? (
-            <div style={{ display: 'flex', gap: '1.25rem' }}>
+            <div style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap' }}>
               {/* Calendar grid */}
-              <div style={{ flex: '0 0 auto', width: '100%', maxWidth: '640px' }}>
+              <div style={{ flex: '1 1 320px', width: '100%', maxWidth: '640px' }}>
                 <style>{`
                   .slujbe-cal-cell { position: relative; transition: box-shadow 0.15s ease; }
                   .slujbe-cal-cell:hover { overflow: visible; z-index: 5; background: #1A0F05; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }

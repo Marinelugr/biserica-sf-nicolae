@@ -234,10 +234,10 @@ export default function AdminVideoPage() {
         </div>
 
         {/* Content: categories sidebar + video grid */}
-        <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+        <div className="flex flex-col lg:flex-row" style={{ flex: 1, overflow: 'hidden' }}>
 
           {/* ─── Categories sidebar ─── */}
-          <div style={{ width: '220px', flexShrink: 0, backgroundColor: '#0A0704', borderRight: '1px solid #1A1008', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+          <div className="w-full lg:w-[220px] max-h-[180px] lg:max-h-none" style={{ flexShrink: 0, backgroundColor: '#0A0704', borderRight: '1px solid #1A1008', borderBottom: '1px solid #1A1008', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
             <div style={{ padding: '1rem', borderBottom: '1px solid #1A1008', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Categorii</span>
               <button onClick={() => { setAddingCat(true); setTimeout(() => document.getElementById('new-cat-inp')?.focus(), 50) }} style={{ background: 'none', border: 'none', color: '#C9A84C', cursor: 'pointer', fontSize: '1.1rem', lineHeight: 1 }} title="Adaugă categorie">+</button>
@@ -312,7 +312,7 @@ export default function AdminVideoPage() {
 
           {/* ─── Videos grid ─── */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
-            <div style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+            <div style={{ padding: '1.25rem 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, flexWrap: 'wrap', gap: '0.75rem' }}>
               <div>
                 <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.25rem', margin: 0 }}>
                   🎬 {selectedCat === 'all' ? 'Toate video-urile' : categories.find(c => c.id === selectedCat)?.name || 'Video'}

@@ -169,8 +169,8 @@ export default function EditArticolClient({ article }: { article: Article }) {
           <AdminSignOutButton />
         </header>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.4rem', margin: 0 }}>📰 Editare articol</h1>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
               {lastSaved && (
@@ -195,7 +195,7 @@ export default function EditArticolClient({ article }: { article: Article }) {
                 <label style={lbl}>Titlu (Română) *</label>
                 <input value={form.titleRo} onChange={e => setForm(f => ({ ...f, titleRo: e.target.value }))} style={inp} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
                     <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
@@ -215,7 +215,7 @@ export default function EditArticolClient({ article }: { article: Article }) {
                 <label style={lbl}>Slug (URL)</label>
                 <input value={form.slug} onChange={e => setForm(f => ({ ...f, slug: e.target.value }))} style={{ ...inp, color: '#9B8050' }} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <label style={lbl}>Categorie</label>
                   <input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))} placeholder="ex: Sfinți, Evenimente..." style={inp} />

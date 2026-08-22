@@ -2,38 +2,23 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-
-const links = [
-  { href: '/admin/homepage', label: '🏠 Configurare homepage' },
-  { href: '/admin', label: '📊 Dashboard', exact: true },
-  { href: '/admin/stiri', label: '📰 Știri și articole' },
-  { href: '/admin/carti', label: '📖 Bibliotecă' },
-  { href: '/admin/slujbe', label: '🗓️ Slujbe' },
-  { href: '/admin/sfinti', label: '👤 Sfinți' },
-  { href: '/admin/istoria-bisericii', label: '🏛️ Istoria bisericii' },
-  { href: '/admin/sfantul-nicolae', label: '✦ Sfântul Nicolae' },
-  { href: '/admin/paroh', label: '⛪ Parohul Bisericii' },
-  { href: '/admin/mesaj-parinte', label: '✉️ Mesajul Părintelui' },
-  { href: '/admin/video', label: '🎬 Video' },
-  { href: '/admin/magazin', label: '🛒 Magazin' },
-  { href: '/admin/donatii', label: '💰 Donații' },
-  { href: '/admin/contact', label: '📞 Contact' },
-  { href: '/admin/media', label: '🖼️ Media' },
-  { href: '/admin/setari', label: '⚙️ Setări' },
-]
+import { ADMIN_LINKS } from './adminLinks'
 
 export default function AdminSidebar() {
   const pathname = usePathname()
 
   return (
-    <aside style={{
-      width: '230px',
-      minHeight: '100vh',
-      backgroundColor: '#0A0704',
-      borderRight: '1px solid #1E1208',
-      padding: '1.5rem 0',
-      flexShrink: 0,
-    }}>
+    <aside
+      className="hidden lg:block"
+      style={{
+        width: '230px',
+        minHeight: '100vh',
+        backgroundColor: '#0A0704',
+        borderRight: '1px solid #1E1208',
+        padding: '1.5rem 0',
+        flexShrink: 0,
+      }}
+    >
       <div style={{ padding: '0 1.25rem 1.25rem', borderBottom: '1px solid #1E1208' }}>
         <div style={{ fontSize: '1.75rem', color: '#C9A84C', lineHeight: 1 }}>☦</div>
         <div style={{ color: '#C9A84C', fontSize: '0.875rem', fontFamily: 'Georgia, serif', fontWeight: 600, marginTop: '0.5rem' }}>
@@ -42,7 +27,7 @@ export default function AdminSidebar() {
       </div>
 
       <nav style={{ padding: '0.75rem 0' }}>
-        {links.map(link => {
+        {ADMIN_LINKS.map(link => {
           const isActive = link.exact
             ? pathname === link.href
             : pathname.startsWith(link.href)

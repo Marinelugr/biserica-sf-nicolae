@@ -291,7 +291,7 @@ export default function AdminDonatiiPage() {
           <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Donații</span>
         </div>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>💰 Donații</h1>
             <a href="/donatii" target="_blank" style={btnGhost}>↗ Vizualizează pagina</a>
@@ -326,7 +326,7 @@ export default function AdminDonatiiPage() {
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem', marginBottom: '0.75rem' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                         <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
@@ -352,7 +352,7 @@ export default function AdminDonatiiPage() {
                     <textarea value={project.descriptionRo} onChange={e => updateProjectField(project.id, 'descriptionRo', e.target.value)} rows={2} style={{ ...inp, resize: 'vertical' }} />
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem', marginBottom: '0.75rem' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                         <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Rusă)</label>
@@ -432,7 +432,7 @@ export default function AdminDonatiiPage() {
                   ))}
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
                   <div>
                     <label style={lbl}>Email PayPal</label>
                     <input value={config.paypalEmail} onChange={e => setConfigField('paypalEmail', e.target.value)} style={inp} />
@@ -443,7 +443,7 @@ export default function AdminDonatiiPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem', marginBottom: '1rem' }}>
                   <div>
                     <label style={lbl}>Nume contact</label>
                     <input value={config.contactName} onChange={e => setConfigField('contactName', e.target.value)} style={inp} />
@@ -454,7 +454,7 @@ export default function AdminDonatiiPage() {
                   </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1rem' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem', marginBottom: '1rem' }}>
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                       <label style={{ ...lbl, marginBottom: 0 }}>Nume contact (Rusă)</label>
@@ -495,7 +495,7 @@ export default function AdminDonatiiPage() {
                   <textarea value={config.safetyNote} onChange={e => setConfigField('safetyNote', e.target.value)} rows={2} style={{ ...inp, resize: 'vertical' }} />
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem' }}>
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                       <label style={{ ...lbl, marginBottom: 0 }}>Notă de siguranță (Rusă)</label>

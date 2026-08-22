@@ -196,7 +196,7 @@ export default function AdminParohPage() {
           <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Paroh</span>
         </div>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
             <div>
               <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>⛪ Preotul Paroh</h1>
@@ -222,7 +222,7 @@ export default function AdminParohPage() {
               <div style={sectionBox}>
                 <div style={sectionTitle}>📋 Date principale</div>
                 <div style={{ display: 'grid', gap: '1.1rem' }}>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                     <div>
                       <label style={lbl}>Numele complet (Română) *</label>
                       <input value={form.nameRo} onChange={e => set('nameRo', e.target.value)} placeholder="Preacucernic Părinte..." style={inp} />
@@ -232,7 +232,7 @@ export default function AdminParohPage() {
                       <input value={form.titleRo} onChange={e => set('titleRo', e.target.value)} placeholder="Preot Paroh" style={inp} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                         <label style={{ ...lbl, marginBottom: 0 }}>Numele (Rusă)</label>
@@ -260,7 +260,7 @@ export default function AdminParohPage() {
                       <input value={form.nameEn} onChange={e => set('nameEn', e.target.value)} placeholder="..." style={inp} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                         <label style={{ ...lbl, marginBottom: 0 }}>Titlul (Rusă)</label>
@@ -280,7 +280,7 @@ export default function AdminParohPage() {
                       <input value={form.titleEn} onChange={e => set('titleEn', e.target.value)} style={inp} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                     <div>
                       <label style={lbl}>Hirotonit în...</label>
                       <input value={form.ordained} onChange={e => set('ordained', e.target.value)} placeholder="ex: Hirotonit în anul 2005..." style={inp} />
@@ -290,7 +290,7 @@ export default function AdminParohPage() {
                       <input value={form.parish} onChange={e => set('parish', e.target.value)} placeholder="Paroh la Parohia..." style={inp} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                         <label style={{ ...lbl, marginBottom: 0 }}>Hirotonit în... (Rusă)</label>
@@ -310,7 +310,7 @@ export default function AdminParohPage() {
                       <input value={form.ordainedEn} onChange={e => set('ordainedEn', e.target.value)} style={inp} />
                     </div>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                     <div>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                         <label style={{ ...lbl, marginBottom: 0 }}>Parohia (Rusă)</label>

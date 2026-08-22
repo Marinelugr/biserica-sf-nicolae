@@ -163,8 +163,8 @@ export default function AdminSfintiPage() {
           <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Sfinți</span>
         </div>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>👤 Sfinți</h1>
             <button onClick={openNew} style={btnPrimary}>+ Sfânt nou</button>
           </div>
@@ -190,7 +190,8 @@ export default function AdminSfintiPage() {
                 {saints.length === 0 ? 'Niciun sfânt. Adaugă primul sfânt.' : 'Niciun rezultat pentru filtrele aplicate.'}
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #2A1A0A' }}>
                     {['Dată', 'Nume', 'Tip sărbătoare', 'Icoană', 'Acțiuni'].map(h => (
@@ -227,6 +228,7 @@ export default function AdminSfintiPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
           <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginTop: '0.75rem' }}>
@@ -272,7 +274,7 @@ export default function AdminSfintiPage() {
                 <label style={lbl}>Nume (Română) *</label>
                 <input value={form.nameRo} onChange={e => setForm(f => ({ ...f, nameRo: e.target.value }))} placeholder="Sfântul Ierarh Nicolae..." style={inp} />
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.875rem' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
                     <label style={{ ...lbl, marginBottom: 0 }}>Nume (Rusă)</label>

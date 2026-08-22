@@ -126,8 +126,8 @@ export default function AdminMagazinPage() {
           <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Magazin</span>
         </div>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>🛒 Magazin</h1>
             <button onClick={openNew} style={btnPrimary}>+ Produs nou</button>
           </div>
@@ -147,7 +147,8 @@ export default function AdminMagazinPage() {
                 {products.length === 0 ? 'Niciun produs. Adaugă primul produs.' : 'Niciun rezultat pentru filtrul aplicat.'}
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #2A1A0A' }}>
                     {['Imagine', 'Nume', 'Preț', 'Stoc', 'Categorie', 'Activ', 'Acțiuni'].map(h => (
@@ -188,6 +189,7 @@ export default function AdminMagazinPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
           <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginTop: '0.75rem' }}>
@@ -211,7 +213,7 @@ export default function AdminMagazinPage() {
                 <input value={form.nameRo} onChange={e => setForm(f => ({ ...f, nameRo: e.target.value }))} placeholder="Lumânări de ceară..." style={inp} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.875rem' }}>
                 <div>
                   <label style={lbl}>Preț (MDL) *</label>
                   <input type="number" min="0" step="0.01" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} placeholder="50" style={inp} />

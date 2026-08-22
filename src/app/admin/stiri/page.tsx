@@ -34,8 +34,8 @@ export default async function AdminStiriPage() {
           <AdminSignOutButton />
         </header>
 
-        <main style={{ flex: 1, padding: '2rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
+        <main style={{ flex: 1, boxSizing: 'border-box' }} className="p-4 sm:p-8">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.75rem', margin: 0 }}>
               📰 Știri și articole
             </h1>
@@ -58,7 +58,8 @@ export default async function AdminStiriPage() {
                 Niciun articol. Creați primul articol.
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #2A1A0A' }}>
                     {['Titlu', 'Categorie', 'Status', 'Data', 'Acțiuni'].map(h => (
@@ -131,6 +132,7 @@ export default async function AdminStiriPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </main>

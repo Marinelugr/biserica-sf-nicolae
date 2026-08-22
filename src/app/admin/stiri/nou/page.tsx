@@ -102,7 +102,7 @@ export default function NouArticolPage() {
           </span>
         </header>
 
-        <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:p-8">
           <form onSubmit={handleSubmit}>
             <div style={{ display: 'grid', gap: '1.25rem', maxWidth: '860px' }}>
               <div>
@@ -111,7 +111,7 @@ export default function NouArticolPage() {
                   placeholder="Titlul articolului" style={inp} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.375rem' }}>
                     <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
@@ -139,7 +139,7 @@ export default function NouArticolPage() {
                   style={{ ...inp, color: '#9B8050' }} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <label style={lbl}>Categorie</label>
                   <input type="text" value={form.category}

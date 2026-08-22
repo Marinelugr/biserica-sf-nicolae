@@ -52,7 +52,7 @@ export default async function AdminDashboard() {
           <AdminSignOutButton />
         </header>
 
-        <main style={{ flex: 1, padding: '2rem' }}>
+        <main style={{ flex: 1, boxSizing: 'border-box' }} className="p-4 sm:p-8">
           <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.75rem', marginBottom: '1.75rem', marginTop: 0 }}>
             Dashboard
           </h1>

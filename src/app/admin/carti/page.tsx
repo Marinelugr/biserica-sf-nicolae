@@ -463,9 +463,9 @@ export default function AdminCartiPage() {
           <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Bibliotecă</span>
         </div>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
           {/* Title + action */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>📖 Bibliotecă ortodoxă</h1>
             <div style={{ display: 'flex', gap: '0.75rem' }}>
               <button onClick={() => setShowCatPanel(v => !v)} style={btnGhost}>
@@ -537,9 +537,9 @@ export default function AdminCartiPage() {
               </div>
             ) : activeCategory ? (
               // ── DnD mode (per category) ─────────────────────────────────
-              <div>
+              <div style={{ overflowX: 'auto' }}>
                 {/* Header row */}
-                <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #2A1A0A', padding: '0 0' }}>
+                <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid #2A1A0A', padding: '0 0', minWidth: '660px' }}>
                   <div style={{ padding: '0.75rem 0.75rem', width: '40px', flexShrink: 0 }} />
                   {['Titlu', 'Tip', 'Categorie', 'Autor', 'Acțiuni'].map((h, i) => (
                     <div key={h} style={{
@@ -580,7 +580,8 @@ export default function AdminCartiPage() {
               </div>
             ) : (
               // ── Static table (all categories) ──────────────────────────
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+              <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '640px' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid #2A1A0A' }}>
                     {['Titlu', 'Tip', 'Categorie', 'Autor', 'Acțiuni'].map(h => (
@@ -600,6 +601,7 @@ export default function AdminCartiPage() {
                   ))}
                 </tbody>
               </table>
+              </div>
             )}
           </div>
         </main>
@@ -624,7 +626,7 @@ export default function AdminCartiPage() {
                 <input value={bookForm.titleRo} onChange={e => setBookForm(f => ({ ...f, titleRo: e.target.value }))} placeholder="Titlul cărții" style={inp} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
                     <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
@@ -641,7 +643,7 @@ export default function AdminCartiPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <label style={lbl}>Tip *</label>
                   <select value={bookForm.type} onChange={e => setBookForm(f => ({ ...f, type: e.target.value }))} style={inp}>
@@ -657,7 +659,7 @@ export default function AdminCartiPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <label style={lbl}>Autor</label>
                   <input value={bookForm.author} onChange={e => setBookForm(f => ({ ...f, author: e.target.value }))} placeholder="ex: Sfântul Ioan Gură de Aur" style={inp} />

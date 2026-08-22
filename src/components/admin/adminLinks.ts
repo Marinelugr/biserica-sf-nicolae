@@ -1,0 +1,18 @@
+export const ADMIN_LINKS: { href: string; label: string; exact?: boolean }[] = [
+  { href: '/admin/homepage', label: '🏠 Configurare homepage' },
+  { href: '/admin', label: '📊 Dashboard', exact: true },
+  { href: '/admin/stiri', label: '📰 Știri și articole' },
+  { href: '/admin/carti', label: '📖 Bibliotecă' },
+  { href: '/admin/slujbe', label: '🗓️ Slujbe' },
+  { href: '/admin/sfinti', label: '👤 Sfinți' },
+  { href: '/admin/istoria-bisericii', label: '🏛️ Istoria bisericii' },
+  { href: '/admin/sfantul-nicolae', label: '✦ Sfântul Nicolae' },
+  { href: '/admin/paroh', label: '⛪ Parohul Bisericii' },
+  { href: '/admin/mesaj-parinte', label: '✉️ Mesajul Părintelui' },
+  { href: '/admin/video', label: '🎬 Video' },
+  { href: '/admin/magazin', label: '🛒 Magazin' },
+  { href: '/admin/donatii', label: '💰 Donații' },
+  { href: '/admin/contact', label: '📞 Contact' },
+  { href: '/admin/media', label: '🖼️ Media' },
+  { href: '/admin/setari', label: '⚙️ Setări' },
+]

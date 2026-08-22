@@ -72,12 +72,12 @@ export default function AdminContactPage() {
           <AdminSignOutButton />
         </header>
 
-        <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:p-8">
           {loading ? (
             <p style={{ color: '#5A4020', fontFamily: 'Georgia, serif' }}>Se încarcă...</p>
           ) : (
             <div style={{ display: 'grid', gap: '1.25rem', maxWidth: '760px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
                 <div>
                   <label style={lbl}>Telefon</label>
                   <input type="text" value={form.phone} onChange={e => set('phone', e.target.value)} placeholder="+373 67 306 191" style={inp} />

@@ -1,3 +1,5 @@
+import AdminMobileNav from '@/components/admin/AdminMobileNav'
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div
@@ -7,10 +9,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         backgroundColor: '#0D0905',
         zIndex: 100,
         overflowY: 'auto',
+        overflowX: 'hidden',
         display: 'flex',
         flexDirection: 'column',
       }}
     >
+      <AdminMobileNav />
       {children}
     </div>
   )

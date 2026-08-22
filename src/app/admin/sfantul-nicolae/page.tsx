@@ -135,7 +135,7 @@ export default function AdminSfantulNicolaePage() {
           <span style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>Sfântul Nicolae</span>
         </div>
 
-        <main style={{ flex: 1, padding: '1.5rem 2rem', overflowY: 'auto' }}>
+        <main style={{ flex: 1, overflowY: 'auto', boxSizing: 'border-box' }} className="p-4 sm:px-8 sm:py-6">
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>✦ Sfântul Ierarh Nicolae</h1>
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
@@ -195,7 +195,7 @@ export default function AdminSfantulNicolaePage() {
                         <label style={lbl}>Titlu (Română)</label>
                         <input value={form.feast1Ro} onChange={e => set('feast1Ro', e.target.value)} style={inp} />
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.5rem' }}>
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                             <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
@@ -215,7 +215,7 @@ export default function AdminSfantulNicolaePage() {
                         <label style={lbl}>Descriere (Română)</label>
                         <input value={form.feast1DescRo} onChange={e => set('feast1DescRo', e.target.value)} style={inp} />
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.5rem' }}>
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                             <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Rusă)</label>
@@ -245,7 +245,7 @@ export default function AdminSfantulNicolaePage() {
                         <label style={lbl}>Titlu (Română)</label>
                         <input value={form.feast2Ro} onChange={e => set('feast2Ro', e.target.value)} style={inp} />
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.5rem' }}>
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                             <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
@@ -265,7 +265,7 @@ export default function AdminSfantulNicolaePage() {
                         <label style={lbl}>Descriere (Română)</label>
                         <input value={form.feast2DescRo} onChange={e => set('feast2DescRo', e.target.value)} style={inp} />
                       </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                      <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.5rem' }}>
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
                             <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Rusă)</label>
