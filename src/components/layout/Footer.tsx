@@ -30,9 +30,9 @@ export default async function Footer() {
   ]
 
   return (
-    <footer style={{ backgroundColor: '#0D0905', borderTop: '1px solid #1E1208' }} className="mt-auto">
+    <footer style={{ backgroundColor: '#04080F', borderTop: '1px solid rgba(255,255,255,0.08)' }} className="mt-auto">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="glass-cobalt grid grid-cols-1 md:grid-cols-4 gap-10 p-6 sm:p-10">
 
           {/* Coloana 1 — Logo & adresă */}
           <div>
@@ -42,23 +42,23 @@ export default async function Footer() {
                 Sfântul Ierarh Nicolae
               </span>
             </div>
-            <p className="font-body text-sm leading-relaxed" style={{ color: '#5A4020' }}>
+            <p className="font-body text-sm leading-relaxed" style={{ color: '#A8B4CC' }}>
               {t.footer.parish}<br />
               {t.footer.address}<br />
               {t.footer.country}
             </p>
-            <p className="font-body text-xs mt-2 leading-relaxed" style={{ color: '#3A2010' }}>
+            <p className="font-body text-xs mt-2 leading-relaxed" style={{ color: '#5c6478' }}>
               {t.footer.metropolis}
             </p>
             <div className="mt-4 space-y-1.5">
               <a href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
                 className="flex items-center gap-2 font-body text-sm transition-colors hover:text-amber-600"
-                style={{ color: '#5A4020' }}>
+                style={{ color: '#A8B4CC' }}>
                 <span aria-hidden="true">☎</span> {CONTACT_INFO.phone}
               </a>
               <a href={`mailto:${CONTACT_INFO.email}`}
                 className="flex items-center gap-2 font-body text-sm transition-colors hover:text-amber-600"
-                style={{ color: '#5A4020' }}>
+                style={{ color: '#A8B4CC' }}>
                 <span aria-hidden="true">✉</span> {CONTACT_INFO.email}
               </a>
             </div>
@@ -66,13 +66,13 @@ export default async function Footer() {
 
           {/* Coloana 2 — Pagini */}
           <div>
-            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#5A4020' }}>
+            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
               {t.footer.pagesTitle}
             </h3>
             <ul className="space-y-2">
               {pageLinks.map(link => (
                 <li key={link.href}>
-                  <Link href={link.href} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#5A4020' }}>
+                  <Link href={link.href} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#A8B4CC' }}>
                     {link.label}
                   </Link>
                 </li>
@@ -82,15 +82,15 @@ export default async function Footer() {
 
           {/* Coloana 3 — Program slujbe */}
           <div>
-            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#5A4020' }}>
+            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
               {t.footer.scheduleTitle}
             </h3>
             <ul className="space-y-2">
               {scheduleItems.map(item => (
                 <li key={item.zi} className="flex items-baseline gap-2">
-                  <span className="font-body text-xs w-20 shrink-0" style={{ color: '#8A7050' }}>{item.zi}</span>
+                  <span className="font-body text-xs w-20 shrink-0" style={{ color: '#828EA8' }}>{item.zi}</span>
                   <span className="font-body text-sm" style={{ color: '#C9A84C' }}>{item.ora}</span>
-                  <span className="font-body text-xs" style={{ color: '#5A4020' }}>{item.slujba}</span>
+                  <span className="font-body text-xs" style={{ color: '#A8B4CC' }}>{item.slujba}</span>
                 </li>
               ))}
             </ul>
@@ -98,12 +98,12 @@ export default async function Footer() {
 
           {/* Coloana 4 — Contact & Social */}
           <div>
-            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#5A4020' }}>
+            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
               {t.footer.contactTitle}
             </h3>
             <ul className="space-y-2 mb-6">
               <li>
-                <Link href={localizedHref('/contact', locale)} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#5A4020' }}>
+                <Link href={localizedHref('/contact', locale)} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#A8B4CC' }}>
                   {t.footer.contact}
                 </Link>
               </li>
@@ -135,7 +135,7 @@ export default async function Footer() {
                   href={social.href}
                   aria-label={social.label}
                   className="flex items-center justify-center w-8 h-8 rounded border transition-all hover:border-amber-600 hover:text-amber-600"
-                  style={{ borderColor: '#2A1A0A', color: '#5A4020' }}
+                  style={{ borderColor: 'rgba(255,255,255,0.12)', color: '#A8B4CC' }}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     {social.icon}
@@ -147,11 +147,11 @@ export default async function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: '1px solid #1E1208' }}>
-          <p className="font-body text-xs" style={{ color: '#3A2010' }}>
+        <div className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <p className="font-body text-xs" style={{ color: '#5c6478' }}>
             © {year} {t.footer.copyright}
           </p>
-          <p className="font-body text-xs italic" style={{ color: '#3A2010' }}>
+          <p className="font-body text-xs italic" style={{ color: '#5c6478' }}>
             {t.footer.blessing} ☦
           </p>
           <div className="flex gap-4">
@@ -161,7 +161,7 @@ export default async function Footer() {
               { href: '/magazin', label: t.nav.shop },
               { href: '/politica-de-confidentialitate', label: t.footer.privacyPolicy },
             ].map(link => (
-              <Link key={link.href} href={localizedHref(link.href, locale)} className="font-body text-xs transition-colors hover:text-amber-600" style={{ color: '#3A2010' }}>
+              <Link key={link.href} href={localizedHref(link.href, locale)} className="font-body text-xs transition-colors hover:text-amber-600" style={{ color: '#5c6478' }}>
                 {link.label}
               </Link>
             ))}

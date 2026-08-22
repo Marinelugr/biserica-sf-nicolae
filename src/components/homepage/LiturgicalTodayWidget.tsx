@@ -35,15 +35,15 @@ export default async function LiturgicalTodayWidget() {
     <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       <Link
         href={`/calendar?zi=${now.getDate()}&luna=${now.getMonth() + 1}&an=${year}`}
-        className="block rounded-2xl p-6 sm:p-8 text-center transition-opacity hover:opacity-90"
-        style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', textDecoration: 'none' }}
+        className="glass-cobalt block p-6 sm:p-8 text-center transition-opacity hover:opacity-90"
+        style={{ textDecoration: 'none' }}
       >
-        <p className="font-heading text-2xl sm:text-3xl mb-2" style={{ color: '#1C1B3A' }}>
+        <p className="font-heading italic text-2xl sm:text-3xl mb-2" style={{ color: '#E9EFFA' }}>
           {dateLabel}
         </p>
         {fastInfo && (
-          <p className="font-body text-sm mb-3" style={{ color: '#4A6A2A' }}>
-            🌿 {fastInfo}
+          <p className="font-body text-sm mb-3" style={{ color: '#D4AF37' }}>
+            🕯 {fastInfo}
           </p>
         )}
         <span className="font-body text-xs" style={{ color: '#C9A84C' }}>

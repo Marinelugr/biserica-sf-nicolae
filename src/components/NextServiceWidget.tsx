@@ -126,7 +126,7 @@ export default function NextServiceWidget() {
   const serviceDate = new Date(service.data)
 
   return (
-    <div className="next-service-widget max-w-md mx-auto">
+    <div className="next-service-widget glass-cobalt max-w-md mx-auto">
       <div className="widget-label">⛪ Următoarea slujbă</div>
       <div className="widget-service-name">{service.titlu}</div>
       <div className="widget-service-time">

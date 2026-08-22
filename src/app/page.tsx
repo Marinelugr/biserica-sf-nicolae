@@ -9,6 +9,7 @@ import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
 import NextServiceWidget from '@/components/NextServiceWidget'
 import PascalCard from '@/components/PascalCard'
 import PriestMessageSection from '@/components/homepage/PriestMessageSection'
+import CobaltAurora from '@/components/homepage/CobaltAurora'
 import { getTodayDate } from '@/lib/utils'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { pick, localeToIntl, type Locale } from '@/lib/i18n/pick'
@@ -170,28 +171,31 @@ export default async function HomePage() {
   const showLibrary = enabled['biblioteca_ortodoxa']
 
   return (
-    <>
-      <Hero />
-      <LiveStreamCard />
-      <LiturgicalTodayWidget />
-      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <PascalCard />
-          <NextServiceWidget />
-        </div>
-      </section>
-      <PriestMessageSection />
-      {showDailyCards && (
-        <DailyCards data={dailyData} enabled={enabled} order={order} />
-      )}
-      {(showNews || showLibrary) && (
-        <NewsAndLibrary
-          articles={homeContent.articles}
-          libraryBooks={homeContent.libraryBooks}
-          showNews={showNews}
-          showLibrary={showLibrary}
-        />
-      )}
-    </>
+    <div className="relative" style={{ backgroundColor: '#04080F' }}>
+      <CobaltAurora />
+      <div className="relative" style={{ zIndex: 2 }}>
+        <Hero />
+        <LiveStreamCard />
+        <LiturgicalTodayWidget />
+        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <PascalCard />
+            <NextServiceWidget />
+          </div>
+        </section>
+        <PriestMessageSection />
+        {showDailyCards && (
+          <DailyCards data={dailyData} enabled={enabled} order={order} />
+        )}
+        {(showNews || showLibrary) && (
+          <NewsAndLibrary
+            articles={homeContent.articles}
+            libraryBooks={homeContent.libraryBooks}
+            showNews={showNews}
+            showLibrary={showLibrary}
+          />
+        )}
+      </div>
+    </div>
   )
 }

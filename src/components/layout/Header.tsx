@@ -45,7 +45,7 @@ function DonateButton({ href, label, compact = false, block = false, onClick }: 
     <Link
       href={href}
       onClick={onClick}
-      className={`font-body whitespace-nowrap rounded border transition-all duration-200 hover:bg-red-950 ${block ? 'block text-center' : ''}`}
+      className={`cobalt-donate-pulse font-body whitespace-nowrap rounded border transition-all duration-200 hover:bg-red-950 ${block ? 'block text-center' : ''}`}
       style={{
         color: '#C06050',
         borderColor: '#6B1A1A',
@@ -93,7 +93,7 @@ export default function Header() {
 
   return (
     <header
-      style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}
+      style={{ backgroundColor: 'rgba(4, 8, 15, 0.72)', borderBottom: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
       className="sticky top-0 z-50"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -120,6 +120,13 @@ export default function Header() {
               Sfântul Ierarh Nicolae
             </span>
           </Link>
+
+          {/* Ornament ✝ — doar pe ecrane largi, centrat lângă logo */}
+          <span className="cobalt-ornament hidden 2xl:flex xl:absolute xl:left-56" aria-hidden="true">
+            <span className="cobalt-ornament-line" />
+            <span>✝</span>
+            <span className="cobalt-ornament-line" />
+          </span>
 
           {/* Nav desktop — centrat, doar >=1280px */}
           <nav className="hidden xl:flex items-center gap-2.5 mx-auto min-w-0">
@@ -183,7 +190,7 @@ export default function Header() {
       {menuOpen && (
         <div
           className="xl:hidden fixed inset-0 overflow-y-auto"
-          style={{ backgroundColor: '#0A0704', top: '64px', zIndex: 60 }}
+          style={{ backgroundColor: 'rgba(4, 8, 15, 0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', top: '64px', zIndex: 60 }}
         >
           <nav className="flex flex-col gap-1 px-4 py-4 max-w-md mx-auto md:max-w-lg">
             {navLinks.map(link => (

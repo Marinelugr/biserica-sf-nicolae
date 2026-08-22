@@ -8,6 +8,7 @@ import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import PageTransition from '@/components/PageTransition'
 import ScrollToTop from '@/components/ScrollToTop'
 import CookieNotice from '@/components/CookieNotice'
+import CobaltCursorFX from '@/components/CobaltCursorFX'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
@@ -116,6 +117,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         style={{ fontFamily: 'var(--font-eb-garamond), Georgia, serif' }}
       >
         <I18nProvider initialLocale={initialLocale}>
+          <CobaltCursorFX />
           <Header />
           <main className="flex-1">
             <PageTransition>{children}</PageTransition>

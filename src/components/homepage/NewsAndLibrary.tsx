@@ -37,7 +37,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
   if (!showNews && !showLibrary) return null
 
   return (
-    <section style={{ backgroundColor: '#FFFFFF' }} className="py-16">
+    <section className="py-16" style={{ position: 'relative', zIndex: 2 }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
 
@@ -52,10 +52,10 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
               transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               <div>
-                <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
+                <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#828EA8' }}>
                   {t.home.ourParish}
                 </p>
-                <h2 className="font-heading text-3xl" style={{ color: '#1C1B3A' }}>
+                <h2 className="font-heading text-3xl" style={{ color: '#E9EFFA' }}>
                   {t.home.latestNews}
                 </h2>
               </div>
@@ -69,10 +69,10 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
             </motion.div>
 
             {/* Divider */}
-            <div className="h-px mb-8" style={{ backgroundColor: '#E8E5E0' }} />
+            <div className="h-px mb-8" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
 
             {articles.length === 0 ? (
-              <p className="font-body italic" style={{ color: '#8A7050' }}>
+              <p className="font-body italic" style={{ color: '#828EA8' }}>
                 {t.home.noNews}
               </p>
             ) : (
@@ -88,7 +88,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                   <Link href={`/stiri/${featured.slug}`} className="flex flex-col sm:flex-row gap-5">
                     <div
                       className="relative shrink-0 overflow-hidden rounded-lg sm:w-3/5"
-                      style={{ aspectRatio: '16/10', backgroundColor: '#F2EBD9' }}
+                      style={{ aspectRatio: '16/10', backgroundColor: 'rgba(255,255,255,0.05)' }}
                     >
                       {featured.imageUrl ? (
                         <Image
@@ -100,24 +100,24 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <span style={{ color: '#D4C8A0', fontSize: '36px' }} aria-hidden="true">☦</span>
+                          <span style={{ color: '#828EA8', fontSize: '36px' }} aria-hidden="true">☦</span>
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
                       {featured.category && (
-                        <span className="font-body text-xs tracking-wide uppercase mb-1" style={{ color: '#8B1A1A' }}>
+                        <span className="font-body text-xs tracking-wide uppercase mb-1" style={{ color: '#C06050' }}>
                           {featured.category}
                         </span>
                       )}
                       <h3
                         className="font-heading leading-snug group-hover:underline underline-offset-2 line-clamp-3"
-                        style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', fontSize: 'clamp(22px, 2.6vw, 28px)' }}
+                        style={{ color: '#E9EFFA', textDecorationColor: '#C9A84C', fontSize: 'clamp(22px, 2.6vw, 28px)' }}
                       >
                         {featured.title}
                       </h3>
                       {featured.excerpt && (
-                        <p className="font-body text-sm leading-relaxed mt-2 line-clamp-3" style={{ color: '#5A4020' }}>
+                        <p className="font-body text-sm leading-relaxed mt-2 line-clamp-3" style={{ color: '#A8B4CC' }}>
                           {featured.excerpt}…
                         </p>
                       )}
@@ -126,7 +126,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                           <time
                             dateTime={featured.publishedAt.toISOString()}
                             className="font-body text-xs"
-                            style={{ color: '#8A7050' }}
+                            style={{ color: '#828EA8' }}
                           >
                             {formatDate(featured.publishedAt, localeToIntl(locale))}
                           </time>
@@ -154,7 +154,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                         <Link href={`/stiri/${article.slug}`}>
                           <div
                             className="relative overflow-hidden rounded mb-2"
-                            style={{ aspectRatio: '16/10', backgroundColor: '#F2EBD9' }}
+                            style={{ aspectRatio: '16/10', backgroundColor: 'rgba(255,255,255,0.05)' }}
                           >
                             {article.imageUrl ? (
                               <Image
@@ -166,13 +166,13 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                               />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center">
-                                <span style={{ color: '#D4C8A0', fontSize: '20px' }} aria-hidden="true">☦</span>
+                                <span style={{ color: '#828EA8', fontSize: '20px' }} aria-hidden="true">☦</span>
                               </div>
                             )}
                           </div>
                           <h3
                             className="font-heading text-sm leading-snug group-hover:underline underline-offset-2 line-clamp-2"
-                            style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}
+                            style={{ color: '#E9EFFA', textDecorationColor: '#C9A84C' }}
                           >
                             {article.title}
                           </h3>
@@ -180,7 +180,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                             <time
                               dateTime={article.publishedAt.toISOString()}
                               className="font-body text-xs mt-1 block"
-                              style={{ color: '#8A7050' }}
+                              style={{ color: '#828EA8' }}
                             >
                               {formatDate(article.publishedAt, localeToIntl(locale))}
                             </time>
@@ -198,7 +198,7 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
           {/* ─── Divider vertical ─── */}
           {showNews && showLibrary && (
           <div className="hidden lg:flex justify-center">
-            <div className="w-px" style={{ backgroundColor: '#E8E5E0' }} />
+            <div className="w-px" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
           </div>
           )}
 
@@ -213,10 +213,10 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
               transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
               <div>
-                <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#8A7050' }}>
+                <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#828EA8' }}>
                   {t.home.sacredTexts}
                 </p>
-                <h2 className="font-heading text-3xl" style={{ color: '#1C1B3A' }}>
+                <h2 className="font-heading text-3xl" style={{ color: '#E9EFFA' }}>
                   {t.home.libraryLabel}
                 </h2>
               </div>
@@ -230,10 +230,10 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
             </motion.div>
 
             {/* Divider */}
-            <div className="h-px mb-8" style={{ backgroundColor: '#E8E5E0' }} />
+            <div className="h-px mb-8" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
 
             {libraryBooks.length === 0 ? (
-              <p className="font-body italic" style={{ color: '#8A7050' }}>
+              <p className="font-body italic" style={{ color: '#828EA8' }}>
                 {t.home.libraryInProgress}
               </p>
             ) : (
@@ -249,18 +249,18 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
                     <Link
                       href={`/carti/${book.slug}`}
                       className="flex items-center justify-between py-3.5 group border-b"
-                      style={{ borderColor: '#E8E5E0' }}
+                      style={{ borderColor: 'rgba(255,255,255,0.1)' }}
                     >
                       <div className="flex-1 min-w-0 pr-3">
                         <span
                           className="font-body text-xs font-medium tracking-widest uppercase block mb-0.5"
-                          style={{ color: '#8B1A1A' }}
+                          style={{ color: '#C06050' }}
                         >
                           {typeLabels[book.type] || book.type}
                         </span>
                         <span
                           className="font-body text-sm leading-snug group-hover:underline underline-offset-2 line-clamp-2"
-                          style={{ color: '#3A1A1A', textDecorationColor: '#C9A84C' }}
+                          style={{ color: '#E9EFFA', textDecorationColor: '#C9A84C' }}
                         >
                           {book.title}
                         </span>
@@ -279,14 +279,14 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
             )}
 
             {/* Call to action */}
-            <div className="mt-8 p-4 rounded-md" style={{ backgroundColor: '#F2EBD9', border: '1px solid #D4C8A0' }}>
-              <p className="font-body text-sm mb-3" style={{ color: '#3A1A1A' }}>
+            <div className="glass-cobalt mt-8 p-4">
+              <p className="font-body text-sm mb-3" style={{ color: '#E9EFFA' }}>
                 {t.home.searchInScripture}
               </p>
               <Link
                 href="/biblie"
                 className="font-body text-sm inline-flex items-center gap-2 px-4 py-2 rounded transition-all hover:opacity-90"
-                style={{ backgroundColor: '#1C1B3A', color: '#F2EBD9' }}
+                style={{ backgroundColor: '#5A8FE8', color: '#04080F' }}
               >
                 {t.home.orthodoxBibleBtn}
               </Link>

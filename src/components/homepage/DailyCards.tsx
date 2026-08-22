@@ -36,19 +36,19 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
   const allCards = [
     {
       key: 'sfintii_zilei',
-      dot: '#8B6014',
+      dot: '#D4AF37',
       icon: '✦',
       label: t.home.saintsToday,
       content: (
         <ul className="space-y-1.5">
           {data.saints.length > 0 ? (
             data.saints.map((saint, i) => (
-              <li key={i} className="font-body text-sm leading-snug" style={{ color: '#3A1A1A' }}>
+              <li key={i} className="font-body text-sm leading-snug" style={{ color: '#E9EFFA' }}>
                 {saint}
               </li>
             ))
           ) : (
-            <li className="font-body text-sm italic" style={{ color: '#8A7050' }}>
+            <li className="font-body text-sm italic" style={{ color: '#828EA8' }}>
               {t.home.noSaints}
             </li>
           )}
@@ -59,15 +59,15 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
     },
     {
       key: 'evanghelia_zilei',
-      dot: '#8B1A1A',
+      dot: '#8B2635',
       icon: '✦',
       label: t.home.gospelToday,
       content: (
         <div>
-          <p className="font-heading text-sm font-semibold mb-2" style={{ color: '#8B1A1A' }}>
+          <p className="font-heading text-sm font-semibold mb-2" style={{ color: '#C06050' }}>
             {data.gospel.reference}
           </p>
-          <p className="font-body text-sm leading-relaxed line-clamp-4" style={{ color: '#3A1A1A' }}>
+          <p className="font-body text-sm leading-relaxed line-clamp-4" style={{ color: '#E9EFFA' }}>
             &ldquo;{data.gospel.text}&rdquo;
           </p>
         </div>
@@ -77,18 +77,18 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
     },
     {
       key: 'rugaciunea_zilei',
-      dot: '#6B4A2A',
+      dot: '#5A8FE8',
       icon: '✦',
       label: t.home.prayerToday,
       content: (
         <div>
-          <p className="font-body text-xs uppercase tracking-wide mb-1" style={{ color: '#8A7050' }}>
+          <p className="font-body text-xs uppercase tracking-wide mb-1" style={{ color: '#828EA8' }}>
             {data.prayer.day}
           </p>
-          <p className="font-heading text-sm font-semibold mb-2" style={{ color: '#6B4A2A' }}>
+          <p className="font-heading text-sm font-semibold mb-2" style={{ color: '#5A8FE8' }}>
             {data.prayer.title}
           </p>
-          <p className="font-body text-sm leading-relaxed line-clamp-3 italic" style={{ color: '#3A1A1A' }}>
+          <p className="font-body text-sm leading-relaxed line-clamp-3 italic" style={{ color: '#E9EFFA' }}>
             {data.prayer.text}
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
   if (cards.length === 0) return null
 
   return (
-    <section style={{ backgroundColor: '#F2EBD9' }} className="py-14">
+    <section className="py-14" style={{ position: 'relative', zIndex: 2 }}>
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Grid carduri */}
         <div className={`grid grid-cols-1 ${GRID_COLS[cards.length] || GRID_COLS[4]} gap-4 ${cards.length === 1 ? 'mx-auto' : ''}`}>
@@ -117,7 +117,7 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
               whileInView="visible"
               viewport={{ once: true, amount: 0.3 }}
               variants={cardVariants}
-              className="card-parchment p-5 flex flex-col justify-between group"
+              className="glass-cobalt p-5 flex flex-col justify-between group"
             >
               <div>
                 {/* Card header */}
@@ -136,7 +136,7 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
                 </div>
 
                 {/* Separator */}
-                <div className="h-px mb-4" style={{ backgroundColor: '#D4C8A0' }} />
+                <div className="h-px mb-4" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
 
                 {/* Content */}
                 <div className="min-h-[100px]">{card.content}</div>

@@ -29,26 +29,17 @@ export default function PascalCard() {
   const years = Array.from({ length: YEARS_BACK + YEARS_FORWARD + 1 }, (_, i) => baseYear - YEARS_BACK + i)
 
   return (
-    <div
-      style={{
-        background: 'linear-gradient(135deg, rgba(201, 169, 110, 0.15), rgba(201, 169, 110, 0.05))',
-        border: '1px solid rgba(201, 169, 110, 0.3)',
-        borderRadius: '16px',
-        padding: '24px 28px',
-        textAlign: 'center',
-        backdropFilter: 'blur(10px)',
-      }}
-    >
-      <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A96E', marginBottom: '10px' }}>
+    <div className="glass-cobalt" style={{ padding: '24px 28px', textAlign: 'center' }}>
+      <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '10px' }}>
         ☦ Calendarul Pascal
       </div>
-      <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '28px', color: '#1C1B3A', marginBottom: '2px' }}>
+      <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '28px', color: '#E9EFFA', marginBottom: '2px' }}>
         Sfintele Paști
       </div>
-      <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '22px', color: '#8B1A1A', marginBottom: '6px' }}>
+      <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '22px', color: '#5A8FE8', marginBottom: '6px' }}>
         {fmt(data.pasti)} {data.year}
       </div>
-      <div style={{ fontSize: '14px', color: '#8A7050', marginBottom: '18px' }}>
+      <div style={{ fontSize: '14px', color: '#828EA8', marginBottom: '18px' }}>
         Floriile: {fmt(data.florii)}
       </div>
 
@@ -61,8 +52,8 @@ export default function PascalCard() {
             onClick={() => setSelectedYear(y)}
             style={{
               ...yearBtnStyle,
-              backgroundColor: y === selectedYear ? '#C9A96E' : 'transparent',
-              color: y === selectedYear ? '#1C1B3A' : '#8A7050',
+              backgroundColor: y === selectedYear ? '#C9A84C' : 'transparent',
+              color: y === selectedYear ? '#04080F' : '#828EA8',
               fontWeight: y === selectedYear ? 700 : 400,
             }}
           >

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import Image from 'next/image'
 import { useI18n } from '@/lib/i18n/context'
 import CandleParticles from '@/components/CandleParticles'
@@ -12,6 +12,8 @@ export default function Hero() {
   const router = useRouter()
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement>(null)
+  const prefersReducedMotion = useReducedMotion()
+  const titleWords = t.home.heroTitle.split(' ')
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,15 +52,23 @@ export default function Hero() {
       <CandleParticles />
 
       <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 text-center">
-        <motion.h1
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7 }}
+        <h1
           className="font-heading italic leading-tight mb-5 hero-title"
           style={{ fontSize: 'clamp(36px, 6vw, 56px)', fontWeight: 400 }}
         >
-          {t.home.heroTitle}
-        </motion.h1>
+          {titleWords.map((word, i) => (
+            <motion.span
+              key={i}
+              initial={prefersReducedMotion ? undefined : { opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: prefersReducedMotion ? 0 : 0.15 + i * 0.15, ease: [0.2, 0.8, 0.2, 1] }}
+              style={{ display: 'inline-block' }}
+            >
+              {word}
+              {i < titleWords.length - 1 ? ' ' : ''}
+            </motion.span>
+          ))}
+        </h1>
 
         <motion.div
           initial={{ opacity: 0 }}
@@ -97,7 +107,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           onSubmit={handleSearch}
-          className="flex gap-0 max-w-lg mx-auto rounded-md overflow-hidden shadow-2xl"
+          className="glass-cobalt flex gap-0 max-w-lg mx-auto overflow-hidden shadow-2xl"
         >
           <label htmlFor="site-search" className="sr-only">{t.home.searchPlaceholder}</label>
           <input
@@ -106,12 +116,9 @@ export default function Hero() {
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder={t.home.searchPlaceholder}
-            className="flex-1 px-4 py-3 text-sm font-body outline-none"
+            className="flex-1 px-4 py-3 text-sm font-body outline-none bg-transparent"
             style={{
-              backgroundColor: 'rgba(13, 9, 5, 0.85)',
               color: '#F2EBD9',
-              border: '1px solid #3A2010',
-              borderRight: 'none',
             }}
           />
           <button
