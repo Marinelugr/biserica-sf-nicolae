@@ -8,6 +8,7 @@ import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
 import ImageUploadButton from '@/components/admin/ImageUploadButton'
 import MediaGallery from '@/components/admin/MediaGallery'
+import { utcToChisinauLocalInputValue } from '@/lib/chisinauTime'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -23,6 +24,7 @@ interface Article {
   contentRu: string | null
   contentEn: string | null
   published: boolean
+  scheduledFor: Date | null
 }
 
 interface ArticleForm {
@@ -30,6 +32,7 @@ interface ArticleForm {
   slug: string; category: string; imageUrl: string
   contentRo: string; contentRu: string; contentEn: string
   published: boolean
+  scheduledFor: string
 }
 
 const inp: React.CSSProperties = { width: '100%', backgroundColor: '#1A1008', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.625rem 0.875rem', color: '#F2EBD9', fontSize: '1rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' }
@@ -62,6 +65,7 @@ export default function EditArticolClient({ article }: { article: Article }) {
     contentRu: article.contentRu || '',
     contentEn: article.contentEn || '',
     published: article.published,
+    scheduledFor: article.scheduledFor ? utcToChisinauLocalInputValue(new Date(article.scheduledFor)) : '',
   }
 
   const [form, setForm] = useState<ArticleForm>(() => {
@@ -230,6 +234,15 @@ export default function EditArticolClient({ article }: { article: Article }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <input type="checkbox" id="pub" checked={form.published} onChange={e => setForm(f => ({ ...f, published: e.target.checked }))} style={{ width: '1rem', height: '1rem', accentColor: '#8B1A1A' }} />
                 <label htmlFor="pub" style={{ ...lbl, marginBottom: 0, cursor: 'pointer' }}>Publicat</label>
+              </div>
+              <div>
+                <label style={lbl}>Programează publicarea pentru (opțional)</label>
+                <input type="datetime-local" value={form.scheduledFor}
+                  onChange={e => setForm(f => ({ ...f, scheduledFor: e.target.value }))}
+                  style={{ ...inp, colorScheme: 'dark' }} />
+                <p style={{ color: '#5A4020', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  Ora Chișinău. Lăsat gol = vizibil imediat dacă „Publicat” e bifat.
+                </p>
               </div>
             </div>
           </div>

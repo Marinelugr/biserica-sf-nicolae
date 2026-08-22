@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 import { translatePath } from '@/lib/i18n/slugs'
+import { publicArticleWhere } from '@/lib/articleVisibility'
 
 const BASE = 'https://biserica-sf-nicolae.org'
 
@@ -47,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let articleRoutes: MetadataRoute.Sitemap = []
   try {
     const articles = await prisma.article.findMany({
-      where: { published: true },
+      where: publicArticleWhere,
       select: { slug: true, publishedAt: true, createdAt: true },
       orderBy: { publishedAt: 'desc' },
     })

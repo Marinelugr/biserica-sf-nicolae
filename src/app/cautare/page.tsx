@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { pick, type Locale } from '@/lib/i18n/pick'
+import { scheduledGate } from '@/lib/articleVisibility'
 
 export const dynamic = 'force-dynamic'
 
@@ -53,10 +54,9 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
       prisma.article.findMany({
         where: {
           published: true,
-          OR: [
-            { titleRo: insensitive },
-            { titleRu: insensitive },
-            { titleEn: insensitive },
+          AND: [
+            scheduledGate,
+            { OR: [{ titleRo: insensitive }, { titleRu: insensitive }, { titleEn: insensitive }] },
           ],
         },
         select: { slug: true, titleRo: true, titleRu: true, titleEn: true, category: true },

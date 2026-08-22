@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { chisinauLocalToUTC } from '@/lib/chisinauTime'
 
 export async function PATCH(
   req: NextRequest,
@@ -10,7 +11,7 @@ export async function PATCH(
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
   const { id } = await params
-  const { titleRo, titleRu, titleEn, slug, category, imageUrl, published, contentRo, contentRu, contentEn } = await req.json()
+  const { titleRo, titleRu, titleEn, slug, category, imageUrl, published, scheduledFor, contentRo, contentRu, contentEn } = await req.json()
 
   try {
     const article = await prisma.article.update({
@@ -24,6 +25,7 @@ export async function PATCH(
         imageUrl: imageUrl || null,
         published: !!published,
         publishedAt: published ? new Date() : null,
+        scheduledFor: scheduledFor ? chisinauLocalToUTC(scheduledFor) : null,
         contentRo: contentRo || '',
         contentRu: contentRu || null,
         contentEn: contentEn || null,

@@ -22,7 +22,7 @@ function slugify(text: string) {
 
 export default function NouArticolPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ titleRo: '', titleRu: '', titleEn: '', slug: '', category: '', imageUrl: '', published: false, contentRo: '', contentRu: '', contentEn: '' })
+  const [form, setForm] = useState({ titleRo: '', titleRu: '', titleEn: '', slug: '', category: '', imageUrl: '', published: false, scheduledFor: '', contentRo: '', contentRu: '', contentEn: '' })
   const [saving, setSaving] = useState(false)
   const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [error, setError] = useState('')
@@ -200,6 +200,16 @@ export default function NouArticolPage() {
                 <label htmlFor="published" style={{ ...lbl, marginBottom: 0, cursor: 'pointer' }}>
                   Publicat imediat
                 </label>
+              </div>
+
+              <div>
+                <label style={lbl}>Programează publicarea pentru (opțional)</label>
+                <input type="datetime-local" value={form.scheduledFor}
+                  onChange={e => setForm(f => ({ ...f, scheduledFor: e.target.value }))}
+                  style={{ ...inp, colorScheme: 'dark' }} />
+                <p style={{ color: '#5A4020', fontSize: '0.75rem', marginTop: '0.375rem' }}>
+                  Ora Chișinău. Lăsat gol = se publică imediat dacă „Publicat imediat” e bifat.
+                </p>
               </div>
 
               {error && (

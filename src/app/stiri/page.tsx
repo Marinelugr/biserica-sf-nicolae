@@ -5,6 +5,7 @@ import { formatDate, readingTime } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { publicArticleWhere } from '@/lib/articleVisibility'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,7 +22,7 @@ async function getArticles() {
   try {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.article.findMany({
-      where: { published: true },
+      where: publicArticleWhere,
       select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true, contentRo: true, contentRu: true, contentEn: true },
       orderBy: { publishedAt: 'desc' },
     })

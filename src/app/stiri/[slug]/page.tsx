@@ -9,6 +9,7 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 import ShareButtons from '@/components/shared/ShareButtons'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
+import { scheduledGate } from '@/lib/articleVisibility'
 
 const SITE_URL = 'https://biserica-sf-nicolae.org'
 
@@ -18,7 +19,7 @@ type Props = { params: Promise<{ slug: string }> }
 
 async function getArticle(slug: string) {
   const { prisma } = await import('@/lib/prisma')
-  return prisma.article.findUnique({ where: { slug, published: true } })
+  return prisma.article.findFirst({ where: { slug, published: true, ...scheduledGate } })
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

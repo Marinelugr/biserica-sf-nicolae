@@ -2,11 +2,13 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
+import { isScheduledFuture } from '@/lib/articleVisibility'
+import { formatChisinauDateTime } from '@/lib/chisinauTime'
 
 export default async function AdminStiriPage() {
   const articles = await prisma.article.findMany({
     orderBy: { createdAt: 'desc' },
-    select: { id: true, titleRo: true, slug: true, published: true, publishedAt: true, createdAt: true, category: true },
+    select: { id: true, titleRo: true, slug: true, published: true, publishedAt: true, scheduledFor: true, createdAt: true, category: true },
   })
 
   return (
@@ -83,18 +85,34 @@ export default async function AdminStiriPage() {
                         {article.category || '—'}
                       </td>
                       <td style={{ padding: '0.875rem 1rem' }}>
-                        <span style={{
-                          display: 'inline-block',
-                          padding: '0.2rem 0.6rem',
-                          borderRadius: '4px',
-                          fontSize: '0.75rem',
-                          fontFamily: 'Georgia, serif',
-                          backgroundColor: article.published ? '#0A2A0A' : '#1A1008',
-                          color: article.published ? '#4A9A4A' : '#9B8050',
-                          border: `1px solid ${article.published ? '#1A4A1A' : '#2A1A0A'}`,
-                        }}>
-                          {article.published ? 'Publicat' : 'Draft'}
-                        </span>
+                        {isScheduledFuture(article) ? (
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '0.2rem 0.6rem',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            fontFamily: 'Georgia, serif',
+                            backgroundColor: '#1A1A08',
+                            color: '#C9A84C',
+                            border: '1px solid #4A3A1A',
+                            whiteSpace: 'nowrap',
+                          }}>
+                            ⏱ Programat pentru {formatChisinauDateTime(article.scheduledFor!)}
+                          </span>
+                        ) : (
+                          <span style={{
+                            display: 'inline-block',
+                            padding: '0.2rem 0.6rem',
+                            borderRadius: '4px',
+                            fontSize: '0.75rem',
+                            fontFamily: 'Georgia, serif',
+                            backgroundColor: article.published ? '#0A2A0A' : '#1A1008',
+                            color: article.published ? '#4A9A4A' : '#9B8050',
+                            border: `1px solid ${article.published ? '#1A4A1A' : '#2A1A0A'}`,
+                          }}>
+                            {article.published ? 'Publicat' : 'Draft'}
+                          </span>
+                        )}
                       </td>
                       <td style={{ padding: '0.875rem 1rem', color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
                         {(article.publishedAt || article.createdAt).toLocaleDateString('ro-MD')}
