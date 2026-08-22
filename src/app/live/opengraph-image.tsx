@@ -75,7 +75,7 @@ export default async function Image() {
             color: '#C9A84C', fontSize: '28px',
             letterSpacing: '2px', marginBottom: '24px'
           }}>
-            Sfânta Liturghie · Duminică · 09:00
+            Sfânta Liturghie · 09:00
           </span>
           <div style={{
             width: '48px', height: '1px',

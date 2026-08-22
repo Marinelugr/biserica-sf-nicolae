@@ -199,7 +199,7 @@ const en: Translations = {
     country: 'Republic of Moldova', metropolis: 'Metropolis of Chișinău and All Moldova',
     pagesTitle: 'PAGES', scheduleTitle: 'SERVICE SCHEDULE', contactTitle: 'CONTACT & SOCIAL',
     support: '❤ Support the Parish', contact: 'Contact form',
-    blessing: 'Website created with blessing',
+    blessing: 'Website built by Marin Grigorița — creator and web developer',
     copyright: 'Parish of Saint Nicholas, Hîrtopul Mic',
     phone: 'Phone', email: 'Email',
     pages: {

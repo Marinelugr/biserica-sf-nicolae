@@ -66,6 +66,10 @@ export default function AdminSlujbePage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [selectedDay, setSelectedDay] = useState<number | null>(null)
   const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar')
+  const [countdownHiddenUntil, setCountdownHiddenUntil] = useState<string | null>(null)
+  const [countdownLoaded, setCountdownLoaded] = useState(false)
+  const [countdownInput, setCountdownInput] = useState('')
+  const [countdownSaving, setCountdownSaving] = useState(false)
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
 
@@ -77,6 +81,56 @@ export default function AdminSlujbePage() {
   }, [year, month])
 
   useEffect(() => { fetchServices() }, [fetchServices])
+
+  const fetchCountdownSetting = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/settings?key=countdown_hidden_until', { cache: 'no-store' })
+      if (res.ok) {
+        const value = await res.json()
+        setCountdownHiddenUntil(typeof value === 'string' && value ? value : null)
+      } else {
+        showToast('Nu s-a putut încărca starea countdown-ului (' + res.status + ')', 'error')
+      }
+    } catch {
+      showToast('Nu s-a putut încărca starea countdown-ului', 'error')
+    } finally {
+      setCountdownLoaded(true)
+    }
+  }, [showToast])
+
+  useEffect(() => { fetchCountdownSetting() }, [fetchCountdownSetting])
+
+  async function handleSaveCountdownPause() {
+    if (!countdownInput) { showToast('Selectați o dată și oră', 'error'); return }
+    const isoValue = new Date(countdownInput).toISOString()
+    if (new Date(isoValue).getTime() <= Date.now()) { showToast('Alegeți o dată în viitor', 'error'); return }
+    setCountdownSaving(true)
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key: 'countdown_hidden_until', value: isoValue }),
+      })
+      if (!res.ok) throw new Error(String(res.status))
+      await fetchCountdownSetting()
+      showToast('Countdown ascuns ✓', 'success')
+    } catch (e) {
+      showToast('Eroare la salvare' + (e instanceof Error ? ` (${e.message})` : ''), 'error')
+    } finally { setCountdownSaving(false) }
+  }
+
+  async function handleRestartCountdown() {
+    setCountdownSaving(true)
+    try {
+      const res = await fetch('/api/admin/settings?key=countdown_hidden_until', { method: 'DELETE' })
+      if (!res.ok) throw new Error(String(res.status))
+      setCountdownHiddenUntil(null)
+      setCountdownInput('')
+      showToast('Countdown repornit ✓', 'success')
+    } catch (e) {
+      showToast('Eroare la repornire' + (e instanceof Error ? ` (${e.message})` : ''), 'error')
+    } finally { setCountdownSaving(false) }
+  }
 
   function prevMonth() { if (month === 1) { setYear(y => y - 1); setMonth(12) } else setMonth(m => m - 1) }
   function nextMonth() { if (month === 12) { setYear(y => y + 1); setMonth(1) } else setMonth(m => m + 1) }
@@ -183,6 +237,41 @@ export default function AdminSlujbePage() {
                 📋 Copiază luna anterioară
               </button>
               <button onClick={() => openNew()} style={btnPrimary}>+ Slujbă nouă</button>
+            </div>
+          </div>
+
+          {/* Pauză countdown "Următoarea slujbă" */}
+          <div style={{ backgroundColor: '#110C07', border: `1px solid ${countdownHiddenUntil ? '#5A3A0A' : '#2A1A0A'}`, borderRadius: '8px', padding: '1.25rem', marginBottom: '1.25rem' }}>
+            <div style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1rem', marginBottom: '0.75rem' }}>⏱ Widget &quot;Următoarea slujbă&quot; (homepage)</div>
+
+            {/* Stare curentă — pill colorat */}
+            <div style={{ marginBottom: '1rem' }}>
+              {!countdownLoaded ? (
+                <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>Se verifică starea…</span>
+              ) : countdownHiddenUntil ? (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', backgroundColor: '#3A2408', color: '#E0A030', border: '1px solid #6B4A10', borderRadius: '999px', padding: '0.3rem 0.9rem', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
+                  ● Countdown ascuns până la {new Date(countdownHiddenUntil).toLocaleString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </span>
+              ) : (
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', backgroundColor: '#0A2A0A', color: '#4ACA4A', border: '1px solid #1A5A1A', borderRadius: '999px', padding: '0.3rem 0.9rem', fontFamily: 'Georgia, serif', fontSize: '0.85rem' }}>
+                  ● Countdown activ
+                </span>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: '1rem', flexWrap: 'wrap' }}>
+              <div>
+                <label style={lbl}>Ascunde countdown-ul de pe homepage până la:</label>
+                <input type="datetime-local" value={countdownInput} onChange={e => setCountdownInput(e.target.value)} style={inp} />
+              </div>
+              <button onClick={handleSaveCountdownPause} disabled={countdownSaving} style={{ ...btnGhost, opacity: countdownSaving ? 0.6 : 1 }}>
+                {countdownSaving ? 'Se salvează...' : 'Ascunde countdown-ul'}
+              </button>
+              {countdownHiddenUntil && (
+                <button onClick={handleRestartCountdown} disabled={countdownSaving} style={{ ...btnPrimary, opacity: countdownSaving ? 0.6 : 1 }}>
+                  {countdownSaving ? 'Se repornește...' : 'Repornește acum'}
+                </button>
+              )}
             </div>
           </div>
 

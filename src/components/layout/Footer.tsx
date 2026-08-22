@@ -42,22 +42,22 @@ export default async function Footer() {
                 Sfântul Ierarh Nicolae
               </span>
             </div>
-            <p className="font-body text-sm leading-relaxed" style={{ color: '#A8B4CC' }}>
+            <p className="font-body text-base leading-relaxed" style={{ color: '#A8B4CC' }}>
               {t.footer.parish}<br />
               {t.footer.address}<br />
               {t.footer.country}
             </p>
-            <p className="font-body text-xs mt-2 leading-relaxed" style={{ color: '#5c6478' }}>
+            <p className="font-body text-sm mt-2 leading-relaxed" style={{ color: '#828EA8' }}>
               {t.footer.metropolis}
             </p>
             <div className="mt-4 space-y-1.5">
               <a href={`tel:${CONTACT_INFO.phone.replace(/\s/g, '')}`}
-                className="flex items-center gap-2 font-body text-sm transition-colors hover:text-amber-600"
+                className="flex items-center gap-2 font-body text-base transition-colors hover:text-amber-600"
                 style={{ color: '#A8B4CC' }}>
                 <span aria-hidden="true">☎</span> {CONTACT_INFO.phone}
               </a>
               <a href={`mailto:${CONTACT_INFO.email}`}
-                className="flex items-center gap-2 font-body text-sm transition-colors hover:text-amber-600"
+                className="flex items-center gap-2 font-body text-base transition-colors hover:text-amber-600"
                 style={{ color: '#A8B4CC' }}>
                 <span aria-hidden="true">✉</span> {CONTACT_INFO.email}
               </a>
@@ -66,13 +66,13 @@ export default async function Footer() {
 
           {/* Coloana 2 — Pagini */}
           <div>
-            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
+            <h3 className="font-heading text-base font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
               {t.footer.pagesTitle}
             </h3>
             <ul className="space-y-2">
               {pageLinks.map(link => (
                 <li key={link.href}>
-                  <Link href={link.href} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#A8B4CC' }}>
+                  <Link href={link.href} className="font-body text-base transition-colors hover:text-amber-600" style={{ color: '#A8B4CC' }}>
                     {link.label}
                   </Link>
                 </li>
@@ -82,15 +82,15 @@ export default async function Footer() {
 
           {/* Coloana 3 — Program slujbe */}
           <div>
-            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
+            <h3 className="font-heading text-base font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
               {t.footer.scheduleTitle}
             </h3>
             <ul className="space-y-2">
               {scheduleItems.map(item => (
                 <li key={item.zi} className="flex items-baseline gap-2">
-                  <span className="font-body text-xs w-20 shrink-0" style={{ color: '#828EA8' }}>{item.zi}</span>
-                  <span className="font-body text-sm" style={{ color: '#C9A84C' }}>{item.ora}</span>
-                  <span className="font-body text-xs" style={{ color: '#A8B4CC' }}>{item.slujba}</span>
+                  <span className="font-body text-sm w-20 shrink-0" style={{ color: '#828EA8' }}>{item.zi}</span>
+                  <span className="font-body text-base" style={{ color: '#C9A84C' }}>{item.ora}</span>
+                  <span className="font-body text-sm" style={{ color: '#A8B4CC' }}>{item.slujba}</span>
                 </li>
               ))}
             </ul>
@@ -98,17 +98,17 @@ export default async function Footer() {
 
           {/* Coloana 4 — Contact & Social */}
           <div>
-            <h3 className="font-heading text-sm font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
+            <h3 className="font-heading text-base font-semibold mb-4 tracking-widest uppercase" style={{ color: '#A8B4CC' }}>
               {t.footer.contactTitle}
             </h3>
             <ul className="space-y-2 mb-6">
               <li>
-                <Link href={localizedHref('/contact', locale)} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#A8B4CC' }}>
+                <Link href={localizedHref('/contact', locale)} className="font-body text-base transition-colors hover:text-amber-600" style={{ color: '#A8B4CC' }}>
                   {t.footer.contact}
                 </Link>
               </li>
               <li>
-                <Link href={localizedHref('/donatii', locale)} className="font-body text-sm transition-colors hover:text-red-400" style={{ color: '#8B1A1A' }}>
+                <Link href={localizedHref('/donatii', locale)} className="font-body text-base transition-colors hover:text-red-400" style={{ color: '#8B1A1A' }}>
                   {t.footer.support}
                 </Link>
               </li>
@@ -148,11 +148,11 @@ export default async function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <p className="font-body text-xs" style={{ color: '#5c6478' }}>
+          <p className="font-body text-sm" style={{ color: '#5c6478' }}>
             © {year} {t.footer.copyright}
           </p>
-          <p className="font-body text-xs italic" style={{ color: '#5c6478' }}>
-            {t.footer.blessing} ☦
+          <p className="font-body text-sm italic" style={{ color: '#5c6478' }}>
+            {t.footer.blessing} · <a href="tel:+37367306191" className="transition-colors hover:text-amber-600" style={{ color: '#5c6478' }}>+373 67 306 191</a> ☦
           </p>
           <div className="flex gap-4">
             {[
@@ -161,7 +161,7 @@ export default async function Footer() {
               { href: '/magazin', label: t.nav.shop },
               { href: '/politica-de-confidentialitate', label: t.footer.privacyPolicy },
             ].map(link => (
-              <Link key={link.href} href={localizedHref(link.href, locale)} className="font-body text-xs transition-colors hover:text-amber-600" style={{ color: '#5c6478' }}>
+              <Link key={link.href} href={localizedHref(link.href, locale)} className="font-body text-sm transition-colors hover:text-amber-600" style={{ color: '#5c6478' }}>
                 {link.label}
               </Link>
             ))}

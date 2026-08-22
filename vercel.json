@@ -1,0 +1,5 @@
+{
+  "crons": [
+    { "path": "/api/cron/sfinti", "schedule": "0 0 * * *" }
+  ]
+}

@@ -303,14 +303,6 @@ h1, h2, h3, h4, h5, h6 {
   50%       { opacity: 0.9; }
 }
 
-/* Cursor personalizat — cruce ortodoxă subtilă */
-*, *::before, *::after {
-  cursor: url('/cursors/cursor-default.svg') 12 12, auto;
-}
-a, button, [role="button"], input[type="submit"], label {
-  cursor: url('/cursors/cursor-pointer.svg') 14 14, pointer;
-}
-
 /* ═══════════════════════════════════════════════════════════════════════════
    Tema Cobalt — fundal aurora, sticlă reactivă, lumină de cursor
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -403,18 +395,3 @@ a, button, [role="button"], input[type="submit"], label {
   .cobalt-donate-pulse { animation: none; }
 }
 
-/* Ornament ✝ din header */
-.cobalt-ornament {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #C9A84C;
-  opacity: 0.75;
-  font-size: 13px;
-}
-.cobalt-ornament .cobalt-ornament-line {
-  width: 32px;
-  height: 1px;
-  background: #C9A84C;
-  opacity: 0.6;
-}

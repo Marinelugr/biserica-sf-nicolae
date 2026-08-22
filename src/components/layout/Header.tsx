@@ -40,6 +40,22 @@ function LocaleSwitcher({ locale, onChange, fontSize = '13px' }: { locale: Local
   )
 }
 
+function HeaderOrnament() {
+  return (
+    <svg
+      aria-hidden="true"
+      width="88"
+      height="14"
+      viewBox="0 0 88 14"
+      className="hidden xl:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+    >
+      <line x1="0" y1="7" x2="30" y2="7" stroke="#5A4020" strokeWidth="1" />
+      <text x="44" y="10.5" textAnchor="middle" fontSize="11" fill="#C9A84C">☦</text>
+      <line x1="58" y1="7" x2="88" y2="7" stroke="#5A4020" strokeWidth="1" />
+    </svg>
+  )
+}
+
 function DonateButton({ href, label, compact = false, block = false, onClick }: { href: string; label: string; compact?: boolean; block?: boolean; onClick?: () => void }) {
   return (
     <Link
@@ -91,16 +107,19 @@ export default function Header() {
   const donateHref = localizedHref('/donatii', locale)
   const homeHref = localizedHref('/', locale)
 
+  const navRow1 = navLinks.slice(0, 7)
+  const navRow2 = navLinks.slice(7)
+
   return (
     <header
       style={{ backgroundColor: 'rgba(4, 8, 15, 0.72)', borderBottom: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)' }}
       className="sticky top-0 z-50"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative flex items-center h-16">
+      <div className="px-4 sm:px-6 lg:px-8 xl:px-10">
+        <div className="relative flex items-center h-14">
 
           {/* Logo — DOAR cruce + titlu — stânga */}
-          <Link href={homeHref} className="flex items-center gap-2 shrink-0 group xl:absolute xl:left-0" aria-label="Acasă">
+          <Link href={homeHref} className="flex items-center gap-2 shrink-0 group" aria-label="Acasă">
             <span
               aria-hidden="true"
               style={{ color: '#C9A84C', fontSize: '26px', lineHeight: 1 }}
@@ -121,40 +140,11 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Ornament ✝ — doar pe ecrane largi, centrat lângă logo */}
-          <span className="cobalt-ornament hidden 2xl:flex xl:absolute xl:left-56" aria-hidden="true">
-            <span className="cobalt-ornament-line" />
-            <span>✝</span>
-            <span className="cobalt-ornament-line" />
-          </span>
-
-          {/* Nav desktop — centrat, doar >=1280px */}
-          <nav className="hidden xl:flex items-center gap-2.5 mx-auto min-w-0">
-            {navLinks.map(link => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="font-body whitespace-nowrap transition-colors duration-200 hover:text-amber-400"
-                style={{ color: '#9B8050', fontSize: '12px' }}
-              >
-                {link.label}
-              </Link>
-            ))}
-
-            <Link
-              href={liveHref}
-              className="font-body whitespace-nowrap flex items-center gap-1 transition-colors duration-200 hover:text-amber-400"
-              style={{ color: '#9B8050', fontSize: '12px' }}
-            >
-              {t.nav.live}
-              {isLive && (
-                <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.6rem' }} aria-label="LIVE">●</span>
-              )}
-            </Link>
-          </nav>
+          {/* Ornament decorativ — centrul golului dintre logo și Donații, doar >=1280px (sub asta bara e prea îngustă, s-ar suprapune) */}
+          <HeaderOrnament />
 
           {/* Donații + Limbi — dreapta, doar >=1280px */}
-          <div className="hidden xl:flex items-center gap-3 xl:absolute xl:right-0">
+          <div className="hidden xl:flex items-center gap-3 ml-auto">
             <DonateButton href={donateHref} label={t.nav.donate} compact />
             <div className="border-l pl-3 shrink-0" style={{ borderColor: '#2A1A0A' }}>
               <LocaleSwitcher locale={locale} onChange={changeLocale} fontSize="12px" />
@@ -184,13 +174,51 @@ export default function Header() {
               style={{ backgroundColor: '#9B8050', transform: menuOpen ? 'translateY(-8px) rotate(-45deg)' : 'none' }} />
           </button>
         </div>
+
+        {/* Nav desktop — 2 rânduri egale, centrate cu gap fix, doar >=1280px */}
+        <nav className="hidden xl:flex flex-col gap-1.5 pt-2 pb-2.5" style={{ borderTop: '1px solid #1A1008' }}>
+          <div className="max-w-6xl mx-auto flex items-center justify-center flex-wrap gap-x-9 gap-y-1.5">
+            {navRow1.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-body whitespace-nowrap transition-colors duration-200 hover:text-amber-400"
+                style={{ color: '#9B8050', fontSize: '15px' }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div className="max-w-6xl mx-auto flex items-center justify-center flex-wrap gap-x-9 gap-y-1.5">
+            {navRow2.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="font-body whitespace-nowrap transition-colors duration-200 hover:text-amber-400"
+                style={{ color: '#9B8050', fontSize: '15px' }}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href={liveHref}
+              className="font-body whitespace-nowrap flex items-center gap-1 transition-colors duration-200 hover:text-amber-400"
+              style={{ color: '#9B8050', fontSize: '15px' }}
+            >
+              {t.nav.live}
+              {isLive && (
+                <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.65rem' }} aria-label="LIVE">●</span>
+              )}
+            </Link>
+          </div>
+        </nav>
       </div>
 
       {/* Overlay meniu — tabletă + mobil (sub 1280px) */}
       {menuOpen && (
         <div
           className="xl:hidden fixed inset-0 overflow-y-auto"
-          style={{ backgroundColor: 'rgba(4, 8, 15, 0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', top: '64px', zIndex: 60 }}
+          style={{ backgroundColor: 'rgba(4, 8, 15, 0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', top: '56px', zIndex: 60 }}
         >
           <nav className="flex flex-col gap-1 px-4 py-4 max-w-md mx-auto md:max-w-lg">
             {navLinks.map(link => (

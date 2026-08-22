@@ -9,6 +9,14 @@ export async function GET() {
   const maxDate = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000)
 
   try {
+    const pauseSetting = await prisma.setting.findUnique({ where: { key: 'countdown_hidden_until' } })
+    if (pauseSetting) {
+      const hiddenUntil = new Date(pauseSetting.value)
+      if (!isNaN(hiddenUntil.getTime()) && hiddenUntil > now) {
+        return NextResponse.json({ found: false, paused: true })
+      }
+    }
+
     const candidates = await prisma.serviceSchedule.findMany({
       where: {
         OR: [
