@@ -102,8 +102,30 @@ const NT_BOOKS = [
   { labelRo: 'Apocalipsa Sfântului Ioan Teologul', labelRu: 'Откровение святого Иоанна Богослова (Апокалипсис)', labelEn: 'The Revelation of St. John the Theologian (Apocalypse)', slug: 'apocalipsa' },
 ] // 27 cărți
 
-export default async function BibliePage() {
+function matchesQuery(book: { labelRo: string; labelRu: string; labelEn: string }, query: string): boolean {
+  const q = query.toLowerCase()
+  return (
+    book.labelRo.toLowerCase().includes(q) ||
+    book.labelRu.toLowerCase().includes(q) ||
+    book.labelEn.toLowerCase().includes(q)
+  )
+}
+
+export default async function BibliePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>
+}) {
   const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
+  const { q } = await searchParams
+  const query = q?.trim() || ''
+
+  const vtNumbered = VT_BOOKS.map((book, i) => ({ ...book, num: i + 1 }))
+  const ntNumbered = NT_BOOKS.map((book, i) => ({ ...book, num: VT_BOOKS.length + i + 1 }))
+
+  const vtResults = query ? vtNumbered.filter(b => matchesQuery(b, query)) : vtNumbered
+  const ntResults = query ? ntNumbered.filter(b => matchesQuery(b, query)) : ntNumbered
+  const totalResults = vtResults.length + ntResults.length
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -129,6 +151,7 @@ export default async function BibliePage() {
             id="bible-search"
             type="search"
             name="q"
+            defaultValue={query}
             placeholder={t.bible.searchPlaceholder}
             className="flex-1 px-4 py-3 text-sm font-body outline-none"
             style={{ border: '1px solid #E8E5E0', borderRight: 'none', color: '#3A1A1A', backgroundColor: '#FAFAF8' }}
@@ -138,85 +161,118 @@ export default async function BibliePage() {
             {t.bible.searchBtn}
           </button>
         </form>
+
+        {query && (
+          <p className="font-body text-xs mt-4" style={{ color: '#8A7050' }}>
+            {totalResults > 0
+              ? `${totalResults} ${totalResults === 1 ? 'carte găsită' : 'cărți găsite'} pentru „${query}"`
+              : `Nu s-au găsit cărți pentru „${query}"`}
+          </p>
+        )}
       </div>
 
-      {/* ═══ VECHIUL TESTAMENT ═══ */}
-      <section className="mb-12" aria-label={t.bible.oldTestament}>
-        <div className="flex items-center gap-4 mb-6">
-          <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-          <div className="text-center shrink-0">
-            <h2 className="font-body tracking-[0.4em]"
-              style={{ color: '#8B1A1A', fontSize: '13px', letterSpacing: '0.4em' }}>
-              {t.bible.oldTestament}
-            </h2>
-            <p className="font-body text-xs mt-0.5" style={{ color: '#B0A080' }}>
-              {t.bible.oldTestamentBooks}
-            </p>
+      {query && totalResults === 0 ? (
+        <div className="text-center py-16">
+          <span style={{ color: '#D4C8A0', fontSize: '48px' }} aria-hidden="true">☦</span>
+          <p className="font-body mt-4 text-lg" style={{ color: '#8A7050' }}>
+            Nu s-au găsit rezultate pentru &ldquo;{query}&rdquo;
+          </p>
+          <p className="font-body text-sm mt-2" style={{ color: '#B0A080' }}>
+            Încercați un alt termen sau răsfoiți lista completă mai jos.
+          </p>
+          <div className="flex justify-center mt-6">
+            <a href="/biblie"
+              className="font-body text-sm px-5 py-2 rounded border transition-all hover:border-amber-400"
+              style={{ color: '#8A7050', borderColor: '#E8E5E0' }}>
+              Vezi toate cărțile
+            </a>
           </div>
-          <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
         </div>
+      ) : (
+        <>
+          {/* ═══ VECHIUL TESTAMENT ═══ */}
+          {vtResults.length > 0 && (
+          <section className="mb-12" aria-label={t.bible.oldTestament}>
+            <div className="flex items-center gap-4 mb-6">
+              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
+              <div className="text-center shrink-0">
+                <h2 className="font-body tracking-[0.4em]"
+                  style={{ color: '#8B1A1A', fontSize: '13px', letterSpacing: '0.4em' }}>
+                  {t.bible.oldTestament}
+                </h2>
+                <p className="font-body text-xs mt-0.5" style={{ color: '#B0A080' }}>
+                  {t.bible.oldTestamentBooks}
+                </p>
+              </div>
+              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
+            </div>
 
-        <ol className="space-y-px">
-          {VT_BOOKS.map((book, i) => (
-            <li key={book.slug}>
-              <a
-                href={`/biblie/${book.slug}`}
-                className="font-heading flex items-baseline gap-3 py-1.5 group transition-colors"
-                style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '18px' }}
-              >
-                <span className="text-xs shrink-0 w-5 text-right" style={{ color: '#D4C8A0' }}>
-                  {i + 1}
-                </span>
-                <span
-                  className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
-                  style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
-                >
-                  {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
+            <ol className="space-y-px">
+              {vtResults.map(book => (
+                <li key={book.slug}>
+                  <a
+                    href={`/biblie/${book.slug}`}
+                    className="font-heading flex items-baseline gap-3 py-1.5 group transition-colors"
+                    style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '18px' }}
+                  >
+                    <span className="text-xs shrink-0 w-5 text-right" style={{ color: '#D4C8A0' }}>
+                      {book.num}
+                    </span>
+                    <span
+                      className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
+                      style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
+                    >
+                      {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+          )}
 
-      {/* ═══ NOUL TESTAMENT ═══ */}
-      <section aria-label={t.bible.newTestament}>
-        <div className="flex items-center gap-4 mb-6">
-          <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-          <div className="text-center shrink-0">
-            <h2 className="font-body tracking-[0.4em]"
-              style={{ color: '#8B1A1A', fontSize: '13px', letterSpacing: '0.4em' }}>
-              {t.bible.newTestament}
-            </h2>
-            <p className="font-body text-xs mt-0.5" style={{ color: '#B0A080' }}>
-              {t.bible.newTestamentBooks}
-            </p>
-          </div>
-          <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-        </div>
+          {/* ═══ NOUL TESTAMENT ═══ */}
+          {ntResults.length > 0 && (
+          <section aria-label={t.bible.newTestament}>
+            <div className="flex items-center gap-4 mb-6">
+              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
+              <div className="text-center shrink-0">
+                <h2 className="font-body tracking-[0.4em]"
+                  style={{ color: '#8B1A1A', fontSize: '13px', letterSpacing: '0.4em' }}>
+                  {t.bible.newTestament}
+                </h2>
+                <p className="font-body text-xs mt-0.5" style={{ color: '#B0A080' }}>
+                  {t.bible.newTestamentBooks}
+                </p>
+              </div>
+              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
+            </div>
 
-        <ol className="space-y-px" start={54}>
-          {NT_BOOKS.map((book, i) => (
-            <li key={book.slug}>
-              <a
-                href={`/biblie/${book.slug}`}
-                className="font-heading flex items-baseline gap-3 py-1.5 group transition-colors"
-                style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '18px' }}
-              >
-                <span className="text-xs shrink-0 w-5 text-right" style={{ color: '#D4C8A0' }}>
-                  {53 + i + 1}
-                </span>
-                <span
-                  className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
-                  style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
-                >
-                  {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
-                </span>
-              </a>
-            </li>
-          ))}
-        </ol>
-      </section>
+            <ol className="space-y-px" start={54}>
+              {ntResults.map(book => (
+                <li key={book.slug}>
+                  <a
+                    href={`/biblie/${book.slug}`}
+                    className="font-heading flex items-baseline gap-3 py-1.5 group transition-colors"
+                    style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '18px' }}
+                  >
+                    <span className="text-xs shrink-0 w-5 text-right" style={{ color: '#D4C8A0' }}>
+                      {book.num}
+                    </span>
+                    <span
+                      className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
+                      style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
+                    >
+                      {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+          </section>
+          )}
+        </>
+      )}
 
       {/* Totaluri */}
       <div className="mt-10 pt-6 flex justify-center gap-8 text-center" style={{ borderTop: '1px solid #E8E5E0' }}>
