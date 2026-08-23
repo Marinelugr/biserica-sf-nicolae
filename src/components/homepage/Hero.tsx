@@ -107,7 +107,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
           onSubmit={handleSearch}
-          className="glass-cobalt flex gap-0 max-w-lg mx-auto overflow-hidden shadow-2xl"
+          className="glass-cobalt glass-cobalt-strong flex gap-0 max-w-lg mx-auto overflow-hidden shadow-2xl"
         >
           <label htmlFor="site-search" className="sr-only">{t.home.searchPlaceholder}</label>
           <input

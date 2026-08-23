@@ -344,6 +344,13 @@ h1, h2, h3, h4, h5, h6 {
   opacity: 1;
 }
 
+/* Variantă de contrast ridicat — pentru sticlă peste fotografie (ex: bara de căutare din hero) */
+.glass-cobalt-strong {
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
 /* Lumină fixă ce urmărește cursorul pe toată pagina */
 .cobalt-spotlight {
   position: fixed;

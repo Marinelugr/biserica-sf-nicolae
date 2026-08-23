@@ -40,22 +40,33 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
       icon: '✦',
       label: t.home.saintsToday,
       content: (
-        <ul className="space-y-1.5">
+        <div>
           {data.saints.length > 0 ? (
-            data.saints.map((saint, i) => (
-              <li key={i} className="font-body text-sm leading-snug" style={{ color: '#E9EFFA' }}>
-                {saint}
-              </li>
-            ))
+            <ul className="space-y-2.5">
+              {data.saints.slice(0, 3).map((saint, i) => (
+                <li key={i} className="font-body text-sm leading-snug" style={{ color: '#E9EFFA' }}>
+                  {saint}
+                </li>
+              ))}
+            </ul>
           ) : (
-            <li className="font-body text-sm italic" style={{ color: '#828EA8' }}>
+            <p className="font-body text-sm italic" style={{ color: '#828EA8' }}>
               {t.home.noSaints}
-            </li>
+            </p>
           )}
-        </ul>
+          {data.saints.length > 3 && (
+            <a
+              href="/sfintii"
+              className="font-body text-xs mt-4 inline-flex items-center gap-1 transition-colors hover:opacity-80"
+              style={{ color: '#D4AF37' }}
+            >
+              {t.home.allSaintsLink}
+            </a>
+          )}
+        </div>
       ),
       link: '/sfintii',
-      linkLabel: t.home.allSaintsLink,
+      linkLabel: '',
     },
     {
       key: 'evanghelia_zilei',
@@ -143,13 +154,15 @@ export default function DailyCards({ data, enabled, order }: DailyCardsProps) {
               </div>
 
               {/* Link */}
-              <a
-                href={card.link}
-                className="font-body text-xs mt-5 inline-flex items-center gap-1 transition-colors group-hover:opacity-80"
-                style={{ color: card.dot }}
-              >
-                {card.linkLabel}
-              </a>
+              {card.linkLabel && (
+                <a
+                  href={card.link}
+                  className="font-body text-xs mt-5 inline-flex items-center gap-1 transition-colors group-hover:opacity-80"
+                  style={{ color: card.dot }}
+                >
+                  {card.linkLabel}
+                </a>
+              )}
             </motion.article>
           ))}
         </div>
