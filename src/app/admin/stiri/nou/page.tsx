@@ -22,7 +22,7 @@ function slugify(text: string) {
 
 export default function NouArticolPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ titleRo: '', titleRu: '', titleEn: '', slug: '', category: '', imageUrl: '', published: false, scheduledFor: '', contentRo: '', contentRu: '', contentEn: '' })
+  const [form, setForm] = useState({ titleRo: '', titleRu: '', titleEn: '', slug: '', category: '', imageUrl: '', published: false, scheduledFor: '', contentRo: '', contentRu: '', contentEn: '', seoKeywords: '' })
   const [saving, setSaving] = useState(false)
   const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [error, setError] = useState('')
@@ -42,11 +42,11 @@ export default function NouArticolPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, field }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
       const data = await res.json()
       const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
       setForm(f => ({ ...f, [field]: val }))
-    } catch { setError('Eroare la traducere DeepL') }
+    } catch (err) { setError(err instanceof Error ? err.message : 'Eroare la traducere DeepL') }
     finally { setTranslating(t => ({ ...t, [field]: false })) }
   }
 
@@ -155,6 +155,13 @@ export default function NouArticolPage() {
                     <ImageUploadButton onUpload={url => setForm(f => ({ ...f, imageUrl: url }))} />
                   </div>
                 </div>
+              </div>
+
+              <div>
+                <label style={lbl}>Cuvinte cheie SEO (opțional, separate prin virgulă)</label>
+                <input type="text" value={form.seoKeywords}
+                  onChange={e => setForm(f => ({ ...f, seoKeywords: e.target.value }))}
+                  placeholder="ex: biserică ortodoxă, Sfântul Nicolae, hram, Criuleni" style={inp} />
               </div>
 
               <div>

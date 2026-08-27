@@ -182,6 +182,11 @@ h1, h2, h3, h4, h5, h6 {
 .tiptap-prose a { color: #8B6014; text-decoration: underline; }
 .tiptap-prose hr { border: none; border-top: 1px solid #E8E5E0; margin: 2rem 0; }
 
+/* Aceleași linkuri, dar pentru containerele randate cu clasa "prose" (cărți, articole,
+   sfinți, paroh, despre) — fără asta, linkurile inserate din editor sunt invizibile
+   pe pagina publică (Tailwind Preflight elimină culoarea/underline-ul implicit). */
+.prose a { color: #8B6014; text-decoration: underline; }
+
 /* Animație fade-in la scroll */
 .fade-in {
   opacity: 0;

@@ -1,4 +1,4 @@
-const DEEPL_API_KEY = process.env.DEEPL_API_KEY!
+const DEEPL_API_KEY = process.env.DEEPL_API_KEY
 const DEEPL_API_URL = 'https://api-free.deepl.com/v2/translate'
 
 export async function translateText(
@@ -7,6 +7,9 @@ export async function translateText(
   sourceLang: 'RO' = 'RO'
 ): Promise<string> {
   if (!text || text.trim() === '') return ''
+  if (!DEEPL_API_KEY) {
+    throw new Error('Cheia DEEPL_API_KEY lipsește din variabilele de mediu ale serverului.')
+  }
   const response = await fetch(DEEPL_API_URL, {
     method: 'POST',
     headers: {
@@ -21,7 +24,22 @@ export async function translateText(
       tag_handling: 'html',
     }),
   })
-  if (!response.ok) throw new Error(`DeepL error: ${response.status}`)
+  if (!response.ok) {
+    // DeepL răspunde de obicei cu { message: "..." } — includem mesajul lor real,
+    // nu doar codul HTTP, ca eroarea afișată în admin să spună exact ce nu merge.
+    let detail = ''
+    try {
+      const body = await response.json() as { message?: string }
+      detail = body.message || ''
+    } catch {
+      /* corpul răspunsului nu era JSON — ignorăm, rămânem doar cu statusul */
+    }
+    throw new Error(
+      detail
+        ? `Eroare DeepL ${response.status}: ${detail}`
+        : `Eroare DeepL (cod ${response.status})`
+    )
+  }
   const data = await response.json() as { translations: { text: string }[] }
   return data.translations[0].text
 }

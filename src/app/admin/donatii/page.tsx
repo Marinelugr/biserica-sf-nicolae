@@ -185,14 +185,14 @@ export default function AdminDonatiiPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, field: sourceField }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
       const data = await res.json()
       const lang = targetSuffix === 'Ru' ? 'ru' : 'en'
       const targetField = (sourceField === 'titleRo' ? 'title' : 'description') + targetSuffix as keyof DonationProject
       updateProjectField(project.id, targetField, data.translations[lang])
       showToast('Tradus cu DeepL ✓', 'success')
-    } catch {
-      showToast('Eroare la traducere DeepL', 'error')
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error')
     } finally {
       setTranslating(t => ({ ...t, [key]: false }))
     }
@@ -213,14 +213,14 @@ export default function AdminDonatiiPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, field: sourceField }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
       const data = await res.json()
       const lang = targetSuffix === 'Ru' ? 'ru' : 'en'
       const targetField = (sourceField + targetSuffix) as keyof ConfigForm
       setConfigField(targetField, data.translations[lang])
       showToast('Tradus cu DeepL ✓', 'success')
-    } catch {
-      showToast('Eroare la traducere DeepL', 'error')
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error')
     } finally {
       setTranslating(t => ({ ...t, [key]: false }))
     }

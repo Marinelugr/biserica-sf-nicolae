@@ -8,11 +8,12 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const priest = await prisma.priest.findFirst({ select: { nameRo: true, photoUrl: true, bioRo: true } })
+  const priest = await prisma.priest.findFirst({ select: { nameRo: true, photoUrl: true, bioRo: true, seoKeywords: true } })
   const plainBio = priest?.bioRo?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Părintele paroh al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova.'
   return {
     title: `Parohul Bisericii — ${priest?.nameRo ?? 'Preot Paroh'} | Sf. Nicolae Hîrtopul Mic`,
     description: plainBio,
+    keywords: priest?.seoKeywords ? priest.seoKeywords.split(',').map(k => k.trim()).filter(Boolean) : undefined,
     alternates: buildAlternates('/paroh'),
     openGraph: {
       title: `${priest?.nameRo ?? 'Preot Paroh'} — Parohul Bisericii`,

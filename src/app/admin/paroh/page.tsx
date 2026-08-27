@@ -40,6 +40,7 @@ interface PriestForm {
   phone: string
   email: string
   facebook: string
+  seoKeywords: string
 }
 
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
@@ -55,7 +56,7 @@ const empty: PriestForm = {
   id: null, nameRo: '', nameRu: '', nameEn: '', titleRo: 'Preot Paroh', titleRu: '', titleEn: '',
   photoUrl: '', bioRo: '', bioRu: '', bioEn: '',
   ordained: '', ordainedRu: '', ordainedEn: '', parish: '', parishRu: '', parishEn: '',
-  education: '', educationRu: '', educationEn: '', phone: '', email: '', facebook: '',
+  education: '', educationRu: '', educationEn: '', phone: '', email: '', facebook: '', seoKeywords: '',
 }
 
 const DRAFT_KEY = 'draft_paroh'
@@ -90,12 +91,12 @@ export default function AdminParohPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, field }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
       const data = await res.json()
       const lang = String(field).endsWith('Ru') ? 'ru' : 'en'
       set(field, data.translations[lang])
       showToast('Tradus cu DeepL ✓', 'success')
-    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    } catch (err) { showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error') }
     finally { setTranslating(t => ({ ...t, [field]: false })) }
   }
 
@@ -144,6 +145,7 @@ export default function AdminParohPage() {
             phone: data.phone || '',
             email: data.email || '',
             facebook: data.facebook || '',
+            seoKeywords: data.seoKeywords || '',
           })
         }
         setLoading(false)
@@ -415,6 +417,13 @@ export default function AdminParohPage() {
                     <input value={form.facebook} onChange={e => set('facebook', e.target.value)} placeholder="https://facebook.com/..." style={inp} />
                   </div>
                 </div>
+              </div>
+
+              {/* ─── SEO ─── */}
+              <div style={sectionBox}>
+                <div style={sectionTitle}>🔍 SEO</div>
+                <label style={lbl}>Cuvinte cheie SEO (opțional, separate prin virgulă)</label>
+                <input value={form.seoKeywords} onChange={e => set('seoKeywords', e.target.value)} placeholder="ex: preot paroh, biserică Hîrtopul Mic, pr. Marin Grigoriță" style={inp} />
               </div>
 
               {/* ─── Galerie foto ─── */}

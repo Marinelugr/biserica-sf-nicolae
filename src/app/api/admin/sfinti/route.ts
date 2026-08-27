@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { normalizeSeoKeywords } from '@/lib/seo'
 
 function slugify(text: string) {
   return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -22,7 +23,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
-  const { nameRo, nameRu, nameEn, month, day, feastType, lifeRo, lifeRu, lifeEn, iconUrl } = await req.json()
+  const { nameRo, nameRu, nameEn, month, day, feastType, lifeRo, lifeRu, lifeEn, iconUrl, seoKeywords } = await req.json()
   if (!nameRo || !month || !day) return NextResponse.json({ error: 'Nume, lună și zi sunt obligatorii' }, { status: 400 })
 
   let slug = `sf-${slugify(nameRo)}-${month}-${day}`
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
       feastType: feastType || null,
       lifeRo: lifeRo || null, lifeRu: lifeRu || null, lifeEn: lifeEn || null,
       iconUrl: iconUrl || null,
+      seoKeywords: normalizeSeoKeywords(seoKeywords),
       slug,
     },
   })

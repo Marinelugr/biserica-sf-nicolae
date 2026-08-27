@@ -32,6 +32,7 @@ interface LibraryBook {
   contentRo: string; contentRu: string | null; contentEn: string | null
   author: string | null; source: string | null
   imageUrl: string | null; galleryUrls: string[]; videoUrl: string | null; videoTitle: string | null
+  seoKeywords: string | null
   ordine: number
   createdAt: string
 }
@@ -227,7 +228,7 @@ export default function AdminCartiPage() {
   // Book form
   const [showBookForm, setShowBookForm] = useState(false)
   const [editBook, setEditBook] = useState<LibraryBook | null>(null)
-  const [bookForm, setBookForm] = useState({ titleRo: '', titleRu: '', titleEn: '', type: 'ACATIST', categoryId: '', contentRo: '', contentRu: '', contentEn: '', author: '', source: '', imageUrl: '', galleryUrls: [] as string[], videoUrl: '', videoTitle: '' })
+  const [bookForm, setBookForm] = useState({ titleRo: '', titleRu: '', titleEn: '', type: 'ACATIST', categoryId: '', contentRo: '', contentRu: '', contentEn: '', author: '', source: '', imageUrl: '', galleryUrls: [] as string[], videoUrl: '', videoTitle: '', seoKeywords: '' })
   const [savingBook, setSavingBook] = useState(false)
   const [translating, setTranslating] = useState<Record<string, boolean>>({})
 
@@ -274,13 +275,13 @@ export default function AdminCartiPage() {
 
   function openNewBook() {
     setEditBook(null)
-    setBookForm({ titleRo: '', titleRu: '', titleEn: '', type: 'ACATIST', categoryId: activeCategory || '', contentRo: '', contentRu: '', contentEn: '', author: '', source: '', imageUrl: '', galleryUrls: [], videoUrl: '', videoTitle: '' })
+    setBookForm({ titleRo: '', titleRu: '', titleEn: '', type: 'ACATIST', categoryId: activeCategory || '', contentRo: '', contentRu: '', contentEn: '', author: '', source: '', imageUrl: '', galleryUrls: [], videoUrl: '', videoTitle: '', seoKeywords: '' })
     setShowBookForm(true)
   }
 
   function openEditBook(book: LibraryBook) {
     setEditBook(book)
-    setBookForm({ titleRo: book.titleRo, titleRu: book.titleRu || '', titleEn: book.titleEn || '', type: book.type, categoryId: book.categoryId || '', contentRo: book.contentRo, contentRu: book.contentRu || '', contentEn: book.contentEn || '', author: book.author || '', source: book.source || '', imageUrl: book.imageUrl || '', galleryUrls: book.galleryUrls || [], videoUrl: book.videoUrl || '', videoTitle: book.videoTitle || '' })
+    setBookForm({ titleRo: book.titleRo, titleRu: book.titleRu || '', titleEn: book.titleEn || '', type: book.type, categoryId: book.categoryId || '', contentRo: book.contentRo, contentRu: book.contentRu || '', contentEn: book.contentEn || '', author: book.author || '', source: book.source || '', imageUrl: book.imageUrl || '', galleryUrls: book.galleryUrls || [], videoUrl: book.videoUrl || '', videoTitle: book.videoTitle || '', seoKeywords: book.seoKeywords || '' })
     setShowBookForm(true)
   }
 
@@ -310,12 +311,12 @@ export default function AdminCartiPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, field }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
       const data = await res.json()
       const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
       setBookForm(f => ({ ...f, [field]: val }))
       showToast('Tradus cu DeepL ✓', 'success')
-    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    } catch (err) { showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error') }
     finally { setTranslating(t => ({ ...t, [field]: false })) }
   }
 
@@ -668,6 +669,11 @@ export default function AdminCartiPage() {
                   <label style={lbl}>Sursă</label>
                   <input value={bookForm.source} onChange={e => setBookForm(f => ({ ...f, source: e.target.value }))} placeholder="ex: Mineiul pe Decembrie" style={inp} />
                 </div>
+              </div>
+
+              <div>
+                <label style={lbl}>Cuvinte cheie SEO (opțional, separate prin virgulă)</label>
+                <input value={bookForm.seoKeywords} onChange={e => setBookForm(f => ({ ...f, seoKeywords: e.target.value }))} placeholder="ex: acatist, Sfântul Nicolae, rugăciune" style={inp} />
               </div>
 
               <div>

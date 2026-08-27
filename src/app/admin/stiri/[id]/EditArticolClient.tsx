@@ -23,6 +23,7 @@ interface Article {
   contentRo: string
   contentRu: string | null
   contentEn: string | null
+  seoKeywords: string | null
   published: boolean
   scheduledFor: Date | null
 }
@@ -31,6 +32,7 @@ interface ArticleForm {
   titleRo: string; titleRu: string; titleEn: string
   slug: string; category: string; imageUrl: string
   contentRo: string; contentRu: string; contentEn: string
+  seoKeywords: string
   published: boolean
   scheduledFor: string
 }
@@ -64,6 +66,7 @@ export default function EditArticolClient({ article }: { article: Article }) {
     contentRo: article.contentRo,
     contentRu: article.contentRu || '',
     contentEn: article.contentEn || '',
+    seoKeywords: article.seoKeywords || '',
     published: article.published,
     scheduledFor: article.scheduledFor ? utcToChisinauLocalInputValue(new Date(article.scheduledFor)) : '',
   }
@@ -112,12 +115,12 @@ export default function EditArticolClient({ article }: { article: Article }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, field }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
       const data = await res.json()
       const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
       setForm(f => ({ ...f, [field]: val }))
       showToast('Tradus cu DeepL ✓', 'success')
-    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    } catch (err) { showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error') }
     finally { setTranslating(t => ({ ...t, [field]: false })) }
   }
 
@@ -230,6 +233,10 @@ export default function EditArticolClient({ article }: { article: Article }) {
                     <img src={form.imageUrl} alt="" style={{ marginTop: '0.5rem', width: '80px', height: '56px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #2A1A0A' }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                   )}
                 </div>
+              </div>
+              <div>
+                <label style={lbl}>Cuvinte cheie SEO (opțional, separate prin virgulă)</label>
+                <input value={form.seoKeywords} onChange={e => setForm(f => ({ ...f, seoKeywords: e.target.value }))} placeholder="ex: biserică ortodoxă, Sfântul Nicolae, hram, Criuleni" style={inp} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <input type="checkbox" id="pub" checked={form.published} onChange={e => setForm(f => ({ ...f, published: e.target.checked }))} style={{ width: '1rem', height: '1rem', accentColor: '#8B1A1A' }} />

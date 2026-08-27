@@ -13,7 +13,7 @@ interface Saint {
   id: string; nameRo: string; nameRu: string | null; nameEn: string | null
   month: number; day: number; feastType: string | null
   lifeRo: string | null; lifeRu: string | null; lifeEn: string | null
-  iconUrl: string | null; slug: string
+  iconUrl: string | null; slug: string; seoKeywords: string | null
 }
 
 const MONTHS = ['Ian', 'Feb', 'Mar', 'Apr', 'Mai', 'Iun', 'Iul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -54,7 +54,7 @@ function ConfirmModal({ message, onConfirm, onCancel, loading }: { message: stri
   )
 }
 
-const emptyForm = { nameRo: '', nameRu: '', nameEn: '', month: '1', day: '1', feastType: '', lifeRo: '', lifeRu: '', lifeEn: '', iconUrl: '' }
+const emptyForm = { nameRo: '', nameRu: '', nameEn: '', month: '1', day: '1', feastType: '', lifeRo: '', lifeRu: '', lifeEn: '', iconUrl: '', seoKeywords: '' }
 
 export default function AdminSfintiPage() {
   const [saints, setSaints] = useState<Saint[]>([])
@@ -82,12 +82,12 @@ export default function AdminSfintiPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: sourceText, field }),
       })
-      if (!res.ok) throw new Error()
+      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
       const data = await res.json()
       const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
       setForm(f => ({ ...f, [field]: val }))
       showToast('Tradus cu DeepL ✓', 'success')
-    } catch { showToast('Eroare la traducere DeepL', 'error') }
+    } catch (err) { showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error') }
     finally { setTranslating(t => ({ ...t, [field]: false })) }
   }
 
@@ -107,7 +107,7 @@ export default function AdminSfintiPage() {
 
   function openEdit(s: Saint) {
     setEditSaint(s)
-    setForm({ nameRo: s.nameRo, nameRu: s.nameRu || '', nameEn: s.nameEn || '', month: String(s.month), day: String(s.day), feastType: s.feastType || '', lifeRo: s.lifeRo || '', lifeRu: s.lifeRu || '', lifeEn: s.lifeEn || '', iconUrl: s.iconUrl || '' })
+    setForm({ nameRo: s.nameRo, nameRu: s.nameRu || '', nameEn: s.nameEn || '', month: String(s.month), day: String(s.day), feastType: s.feastType || '', lifeRo: s.lifeRo || '', lifeRu: s.lifeRu || '', lifeEn: s.lifeEn || '', iconUrl: s.iconUrl || '', seoKeywords: s.seoKeywords || '' })
     setShowForm(true)
   }
 
@@ -313,6 +313,12 @@ export default function AdminSfintiPage() {
                     <img src={form.iconUrl} alt="" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #2A1A0A', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                   )}
                 </div>
+              </div>
+
+              {/* SEO */}
+              <div>
+                <label style={lbl}>Cuvinte cheie SEO (opțional, separate prin virgulă)</label>
+                <input value={form.seoKeywords} onChange={e => setForm(f => ({ ...f, seoKeywords: e.target.value }))} placeholder="ex: sfânt, mucenic, viața sfântului" style={inp} />
               </div>
 
               {/* Life */}

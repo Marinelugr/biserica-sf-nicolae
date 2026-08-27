@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { normalizeSeoKeywords } from '@/lib/seo'
 
 export async function PATCH(
   req: NextRequest,
@@ -9,7 +10,7 @@ export async function PATCH(
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
   const { id } = await params
-  const { titleRo, titleRu, titleEn, type, categoryId, contentRo, contentRu, contentEn, author, source, imageUrl, galleryUrls, videoUrl, videoTitle } = await req.json()
+  const { titleRo, titleRu, titleEn, type, categoryId, contentRo, contentRu, contentEn, author, source, imageUrl, galleryUrls, videoUrl, videoTitle, seoKeywords } = await req.json()
   const book = await prisma.libraryBook.update({
     where: { id },
     data: {
@@ -24,6 +25,7 @@ export async function PATCH(
       galleryUrls: galleryUrls || [],
       videoUrl: videoUrl || null,
       videoTitle: videoTitle || null,
+      seoKeywords: normalizeSeoKeywords(seoKeywords),
     },
     include: { category: { select: { id: true, name: true, emoji: true, color: true } } },
   })

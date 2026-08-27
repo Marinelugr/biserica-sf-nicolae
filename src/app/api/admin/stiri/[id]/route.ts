@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { chisinauLocalToUTC } from '@/lib/chisinauTime'
+import { normalizeSeoKeywords } from '@/lib/seo'
 
 export async function PATCH(
   req: NextRequest,
@@ -11,7 +12,7 @@ export async function PATCH(
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
   const { id } = await params
-  const { titleRo, titleRu, titleEn, slug, category, imageUrl, published, scheduledFor, contentRo, contentRu, contentEn } = await req.json()
+  const { titleRo, titleRu, titleEn, slug, category, imageUrl, published, scheduledFor, contentRo, contentRu, contentEn, seoKeywords } = await req.json()
 
   try {
     const article = await prisma.article.update({
@@ -29,6 +30,7 @@ export async function PATCH(
         contentRo: contentRo || '',
         contentRu: contentRu || null,
         contentEn: contentEn || null,
+        seoKeywords: normalizeSeoKeywords(seoKeywords),
       },
     })
     return NextResponse.json(article)

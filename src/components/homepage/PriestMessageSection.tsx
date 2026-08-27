@@ -22,11 +22,23 @@ export default async function PriestMessageSection() {
       `}</style>
       <div className="glass-cobalt max-w-4xl mx-auto priest-msg-row" style={{ display: 'flex', flexDirection: photoUrl ? 'row' : 'column', gap: '1.75rem', alignItems: 'center', padding: '2.5rem' }}>
         {photoUrl && (
-          <img
-            src={photoUrl}
-            alt={semnatura}
-            style={{ width: '130px', height: '130px', borderRadius: '50%', border: '2px solid rgba(212,175,55,0.4)', objectFit: 'cover', flexShrink: 0 }}
-          />
+          <Link href="/paroh" aria-label="Vezi pagina Parohul Bisericii" style={{ flexShrink: 0, display: 'block' }}>
+            <img
+              src={photoUrl}
+              alt={semnatura}
+              style={{
+                width: '190px',
+                height: '230px',
+                borderRadius: '10px',
+                border: '2px solid rgba(212,175,55,0.4)',
+                objectFit: 'cover',
+                display: 'block',
+                transition: 'opacity 0.15s ease',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.88' }}
+              onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.opacity = '1' }}
+            />
+          </Link>
         )}
         <div style={{ flex: 1, minWidth: 0, width: '100%' }}>
           <p style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', color: '#E9EFFA', fontSize: '1.15rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>

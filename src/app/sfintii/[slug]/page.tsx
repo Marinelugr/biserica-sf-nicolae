@@ -30,6 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${title} | Sfinți`,
     description: plain || `Viața și prăznuirea ${title}.`,
+    keywords: saint.seoKeywords ? saint.seoKeywords.split(',').map(k => k.trim()).filter(Boolean) : undefined,
     alternates: buildAlternates(`/sfintii/${slug}`),
     openGraph: {
       title, description: plain, type: 'article',

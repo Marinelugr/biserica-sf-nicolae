@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { normalizeSeoKeywords } from '@/lib/seo'
 
 function slugify(text: string) {
   return text.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
@@ -20,7 +21,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
-  const { titleRo, titleRu, titleEn, type, categoryId, contentRo, contentRu, contentEn, author, source, imageUrl, galleryUrls, videoUrl, videoTitle } = await req.json()
+  const { titleRo, titleRu, titleEn, type, categoryId, contentRo, contentRu, contentEn, author, source, imageUrl, galleryUrls, videoUrl, videoTitle, seoKeywords } = await req.json()
   if (!titleRo || !type) return NextResponse.json({ error: 'Titlul și tipul sunt obligatorii' }, { status: 400 })
 
   let slug = slugify(titleRo)
@@ -41,6 +42,7 @@ export async function POST(req: NextRequest) {
         galleryUrls: galleryUrls || [],
         videoUrl: videoUrl || null,
         videoTitle: videoTitle || null,
+        seoKeywords: normalizeSeoKeywords(seoKeywords),
       },
       include: { category: { select: { id: true, name: true, emoji: true, color: true } } },
     })

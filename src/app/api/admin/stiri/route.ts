@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
 import { chisinauLocalToUTC } from '@/lib/chisinauTime'
+import { normalizeSeoKeywords } from '@/lib/seo'
 
 export async function GET() {
   const session = await auth()
@@ -15,7 +16,7 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
-  const { titleRo, titleRu, titleEn, slug, category, imageUrl, published, scheduledFor, contentRo, contentRu, contentEn } = await req.json()
+  const { titleRo, titleRu, titleEn, slug, category, imageUrl, published, scheduledFor, contentRo, contentRu, contentEn, seoKeywords } = await req.json()
 
   if (!titleRo || !slug) {
     return NextResponse.json({ error: 'Titlul și slug-ul sunt obligatorii' }, { status: 400 })
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
         contentRo: contentRo || '',
         contentRu: contentRu || null,
         contentEn: contentEn || null,
+        seoKeywords: normalizeSeoKeywords(seoKeywords),
       },
     })
     return NextResponse.json(article, { status: 201 })

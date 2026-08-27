@@ -15,6 +15,18 @@ export default function Hero() {
   const prefersReducedMotion = useReducedMotion()
   const titleWords = t.home.heroTitle.split(' ')
 
+  // Secvența de intrare: titlul apare cuvânt cu cuvânt, apoi separatorul și cele
+  // două subtitluri, decalate puțin în timp, imediat după ce ultimul cuvânt al
+  // titlului termină de apărut — calculat dinamic ca titlul să funcționeze
+  // corect indiferent de numărul de cuvinte (RO/RU/EN diferă).
+  const titleWordDelay = (i: number) => 0.15 + i * 0.15
+  const titleDoneDelay = titleWordDelay(titleWords.length - 1) + 0.55
+  const separatorDelay = titleDoneDelay
+  const subtitle1Delay = separatorDelay + 0.15
+  const subtitle2Delay = subtitle1Delay + 0.15
+  const searchDelay = subtitle2Delay + 0.25
+  const buttonsDelay = searchDelay + 0.25
+
   useEffect(() => {
     const handleScroll = () => {
       if (!heroRef.current) return
@@ -43,9 +55,10 @@ export default function Hero() {
           src="/images/12.jpg"
           alt={t.home.heroImageAlt}
           fill
+          sizes="100vw"
           className="object-cover object-center"
           priority
-          quality={90}
+          quality={100}
         />
       </div>
       <div className="absolute inset-0 hero-overlay" />
@@ -71,9 +84,9 @@ export default function Hero() {
         </h1>
 
         <motion.div
-          initial={{ opacity: 0 }}
+          initial={prefersReducedMotion ? undefined : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
+          transition={{ duration: 0.5, delay: prefersReducedMotion ? 0 : separatorDelay }}
           className="flex items-center justify-center gap-3 mb-6"
         >
           <span className="h-px w-16 block" style={{ backgroundColor: '#5A4020' }} />
@@ -82,21 +95,21 @@ export default function Hero() {
         </motion.div>
 
         <motion.p
-          initial={{ opacity: 0, y: 10 }}
+          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: prefersReducedMotion ? 0 : subtitle1Delay, ease: [0.2, 0.8, 0.2, 1] }}
           className="font-body mb-2"
-          style={{ color: '#C9A84C', fontSize: '20px' }}
+          style={{ color: '#F5EFD8', fontSize: '20px', fontWeight: 600, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
         >
           {t.home.heroSubtitle}
         </motion.p>
 
         <motion.p
-          initial={{ opacity: 0, y: 10 }}
+          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.38 }}
+          transition={{ duration: 0.6, delay: prefersReducedMotion ? 0 : subtitle2Delay, ease: [0.2, 0.8, 0.2, 1] }}
           className="font-body mb-10"
-          style={{ color: '#9B8050', fontSize: '20px' }}
+          style={{ color: '#E4D9B8', fontSize: '20px', fontWeight: 500, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
         >
           {t.home.heroMitropolia}
         </motion.p>
@@ -105,7 +118,7 @@ export default function Hero() {
         <motion.form
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+          transition={{ duration: 0.6, delay: searchDelay }}
           onSubmit={handleSearch}
           className="glass-cobalt glass-cobalt-strong flex gap-0 max-w-lg mx-auto overflow-hidden shadow-2xl"
         >
@@ -139,7 +152,7 @@ export default function Hero() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.75 }}
+          transition={{ duration: 0.5, delay: buttonsDelay }}
           className="mt-10 flex justify-center gap-6"
           style={{ paddingBottom: '40px' }}
         >

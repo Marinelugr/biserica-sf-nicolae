@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { normalizeSeoKeywords } from '@/lib/seo'
 
 export async function GET() {
   const session = await auth()
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
     nameRo, nameRu, nameEn, titleRo, titleRu, titleEn, photoUrl,
     bioRo, bioRu, bioEn, ordained, ordainedRu, ordainedEn,
     parish, parishRu, parishEn, education, educationRu, educationEn,
-    phone, email, facebook,
+    phone, email, facebook, seoKeywords,
   } = data
 
   if (!nameRo || !titleRo) {
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     parish: parish || null, parishRu: parishRu || null, parishEn: parishEn || null,
     education: education || null, educationRu: educationRu || null, educationEn: educationEn || null,
     phone: phone || null, email: email || null, facebook: facebook || null,
+    seoKeywords: normalizeSeoKeywords(seoKeywords),
   }
 
   const existing = await prisma.priest.findFirst()

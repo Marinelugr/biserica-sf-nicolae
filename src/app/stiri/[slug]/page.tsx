@@ -1,11 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { formatDate, readingTime } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick, localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import ContentCoverImage from '@/components/shared/ContentCoverImage'
 import ShareButtons from '@/components/shared/ShareButtons'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
@@ -33,6 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title,
     description: plainText,
+    keywords: article.seoKeywords ? article.seoKeywords.split(',').map(k => k.trim()).filter(Boolean) : undefined,
     alternates: buildAlternates(`/stiri/${slug}`),
     openGraph: {
       title,
@@ -108,17 +109,12 @@ export default async function ArticolPage({ params }: Props) {
 
       {/* Imagine principală */}
       {article.imageUrl && (
-        <div className="w-full mb-10 rounded-lg overflow-hidden" style={{ maxHeight: '70vh', display: 'flex', justifyContent: 'center', backgroundColor: '#F2EBD9' }}>
-          <Image
-            src={article.imageUrl}
-            alt={title}
-            width={1200}
-            height={800}
-            sizes="(max-width: 768px) 100vw, 768px"
-            style={{ width: '100%', height: 'auto', maxHeight: '70vh', objectFit: 'contain' }}
-            priority
-          />
-        </div>
+        <ContentCoverImage
+          src={article.imageUrl}
+          alt={title}
+          className="w-full mb-10 rounded-lg"
+          priority
+        />
       )}
 
       {/* Conținut */}

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
 import { notFound } from 'next/navigation'
+import ContentCoverImage from '@/components/shared/ContentCoverImage'
 import PublicGallery from '@/components/PublicGallery'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
@@ -36,6 +36,7 @@ async function getBook(slug: string) {
       id: true, slug: true, titleRo: true, titleRu: true, titleEn: true, type: true,
       contentRo: true, contentRu: true, contentEn: true, author: true, source: true,
       imageUrl: true, galleryUrls: true, videoUrl: true, videoTitle: true, views: true,
+      seoKeywords: true,
     },
   })
 }
@@ -51,6 +52,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${title} | Bibliotecă Ortodoxă`,
     description: plain,
+    keywords: book.seoKeywords ? book.seoKeywords.split(',').map(k => k.trim()).filter(Boolean) : undefined,
     alternates: buildAlternates(`/carti/${slug}`),
     openGraph: {
       title, description: plain, type: 'article',
@@ -130,17 +132,12 @@ export default async function CartePage({ params }: Props) {
 
       {/* Imagine principală (cover) */}
       {book.imageUrl && (
-        <div className="w-full mb-10 rounded-xl overflow-hidden shadow-md" style={{ maxHeight: '70vh', display: 'flex', justifyContent: 'center', backgroundColor: '#F2EBD9' }}>
-          <Image
-            src={book.imageUrl}
-            alt={title}
-            width={1200}
-            height={800}
-            sizes="(max-width: 768px) 100vw, 768px"
-            style={{ width: '100%', height: 'auto', maxHeight: '70vh', objectFit: 'contain' }}
-            priority
-          />
-        </div>
+        <ContentCoverImage
+          src={book.imageUrl}
+          alt={title}
+          className="w-full mb-10 rounded-xl shadow-md"
+          priority
+        />
       )}
 
       {/* Video */}
