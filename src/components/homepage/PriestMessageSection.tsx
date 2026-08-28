@@ -16,11 +16,14 @@ export default async function PriestMessageSection() {
         @media (max-width: 640px) {
           .priest-msg-row { flex-direction: column !important; align-items: center !important; text-align: center; }
         }
+        .priest-msg-photo { transition: opacity 0.15s ease; }
+        .priest-msg-photo:hover { opacity: 0.88; }
       `}</style>
       <div className="glass-cobalt max-w-4xl mx-auto priest-msg-row" style={{ display: 'flex', flexDirection: photoUrl ? 'row' : 'column', gap: '1.75rem', alignItems: 'center', padding: '2.5rem' }}>
         {photoUrl && (
           <Link href="/paroh" aria-label="Vezi pagina Parohul Bisericii" style={{ flexShrink: 0, display: 'block' }}>
             <img
+              className="priest-msg-photo"
               src={photoUrl}
               alt={semnatura}
               style={{
@@ -30,10 +33,7 @@ export default async function PriestMessageSection() {
                 border: '2px solid rgba(212,175,55,0.4)',
                 objectFit: 'cover',
                 display: 'block',
-                transition: 'opacity 0.15s ease',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLImageElement).style.opacity = '0.88' }}
-              onMouseLeave={e => { (e.currentTarget as HTMLImageElement).style.opacity = '1' }}
             />
           </Link>
         )}
