@@ -10,9 +10,9 @@ import MediaGallery from '@/components/admin/MediaGallery'
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
 interface Saint {
-  id: string; nameRo: string; nameRu: string | null; nameEn: string | null
+  id: string; nameRo: string
   month: number; day: number; feastType: string | null
-  lifeRo: string | null; lifeRu: string | null; lifeEn: string | null
+  lifeRo: string | null
   iconUrl: string | null; slug: string; seoKeywords: string | null
 }
 
@@ -54,7 +54,7 @@ function ConfirmModal({ message, onConfirm, onCancel, loading }: { message: stri
   )
 }
 
-const emptyForm = { nameRo: '', nameRu: '', nameEn: '', month: '1', day: '1', feastType: '', lifeRo: '', lifeRu: '', lifeEn: '', iconUrl: '', seoKeywords: '' }
+const emptyForm = { nameRo: '', month: '1', day: '1', feastType: '', lifeRo: '', iconUrl: '', seoKeywords: '' }
 
 export default function AdminSfintiPage() {
   const [saints, setSaints] = useState<Saint[]>([])
@@ -65,31 +65,11 @@ export default function AdminSfintiPage() {
   const [editSaint, setEditSaint] = useState<Saint | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
-  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
-
-  async function translateField(sourceField: 'nameRo' | 'lifeRo', field: 'nameRu' | 'nameEn' | 'lifeRu' | 'lifeEn') {
-    const sourceText = form[sourceField]
-    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
-    setTranslating(t => ({ ...t, [field]: true }))
-    try {
-      const res = await fetch('/api/admin/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sourceText, field }),
-      })
-      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
-      const data = await res.json()
-      const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
-      setForm(f => ({ ...f, [field]: val }))
-      showToast('Tradus cu DeepL ✓', 'success')
-    } catch (err) { showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error') }
-    finally { setTranslating(t => ({ ...t, [field]: false })) }
-  }
 
   const fetchSaints = useCallback(async () => {
     const res = await fetch('/api/admin/sfinti')
@@ -107,7 +87,7 @@ export default function AdminSfintiPage() {
 
   function openEdit(s: Saint) {
     setEditSaint(s)
-    setForm({ nameRo: s.nameRo, nameRu: s.nameRu || '', nameEn: s.nameEn || '', month: String(s.month), day: String(s.day), feastType: s.feastType || '', lifeRo: s.lifeRo || '', lifeRu: s.lifeRu || '', lifeEn: s.lifeEn || '', iconUrl: s.iconUrl || '', seoKeywords: s.seoKeywords || '' })
+    setForm({ nameRo: s.nameRo, month: String(s.month), day: String(s.day), feastType: s.feastType || '', lifeRo: s.lifeRo || '', iconUrl: s.iconUrl || '', seoKeywords: s.seoKeywords || '' })
     setShowForm(true)
   }
 
@@ -269,38 +249,10 @@ export default function AdminSfintiPage() {
                 </div>
               </div>
 
-              {/* Names */}
+              {/* Name */}
               <div>
-                <label style={lbl}>Nume (Română) *</label>
+                <label style={lbl}>Nume *</label>
                 <input value={form.nameRo} onChange={e => setForm(f => ({ ...f, nameRo: e.target.value }))} placeholder="Sfântul Ierarh Nicolae..." style={inp} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.875rem' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                    <label style={{ ...lbl, marginBottom: 0 }}>Nume (Rusă)</label>
-                    <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      {!form.nameRu && <span style={{ fontSize: '0.65rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
-                      {form.nameRu && <span style={{ fontSize: '0.65rem', color: '#5A9050' }}>🤖 DeepL</span>}
-                      <button onClick={() => translateField('nameRo', 'nameRu')} disabled={!!translating['nameRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
-                        {translating['nameRu'] ? '...' : '🔄 RU'}
-                      </button>
-                    </div>
-                  </div>
-                  <input value={form.nameRu} onChange={e => setForm(f => ({ ...f, nameRu: e.target.value }))} placeholder="Святитель Николай..." style={inp} />
-                </div>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                    <label style={{ ...lbl, marginBottom: 0 }}>Nume (Engleză)</label>
-                    <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      {!form.nameEn && <span style={{ fontSize: '0.65rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
-                      {form.nameEn && <span style={{ fontSize: '0.65rem', color: '#5A9050' }}>🤖 DeepL</span>}
-                      <button onClick={() => translateField('nameRo', 'nameEn')} disabled={!!translating['nameEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
-                        {translating['nameEn'] ? '...' : '🔄 EN'}
-                      </button>
-                    </div>
-                  </div>
-                  <input value={form.nameEn} onChange={e => setForm(f => ({ ...f, nameEn: e.target.value }))} placeholder="Saint Nicholas..." style={inp} />
-                </div>
               </div>
 
               {/* Icon */}
@@ -323,28 +275,8 @@ export default function AdminSfintiPage() {
 
               {/* Life */}
               <div style={{ flex: 1 }}>
-                <label style={lbl}>Viața sfântului (Română)</label>
+                <label style={lbl}>Viața sfântului</label>
                 <TipTapEditor value={form.lifeRo} onChange={val => setForm(f => ({ ...f, lifeRo: val }))} placeholder="Viața și faptele sfântului..." />
-              </div>
-
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                  <label style={{ ...lbl, marginBottom: 0 }}>Viața sfântului (Rusă)</label>
-                  <button onClick={() => translateField('lifeRo', 'lifeRu')} disabled={!!translating['lifeRu']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
-                    {translating['lifeRu'] ? '...' : '🔄 RU'}
-                  </button>
-                </div>
-                <TipTapEditor value={form.lifeRu} onChange={val => setForm(f => ({ ...f, lifeRu: val }))} placeholder="Житие и деяния святого..." />
-              </div>
-
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                  <label style={{ ...lbl, marginBottom: 0 }}>Viața sfântului (Engleză)</label>
-                  <button onClick={() => translateField('lifeRo', 'lifeEn')} disabled={!!translating['lifeEn']} style={{ ...btnGhost, padding: '0.15rem 0.4rem', fontSize: '0.65rem' }}>
-                    {translating['lifeEn'] ? '...' : '🔄 EN'}
-                  </button>
-                </div>
-                <TipTapEditor value={form.lifeEn} onChange={val => setForm(f => ({ ...f, lifeEn: val }))} placeholder="The life and deeds of the saint..." />
               </div>
 
               {/* Gallery */}

@@ -17,9 +17,9 @@ export async function POST(req: NextRequest) {
 
   const data = await req.json()
   const {
-    nameRo, nameRu, nameEn, titleRo, titleRu, titleEn, photoUrl,
-    bioRo, bioRu, bioEn, ordained, ordainedRu, ordainedEn,
-    parish, parishRu, parishEn, education, educationRu, educationEn,
+    nameRo, titleRo, photoUrl,
+    bioRo, ordained,
+    parish, education,
     phone, email, facebook, seoKeywords,
   } = data
 
@@ -28,13 +28,13 @@ export async function POST(req: NextRequest) {
   }
 
   const payload = {
-    nameRo, nameRu: nameRu || null, nameEn: nameEn || null,
-    titleRo, titleRu: titleRu || null, titleEn: titleEn || null,
+    nameRo,
+    titleRo,
     photoUrl: photoUrl || null,
-    bioRo: bioRo || null, bioRu: bioRu || null, bioEn: bioEn || null,
-    ordained: ordained || null, ordainedRu: ordainedRu || null, ordainedEn: ordainedEn || null,
-    parish: parish || null, parishRu: parishRu || null, parishEn: parishEn || null,
-    education: education || null, educationRu: educationRu || null, educationEn: educationEn || null,
+    bioRo: bioRo || null,
+    ordained: ordained || null,
+    parish: parish || null,
+    education: education || null,
     phone: phone || null, email: email || null, facebook: facebook || null,
     seoKeywords: normalizeSeoKeywords(seoKeywords),
   }

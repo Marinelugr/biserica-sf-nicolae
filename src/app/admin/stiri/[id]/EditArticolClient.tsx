@@ -15,23 +15,19 @@ const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { 
 interface Article {
   id: string
   titleRo: string
-  titleRu: string | null
-  titleEn: string | null
   slug: string
   category: string | null
   imageUrl: string | null
   contentRo: string
-  contentRu: string | null
-  contentEn: string | null
   seoKeywords: string | null
   published: boolean
   scheduledFor: Date | null
 }
 
 interface ArticleForm {
-  titleRo: string; titleRu: string; titleEn: string
+  titleRo: string
   slug: string; category: string; imageUrl: string
-  contentRo: string; contentRu: string; contentEn: string
+  contentRo: string
   seoKeywords: string
   published: boolean
   scheduledFor: string
@@ -39,7 +35,6 @@ interface ArticleForm {
 
 const inp: React.CSSProperties = { width: '100%', backgroundColor: '#1A1008', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.625rem 0.875rem', color: '#F2EBD9', fontSize: '1rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' }
 const lbl: React.CSSProperties = { display: 'block', color: '#9B8050', fontSize: '0.875rem', marginBottom: '0.375rem', fontFamily: 'Georgia, serif' }
-const btnGhost: React.CSSProperties = { backgroundColor: 'transparent', color: '#9B8050', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.2rem 0.5rem', fontFamily: 'Georgia, serif', fontSize: '0.7rem', cursor: 'pointer' }
 const sectionBox: React.CSSProperties = { backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }
 const sectionTitle: React.CSSProperties = { color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid #1E1208' }
 
@@ -58,14 +53,10 @@ export default function EditArticolClient({ article }: { article: Article }) {
 
   const defaultForm: ArticleForm = {
     titleRo: article.titleRo,
-    titleRu: article.titleRu || '',
-    titleEn: article.titleEn || '',
     slug: article.slug,
     category: article.category || '',
     imageUrl: article.imageUrl || '',
     contentRo: article.contentRo,
-    contentRu: article.contentRu || '',
-    contentEn: article.contentEn || '',
     seoKeywords: article.seoKeywords || '',
     published: article.published,
     scheduledFor: article.scheduledFor ? utcToChisinauLocalInputValue(new Date(article.scheduledFor)) : '',
@@ -83,7 +74,6 @@ export default function EditArticolClient({ article }: { article: Article }) {
     return defaultForm
   })
   const [saving, setSaving] = useState(false)
-  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const [lastSaved, setLastSaved] = useState<string | null>(null)
   const formRef = useRef(form)
@@ -105,25 +95,6 @@ export default function EditArticolClient({ article }: { article: Article }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  async function translate(field: string) {
-    const sourceText = field.startsWith('title') ? form.titleRo : form.contentRo
-    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
-    setTranslating(t => ({ ...t, [field]: true }))
-    try {
-      const res = await fetch('/api/admin/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sourceText, field }),
-      })
-      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
-      const data = await res.json()
-      const val = field.endsWith('Ru') ? data.translations.ru : data.translations.en
-      setForm(f => ({ ...f, [field]: val }))
-      showToast('Tradus cu DeepL ✓', 'success')
-    } catch (err) { showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error') }
-    finally { setTranslating(t => ({ ...t, [field]: false })) }
-  }
-
   async function handleSave() {
     setSaving(true)
     try {
@@ -144,19 +115,6 @@ export default function EditArticolClient({ article }: { article: Article }) {
     if (!confirm('Ștergi acest articol definitiv?')) return
     await fetch(`/api/admin/stiri/${article.id}`, { method: 'DELETE' })
     router.push('/admin/stiri')
-  }
-
-  function TranslateBtn({ field, hasValue }: { field: string; hasValue: boolean }) {
-    const lang = field.endsWith('Ru') ? 'RU' : 'EN'
-    return (
-      <div style={{ display: 'flex', gap: '0.35rem', alignItems: 'center' }}>
-        {!hasValue && <span style={{ fontSize: '0.68rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
-        {hasValue && <span style={{ fontSize: '0.68rem', color: '#5A9050' }}>🤖 DeepL</span>}
-        <button onClick={() => translate(field)} disabled={!!translating[field]} style={btnGhost}>
-          {translating[field] ? 'Se traduce...' : `🔄 ${lang}`}
-        </button>
-      </div>
-    )
   }
 
   return (
@@ -195,24 +153,8 @@ export default function EditArticolClient({ article }: { article: Article }) {
             <div style={sectionTitle}>📝 Date articol</div>
             <div style={{ display: 'grid', gap: '1.1rem' }}>
               <div>
-                <label style={lbl}>Titlu (Română) *</label>
+                <label style={lbl}>Titlu *</label>
                 <input value={form.titleRo} onChange={e => setForm(f => ({ ...f, titleRo: e.target.value }))} style={inp} />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '1rem' }}>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                    <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
-                    <TranslateBtn field="titleRu" hasValue={!!form.titleRu} />
-                  </div>
-                  <input value={form.titleRu} onChange={e => setForm(f => ({ ...f, titleRu: e.target.value }))} placeholder="Заголовок..." style={inp} />
-                </div>
-                <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
-                    <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Engleză)</label>
-                    <TranslateBtn field="titleEn" hasValue={!!form.titleEn} />
-                  </div>
-                  <input value={form.titleEn} onChange={e => setForm(f => ({ ...f, titleEn: e.target.value }))} placeholder="Title..." style={inp} />
-                </div>
               </div>
               <div>
                 <label style={lbl}>Slug (URL)</label>
@@ -254,28 +196,10 @@ export default function EditArticolClient({ article }: { article: Article }) {
             </div>
           </div>
 
-          {/* ─── Conținut Română ─── */}
+          {/* ─── Conținut ─── */}
           <div style={sectionBox}>
-            <div style={sectionTitle}>📝 Conținut (Română)</div>
+            <div style={sectionTitle}>📝 Conținut</div>
             <TipTapEditor value={form.contentRo} onChange={v => setForm(f => ({ ...f, contentRo: v }))} />
-          </div>
-
-          {/* ─── Conținut Rusă ─── */}
-          <div style={sectionBox}>
-            <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>📝 Conținut (Rusă)</span>
-              <TranslateBtn field="contentRu" hasValue={!!form.contentRu} />
-            </div>
-            <TipTapEditor value={form.contentRu} onChange={v => setForm(f => ({ ...f, contentRu: v }))} placeholder="Содержание на русском языке..." />
-          </div>
-
-          {/* ─── Conținut Engleză ─── */}
-          <div style={sectionBox}>
-            <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span>📝 Conținut (Engleză)</span>
-              <TranslateBtn field="contentEn" hasValue={!!form.contentEn} />
-            </div>
-            <TipTapEditor value={form.contentEn} onChange={v => setForm(f => ({ ...f, contentEn: v }))} placeholder="Content in English..." />
           </div>
 
           {/* ─── Galerie foto articol ─── */}

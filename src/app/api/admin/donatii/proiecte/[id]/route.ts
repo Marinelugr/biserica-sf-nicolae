@@ -9,17 +9,13 @@ export async function PATCH(
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
   const { id } = await params
-  const { titleRo, titleRu, titleEn, descriptionRo, descriptionRu, descriptionEn, progress, target, order, active } = await req.json()
+  const { titleRo, descriptionRo, progress, target, order, active } = await req.json()
 
   const project = await prisma.donationProject.update({
     where: { id },
     data: {
       ...(titleRo !== undefined && { titleRo }),
-      ...(titleRu !== undefined && { titleRu: titleRu || null }),
-      ...(titleEn !== undefined && { titleEn: titleEn || null }),
       ...(descriptionRo !== undefined && { descriptionRo }),
-      ...(descriptionRu !== undefined && { descriptionRu: descriptionRu || null }),
-      ...(descriptionEn !== undefined && { descriptionEn: descriptionEn || null }),
       ...(progress !== undefined && { progress }),
       ...(target !== undefined && { target }),
       ...(order !== undefined && { order }),

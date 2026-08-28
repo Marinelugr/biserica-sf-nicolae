@@ -18,8 +18,6 @@ interface MesajForm {
   id: string | null
   photoUrl: string
   mesajRo: string
-  mesajRu: string
-  mesajEn: string
   semnaturaRo: string
   active: boolean
 }
@@ -93,7 +91,7 @@ function PreviewModal({ form, onClose }: { form: MesajForm; onClose: () => void 
 }
 
 const empty: MesajForm = {
-  id: null, photoUrl: '', mesajRo: '', mesajRu: '', mesajEn: '',
+  id: null, photoUrl: '', mesajRo: '',
   semnaturaRo: 'Pr. Marin Grigoriță, Parohul Bisericii', active: true,
 }
 
@@ -101,28 +99,9 @@ export default function AdminMesajParintePage() {
   const [form, setForm] = useState<MesajForm>(empty)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [translating, setTranslating] = useState<Record<string, boolean>>({})
   const [showPreview, setShowPreview] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
-
-  async function translateField(sourceText: string, field: keyof MesajForm) {
-    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
-    setTranslating(t => ({ ...t, [field]: true }))
-    try {
-      const res = await fetch('/api/admin/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sourceText, field }),
-      })
-      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
-      const data = await res.json()
-      const lang = String(field).endsWith('Ru') ? 'ru' : 'en'
-      set(field, data.translations[lang])
-      showToast('Tradus cu DeepL ✓', 'success')
-    } catch (err) { showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error') }
-    finally { setTranslating(t => ({ ...t, [field]: false })) }
-  }
 
   useEffect(() => {
     fetch('/api/admin/mesaj-parinte')
@@ -133,8 +112,6 @@ export default function AdminMesajParintePage() {
             id: data.id || null,
             photoUrl: data.photoUrl || '',
             mesajRo: data.mesajRo || '',
-            mesajRu: data.mesajRu || '',
-            mesajEn: data.mesajEn || '',
             semnaturaRo: data.semnaturaRo || 'Pr. Marin Grigoriță, Parohul Bisericii',
             active: data.active ?? true,
           })
@@ -221,40 +198,10 @@ export default function AdminMesajParintePage() {
                 </div>
               </div>
 
-              {/* ─── Mesaj RO ─── */}
+              {/* ─── Mesaj ─── */}
               <div style={sectionBox}>
-                <div style={sectionTitle}>✉️ Mesajul (Română) *</div>
+                <div style={sectionTitle}>✉️ Mesajul *</div>
                 <textarea value={form.mesajRo} onChange={e => set('mesajRo', e.target.value)} placeholder="Bine ați venit la pagina oficială a bisericii..." style={textarea} />
-              </div>
-
-              {/* ─── Mesaj RU ─── */}
-              <div style={sectionBox}>
-                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>✉️ Mesajul (Rusă)</span>
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    {!form.mesajRu && <span style={{ fontSize: '0.75rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
-                    {form.mesajRu && <span style={{ fontSize: '0.75rem', color: '#5A9050' }}>🤖 DeepL</span>}
-                    <button onClick={() => translateField(form.mesajRo, 'mesajRu')} disabled={translating['mesajRu']} style={{ ...btnGhost, padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
-                      {translating['mesajRu'] ? 'Se traduce...' : '🔄 Traduce RU'}
-                    </button>
-                  </div>
-                </div>
-                <textarea value={form.mesajRu} onChange={e => set('mesajRu', e.target.value)} placeholder="Добро пожаловать..." style={textarea} />
-              </div>
-
-              {/* ─── Mesaj EN ─── */}
-              <div style={sectionBox}>
-                <div style={{ ...sectionTitle, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span>✉️ Mesajul (Engleză)</span>
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                    {!form.mesajEn && <span style={{ fontSize: '0.75rem', color: '#8B6014' }}>⚠️ Lipsă</span>}
-                    {form.mesajEn && <span style={{ fontSize: '0.75rem', color: '#5A9050' }}>🤖 DeepL</span>}
-                    <button onClick={() => translateField(form.mesajRo, 'mesajEn')} disabled={translating['mesajEn']} style={{ ...btnGhost, padding: '0.3rem 0.75rem', fontSize: '0.75rem' }}>
-                      {translating['mesajEn'] ? 'Se traduce...' : '🔄 Traduce EN'}
-                    </button>
-                  </div>
-                </div>
-                <textarea value={form.mesajEn} onChange={e => set('mesajEn', e.target.value)} placeholder="Welcome to the official page..." style={textarea} />
               </div>
 
               {/* ─── Semnătură + Activ ─── */}
@@ -262,7 +209,7 @@ export default function AdminMesajParintePage() {
                 <div style={sectionTitle}>✍️ Semnătură și vizibilitate</div>
                 <div style={{ display: 'grid', gap: '1.1rem' }}>
                   <div>
-                    <label style={lbl}>Semnătură (Română)</label>
+                    <label style={lbl}>Semnătură</label>
                     <input value={form.semnaturaRo} onChange={e => set('semnaturaRo', e.target.value)} placeholder="Pr. Marin Grigoriță, Parohul Bisericii" style={inp} />
                   </div>
                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer' }}>

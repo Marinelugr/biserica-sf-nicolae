@@ -6,7 +6,7 @@ import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
 
 interface ServiceSchedule {
   id: string; year: number; month: number; day: number
-  time: string; serviceRo: string; serviceRu: string | null; notes: string | null
+  time: string; serviceRo: string; notes: string | null
 }
 
 const MONTHS_FULL = ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie']
@@ -47,7 +47,7 @@ function getFirstDayOfMonth(year: number, month: number) {
   return new Date(year, month - 1, 1).getDay()
 }
 
-const emptyForm = { day: '', time: '08:00', serviceRo: '', serviceRu: '', notes: '' }
+const emptyForm = { day: '', time: '08:00', serviceRo: '', notes: '' }
 
 export default function AdminSlujbePage() {
   const now = new Date()
@@ -143,7 +143,7 @@ export default function AdminSlujbePage() {
 
   function openEdit(s: ServiceSchedule) {
     setEditService(s)
-    setForm({ day: String(s.day), time: s.time, serviceRo: s.serviceRo, serviceRu: s.serviceRu || '', notes: s.notes || '' })
+    setForm({ day: String(s.day), time: s.time, serviceRo: s.serviceRo, notes: s.notes || '' })
     setShowForm(true)
   }
 
@@ -154,8 +154,8 @@ export default function AdminSlujbePage() {
       const url = editService ? `/api/admin/slujbe/${editService.id}` : '/api/admin/slujbe'
       const method = editService ? 'PATCH' : 'POST'
       const body = editService
-        ? { time: form.time, serviceRo: form.serviceRo, serviceRu: form.serviceRu, notes: form.notes }
-        : { year, month, day: form.day, time: form.time, serviceRo: form.serviceRo, serviceRu: form.serviceRu, notes: form.notes }
+        ? { time: form.time, serviceRo: form.serviceRo, notes: form.notes }
+        : { year, month, day: form.day, time: form.time, serviceRo: form.serviceRo, notes: form.notes }
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
       showToast(editService ? 'Slujbă actualizată ✓' : 'Slujbă adăugată ✓', 'success')
@@ -365,8 +365,7 @@ export default function AdminSlujbePage() {
                         {selectedServices.map(s => (
                           <div key={s.id} style={{ backgroundColor: '#1A0F05', border: '1px solid #2A1A0A', borderRadius: '6px', padding: '0.875rem' }}>
                             <div style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '0.9rem', marginBottom: '0.25rem' }}>{s.time}</div>
-                            <div style={{ color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.875rem', marginBottom: s.serviceRu || s.notes ? '0.5rem' : 0 }}>{s.serviceRo}</div>
-                            {s.serviceRu && <div style={{ color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginBottom: '0.25rem' }}>{s.serviceRu}</div>}
+                            <div style={{ color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.875rem', marginBottom: s.notes ? '0.5rem' : 0 }}>{s.serviceRo}</div>
                             {s.notes && <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', fontStyle: 'italic' }}>{s.notes}</div>}
                             <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.75rem' }}>
                               <button onClick={() => openEdit(s)} style={{ background: 'none', border: 'none', color: '#C9A84C', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.8rem', padding: 0 }}>Editează</button>
@@ -405,7 +404,6 @@ export default function AdminSlujbePage() {
                         <td style={{ padding: '0.75rem 1rem', color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.875rem', whiteSpace: 'nowrap' }}>{s.time}</td>
                         <td style={{ padding: '0.75rem 1rem', color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.875rem' }}>
                           <div>{s.serviceRo}</div>
-                          {s.serviceRu && <div style={{ color: '#5A4020', fontSize: '0.8rem' }}>{s.serviceRu}</div>}
                         </td>
                         <td style={{ padding: '0.75rem 1rem', color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {s.notes || '—'}
@@ -457,13 +455,8 @@ export default function AdminSlujbePage() {
               </div>
 
               <div>
-                <label style={lbl}>Denumirea slujbei (Română) *</label>
+                <label style={lbl}>Denumirea slujbei *</label>
                 <input value={form.serviceRo} onChange={e => setForm(f => ({ ...f, serviceRo: e.target.value }))} placeholder="Sfânta Liturghie..." style={inp} />
-              </div>
-
-              <div>
-                <label style={lbl}>Denumirea slujbei (Rusă)</label>
-                <input value={form.serviceRu} onChange={e => setForm(f => ({ ...f, serviceRu: e.target.value }))} placeholder="Божественная литургия..." style={inp} />
               </div>
 
               <div>

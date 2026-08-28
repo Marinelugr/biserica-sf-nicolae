@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick } from '@/lib/i18n/pick'
+import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
@@ -23,7 +22,7 @@ async function getBooks(type: string) {
   const { prisma } = await import('@/lib/prisma')
   return prisma.libraryBook.findMany({
     where: { type },
-    select: { slug: true, titleRo: true, titleRu: true, titleEn: true, author: true, source: true, ordine: true },
+    select: { slug: true, titleRo: true, author: true, source: true, ordine: true },
     orderBy: [{ ordine: 'asc' }, { titleRo: 'asc' }],
   })
 }
@@ -57,7 +56,7 @@ export default async function CategoriePage({ params }: Props) {
   const cat = CATEGORY_META.find(c => c.slug === slug) as CategoryMeta | undefined
   if (!cat) notFound()
 
-  const [books, t, locale] = await Promise.all([getBooks(cat.key), getServerT(), getServerLocale()])
+  const [books, t] = await Promise.all([getBooks(cat.key), getServerT()])
   const label = t.books.categories[cat.key]
   const description = t.books.categoryDescriptions[cat.key]
 
@@ -129,7 +128,7 @@ export default async function CategoriePage({ params }: Props) {
                       className="font-body text-base group-hover:underline underline-offset-2 block"
                       style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}
                     >
-                      {pick(locale, book.titleRo, book.titleRu, book.titleEn)}
+                      {book.titleRo}
                     </span>
                     {book.author && (
                       <span className="font-body text-xs mt-0.5 block" style={{ color: '#8A7050' }}>

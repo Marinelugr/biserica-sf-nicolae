@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
-  const { titleRo, titleRu, titleEn, slug, category, imageUrl, published, scheduledFor, contentRo, contentRu, contentEn, seoKeywords } = await req.json()
+  const { titleRo, slug, category, imageUrl, published, scheduledFor, contentRo, seoKeywords } = await req.json()
 
   if (!titleRo || !slug) {
     return NextResponse.json({ error: 'Titlul și slug-ul sunt obligatorii' }, { status: 400 })
@@ -26,8 +26,6 @@ export async function POST(req: NextRequest) {
     const article = await prisma.article.create({
       data: {
         titleRo,
-        titleRu: titleRu || null,
-        titleEn: titleEn || null,
         slug,
         category: category || null,
         imageUrl: imageUrl || null,
@@ -35,8 +33,6 @@ export async function POST(req: NextRequest) {
         publishedAt: published ? new Date() : null,
         scheduledFor: scheduledFor ? chisinauLocalToUTC(scheduledFor) : null,
         contentRo: contentRo || '',
-        contentRu: contentRu || null,
-        contentEn: contentEn || null,
         seoKeywords: normalizeSeoKeywords(seoKeywords),
       },
     })

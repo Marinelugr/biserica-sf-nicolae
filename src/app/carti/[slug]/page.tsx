@@ -6,7 +6,6 @@ import PublicGallery from '@/components/PublicGallery'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
@@ -33,8 +32,8 @@ async function getBook(slug: string) {
   return prisma.libraryBook.findUnique({
     where: { slug },
     select: {
-      id: true, slug: true, titleRo: true, titleRu: true, titleEn: true, type: true,
-      contentRo: true, contentRu: true, contentEn: true, author: true, source: true,
+      id: true, slug: true, titleRo: true, type: true,
+      contentRo: true, author: true, source: true,
       imageUrl: true, galleryUrls: true, videoUrl: true, videoTitle: true, views: true,
       seoKeywords: true,
     },
@@ -45,9 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const book = await getBook(slug)
   if (!book) return {}
-  const locale = await getServerLocale()
-  const title = pick(locale, book.titleRo, book.titleRu, book.titleEn)
-  const content = pick(locale, book.contentRo, book.contentRu, book.contentEn)
+  const title = book.titleRo
+  const content = book.contentRo
   const plain = content.replace(/<[^>]*>/g, '').substring(0, 160)
   return {
     title: `${title} | Bibliotecă Ortodoxă`,
@@ -80,8 +78,8 @@ export default async function CartePage({ params }: Props) {
   const galleryItems = (book.galleryUrls || []).map((url, i) => ({
     id: String(i), url, thumbnailUrl: url, caption: null,
   }))
-  const title = pick(locale, book.titleRo, book.titleRu, book.titleEn)
-  const content = pick(locale, book.contentRo, book.contentRu, book.contentEn)
+  const title = book.titleRo
+  const content = book.contentRo
   const categoryLabel = t.books.categories[cat.key]
 
   return (

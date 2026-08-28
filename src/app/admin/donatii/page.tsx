@@ -18,11 +18,7 @@ const rowCard: React.CSSProperties = { backgroundColor: '#0A0704', border: '1px 
 interface DonationProject {
   id: string
   titleRo: string
-  titleRu: string
-  titleEn: string
   descriptionRo: string
-  descriptionRu: string
-  descriptionEn: string
   progress: number
   target: string
   order: number
@@ -39,23 +35,19 @@ interface ConfigForm {
   paypalEmail: string
   paypalLink: string
   contactName: string
-  contactNameRu: string
-  contactNameEn: string
   contactPhone: string
   facebookUrl: string
   tiktokUrl: string
   instagramUrl: string
   safetyNote: string
-  safetyNoteRu: string
-  safetyNoteEn: string
   videoLinks: VideoLink[]
 }
 
 const emptyConfig: ConfigForm = {
   localAccounts: [], ibanAccounts: [], paypalEmail: '', paypalLink: '',
-  contactName: '', contactNameRu: '', contactNameEn: '', contactPhone: '',
+  contactName: '', contactPhone: '',
   facebookUrl: '', tiktokUrl: '', instagramUrl: '',
-  safetyNote: '', safetyNoteRu: '', safetyNoteEn: '', videoLinks: [],
+  safetyNote: '', videoLinks: [],
 }
 
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
@@ -71,7 +63,6 @@ export default function AdminDonatiiPage() {
   const [projects, setProjects] = useState<DonationProject[]>([])
   const [loadingProjects, setLoadingProjects] = useState(true)
   const [savingProjectId, setSavingProjectId] = useState<string | null>(null)
-  const [translating, setTranslating] = useState<Record<string, boolean>>({})
 
   const [config, setConfig] = useState<ConfigForm>(emptyConfig)
   const [loadingConfig, setLoadingConfig] = useState(true)
@@ -97,15 +88,11 @@ export default function AdminDonatiiPage() {
         paypalEmail: data.paypalEmail || '',
         paypalLink: data.paypalLink || '',
         contactName: data.contactName || '',
-        contactNameRu: data.contactNameRu || '',
-        contactNameEn: data.contactNameEn || '',
         contactPhone: data.contactPhone || '',
         facebookUrl: data.facebookUrl || '',
         tiktokUrl: data.tiktokUrl || '',
         instagramUrl: data.instagramUrl || '',
         safetyNote: data.safetyNote || '',
-        safetyNoteRu: data.safetyNoteRu || '',
-        safetyNoteEn: data.safetyNoteEn || '',
         videoLinks: data.videoLinks || [],
       }))
       .catch(() => showToast('Eroare la încărcarea configurării', 'error'))
@@ -174,56 +161,8 @@ export default function AdminDonatiiPage() {
     ])
   }
 
-  async function translateProjectField(project: DonationProject, sourceField: 'titleRo' | 'descriptionRo', targetSuffix: 'Ru' | 'En') {
-    const key = `${project.id}-${sourceField}-${targetSuffix}`
-    const sourceText = project[sourceField]
-    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
-    setTranslating(t => ({ ...t, [key]: true }))
-    try {
-      const res = await fetch('/api/admin/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sourceText, field: sourceField }),
-      })
-      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
-      const data = await res.json()
-      const lang = targetSuffix === 'Ru' ? 'ru' : 'en'
-      const targetField = (sourceField === 'titleRo' ? 'title' : 'description') + targetSuffix as keyof DonationProject
-      updateProjectField(project.id, targetField, data.translations[lang])
-      showToast('Tradus cu DeepL ✓', 'success')
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error')
-    } finally {
-      setTranslating(t => ({ ...t, [key]: false }))
-    }
-  }
-
   function setConfigField<K extends keyof ConfigForm>(key: K, value: ConfigForm[K]) {
     setConfig(c => ({ ...c, [key]: value }))
-  }
-
-  async function translateConfigField(sourceField: 'contactName' | 'safetyNote', targetSuffix: 'Ru' | 'En') {
-    const key = `config-${sourceField}-${targetSuffix}`
-    const sourceText = config[sourceField]
-    if (!sourceText.trim()) { showToast('Completați mai întâi câmpul în română', 'error'); return }
-    setTranslating(t => ({ ...t, [key]: true }))
-    try {
-      const res = await fetch('/api/admin/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: sourceText, field: sourceField }),
-      })
-      if (!res.ok) { const data = await res.json().catch(() => ({})); throw new Error(data.error || `Eroare DeepL (cod ${res.status})`) }
-      const data = await res.json()
-      const lang = targetSuffix === 'Ru' ? 'ru' : 'en'
-      const targetField = (sourceField + targetSuffix) as keyof ConfigForm
-      setConfigField(targetField, data.translations[lang])
-      showToast('Tradus cu DeepL ✓', 'success')
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Eroare la traducere DeepL', 'error')
-    } finally {
-      setTranslating(t => ({ ...t, [key]: false }))
-    }
   }
 
   function addLocalAccount() {
@@ -313,7 +252,7 @@ export default function AdminDonatiiPage() {
                 <div key={project.id} style={rowCard}>
                   <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '0.75rem' }}>
                     <div style={{ flex: 1 }}>
-                      <label style={lbl}>Titlu (Română)</label>
+                      <label style={lbl}>Titlu</label>
                       <input value={project.titleRo} onChange={e => updateProjectField(project.id, 'titleRo', e.target.value)} style={inp} />
                     </div>
                     <div style={{ width: '140px' }}>
@@ -326,51 +265,9 @@ export default function AdminDonatiiPage() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem', marginBottom: '0.75rem' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                        <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Rusă)</label>
-                        <button onClick={() => translateProjectField(project, 'titleRo', 'Ru')} disabled={translating[`${project.id}-titleRo-Ru`]} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                          {translating[`${project.id}-titleRo-Ru`] ? '...' : '🔄 RU'}
-                        </button>
-                      </div>
-                      <input value={project.titleRu} onChange={e => updateProjectField(project.id, 'titleRu', e.target.value)} style={inpSm} />
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                        <label style={{ ...lbl, marginBottom: 0 }}>Titlu (Engleză)</label>
-                        <button onClick={() => translateProjectField(project, 'titleRo', 'En')} disabled={translating[`${project.id}-titleRo-En`]} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                          {translating[`${project.id}-titleRo-En`] ? '...' : '🔄 EN'}
-                        </button>
-                      </div>
-                      <input value={project.titleEn} onChange={e => updateProjectField(project.id, 'titleEn', e.target.value)} style={inpSm} />
-                    </div>
-                  </div>
-
                   <div style={{ marginBottom: '0.75rem' }}>
-                    <label style={lbl}>Descriere (Română)</label>
+                    <label style={lbl}>Descriere</label>
                     <textarea value={project.descriptionRo} onChange={e => updateProjectField(project.id, 'descriptionRo', e.target.value)} rows={2} style={{ ...inp, resize: 'vertical' }} />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem', marginBottom: '0.75rem' }}>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                        <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Rusă)</label>
-                        <button onClick={() => translateProjectField(project, 'descriptionRo', 'Ru')} disabled={translating[`${project.id}-descriptionRo-Ru`]} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                          {translating[`${project.id}-descriptionRo-Ru`] ? '...' : '🔄 RU'}
-                        </button>
-                      </div>
-                      <textarea value={project.descriptionRu} onChange={e => updateProjectField(project.id, 'descriptionRu', e.target.value)} rows={2} style={{ ...inpSm, resize: 'vertical' }} />
-                    </div>
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                        <label style={{ ...lbl, marginBottom: 0 }}>Descriere (Engleză)</label>
-                        <button onClick={() => translateProjectField(project, 'descriptionRo', 'En')} disabled={translating[`${project.id}-descriptionRo-En`]} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                          {translating[`${project.id}-descriptionRo-En`] ? '...' : '🔄 EN'}
-                        </button>
-                      </div>
-                      <textarea value={project.descriptionEn} onChange={e => updateProjectField(project.id, 'descriptionEn', e.target.value)} rows={2} style={{ ...inpSm, resize: 'vertical' }} />
-                    </div>
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -454,27 +351,6 @@ export default function AdminDonatiiPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem', marginBottom: '1rem' }}>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                      <label style={{ ...lbl, marginBottom: 0 }}>Nume contact (Rusă)</label>
-                      <button onClick={() => translateConfigField('contactName', 'Ru')} disabled={translating['config-contactName-Ru']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                        {translating['config-contactName-Ru'] ? '...' : '🔄 RU'}
-                      </button>
-                    </div>
-                    <input value={config.contactNameRu} onChange={e => setConfigField('contactNameRu', e.target.value)} style={inpSm} />
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                      <label style={{ ...lbl, marginBottom: 0 }}>Nume contact (Engleză)</label>
-                      <button onClick={() => translateConfigField('contactName', 'En')} disabled={translating['config-contactName-En']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                        {translating['config-contactName-En'] ? '...' : '🔄 EN'}
-                      </button>
-                    </div>
-                    <input value={config.contactNameEn} onChange={e => setConfigField('contactNameEn', e.target.value)} style={inpSm} />
-                  </div>
-                </div>
-
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                   <div>
                     <label style={lbl}>Facebook URL</label>
@@ -491,29 +367,8 @@ export default function AdminDonatiiPage() {
                 </div>
 
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={lbl}>Notă de siguranță (Română)</label>
+                  <label style={lbl}>Notă de siguranță</label>
                   <textarea value={config.safetyNote} onChange={e => setConfigField('safetyNote', e.target.value)} rows={2} style={{ ...inp, resize: 'vertical' }} />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '0.75rem' }}>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                      <label style={{ ...lbl, marginBottom: 0 }}>Notă de siguranță (Rusă)</label>
-                      <button onClick={() => translateConfigField('safetyNote', 'Ru')} disabled={translating['config-safetyNote-Ru']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                        {translating['config-safetyNote-Ru'] ? '...' : '🔄 RU'}
-                      </button>
-                    </div>
-                    <textarea value={config.safetyNoteRu} onChange={e => setConfigField('safetyNoteRu', e.target.value)} rows={2} style={{ ...inpSm, resize: 'vertical' }} />
-                  </div>
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem' }}>
-                      <label style={{ ...lbl, marginBottom: 0 }}>Notă de siguranță (Engleză)</label>
-                      <button onClick={() => translateConfigField('safetyNote', 'En')} disabled={translating['config-safetyNote-En']} style={{ ...btnGhost, padding: '0.2rem 0.5rem', fontSize: '0.7rem' }}>
-                        {translating['config-safetyNote-En'] ? '...' : '🔄 EN'}
-                      </button>
-                    </div>
-                    <textarea value={config.safetyNoteEn} onChange={e => setConfigField('safetyNoteEn', e.target.value)} rows={2} style={{ ...inpSm, resize: 'vertical' }} />
-                  </div>
                 </div>
               </>
             )}

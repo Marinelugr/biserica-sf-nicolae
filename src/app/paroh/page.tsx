@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick } from '@/lib/i18n/pick'
+import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
@@ -28,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ParohPage() {
-  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
+  const t = await getServerT()
   const priest = await prisma.priest.findFirst()
   const gallery = await prisma.mediaItem.findMany({
     where: { entityType: 'priest', entityId: priest?.id ?? '' },
@@ -45,12 +44,12 @@ export default async function ParohPage() {
     )
   }
 
-  const name = pick(locale, priest.nameRo, priest.nameRu, priest.nameEn)
-  const title = pick(locale, priest.titleRo, priest.titleRu, priest.titleEn)
-  const bio = pick(locale, priest.bioRo ?? '', priest.bioRu, priest.bioEn)
-  const ordained = pick(locale, priest.ordained ?? '', priest.ordainedRu, priest.ordainedEn)
-  const parish = pick(locale, priest.parish ?? '', priest.parishRu, priest.parishEn)
-  const education = pick(locale, priest.education ?? '', priest.educationRu, priest.educationEn)
+  const name = priest.nameRo
+  const title = priest.titleRo
+  const bio = priest.bioRo ?? ''
+  const ordained = priest.ordained ?? ''
+  const parish = priest.parish ?? ''
+  const education = priest.education ?? ''
 
   return (
     <div>

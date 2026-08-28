@@ -1,16 +1,13 @@
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
-import { getServerLocale } from '@/lib/i18n/server'
-import { pick } from '@/lib/i18n/pick'
 import { FALLBACK_MESAJ, FALLBACK_SEMNATURA, FALLBACK_PHOTO_URL, firstSentences } from '@/lib/priestMessage'
 
 export default async function PriestMessageSection() {
-  const locale = await getServerLocale()
   const mesaj = await prisma.priestMessage.findFirst({ where: { active: true } })
 
   const photoUrl = mesaj?.photoUrl ?? FALLBACK_PHOTO_URL
-  const mesajText = mesaj ? pick(locale, mesaj.mesajRo, mesaj.mesajRu, mesaj.mesajEn) : FALLBACK_MESAJ
-  const semnatura = mesaj ? pick(locale, mesaj.semnaturaRo, mesaj.semnaturaRu, mesaj.semnaturaEn) : FALLBACK_SEMNATURA
+  const mesajText = mesaj?.mesajRo || FALLBACK_MESAJ
+  const semnatura = mesaj?.semnaturaRo || FALLBACK_SEMNATURA
   const excerpt = firstSentences(mesajText, 2) + '…'
 
   return (

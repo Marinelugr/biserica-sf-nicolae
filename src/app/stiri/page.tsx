@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { formatDate, readingTime } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick, localeToIntl } from '@/lib/i18n/pick'
+import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { publicArticleWhere } from '@/lib/articleVisibility'
 
@@ -23,7 +23,7 @@ async function getArticles() {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.article.findMany({
       where: publicArticleWhere,
-      select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true, contentRo: true, contentRu: true, contentEn: true },
+      select: { slug: true, titleRo: true, imageUrl: true, publishedAt: true, category: true, contentRo: true },
       orderBy: { publishedAt: 'desc' },
     })
   } catch {
@@ -72,7 +72,7 @@ export default async function StiriPage() {
                 {article.imageUrl ? (
                   <Image
                     src={article.imageUrl}
-                    alt={pick(locale, article.titleRo, article.titleRu, article.titleEn)}
+                    alt={article.titleRo}
                     width={600}
                     height={400}
                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -93,7 +93,7 @@ export default async function StiriPage() {
                 )}
                 <Link href={`/stiri/${article.slug}`}>
                   <h2 className="font-heading text-xl mt-1 mb-2 group-hover:underline underline-offset-2 leading-snug" style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}>
-                    {pick(locale, article.titleRo, article.titleRu, article.titleEn)}
+                    {article.titleRo}
                   </h2>
                 </Link>
                 <p className="font-body text-xs" style={{ color: '#8A7050' }}>
@@ -103,7 +103,7 @@ export default async function StiriPage() {
                     </time>
                   )}
                   {article.publishedAt && ' · '}
-                  ~{readingTime(pick(locale, article.contentRo, article.contentRu, article.contentEn))} min citire
+                  ~{readingTime(article.contentRo)} min citire
                 </p>
               </div>
             </article>

@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLiturgicalDates, formatDate } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick, localeToIntl } from '@/lib/i18n/pick'
+import { localeToIntl } from '@/lib/i18n/pick'
 import { getFixedFeasts, FIXED_FASTS, isApostlesFast } from '@/lib/constants/oldCalendarFeasts'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
@@ -26,7 +26,7 @@ async function getSaintsForDay(day: number, month: number) {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.saint.findMany({
       where: { day, month },
-      select: { nameRo: true, nameRu: true, nameEn: true },
+      select: { nameRo: true },
       orderBy: { nameRo: 'asc' },
     })
   } catch {
@@ -277,7 +277,7 @@ export default async function CalendarPage({
                   style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
                   <span className="text-lg shrink-0 mt-0.5" aria-hidden="true">☦</span>
                   <div>
-                    <p className="font-heading text-base" style={{ color: '#3A1A1A' }}>{pick(locale, saint.nameRo, saint.nameRu, saint.nameEn)}</p>
+                    <p className="font-heading text-base" style={{ color: '#3A1A1A' }}>{saint.nameRo}</p>
                   </div>
                 </li>
               ))}

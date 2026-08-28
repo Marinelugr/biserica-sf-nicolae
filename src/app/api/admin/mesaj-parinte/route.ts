@@ -15,10 +15,7 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
   const data = await req.json()
-  const {
-    photoUrl, mesajRo, mesajRu, mesajEn,
-    semnaturaRo, semnaturaRu, semnaturaEn, active,
-  } = data
+  const { photoUrl, mesajRo, semnaturaRo, active } = data
 
   if (!mesajRo) {
     return NextResponse.json({ error: 'Mesajul (Română) este obligatoriu' }, { status: 400 })
@@ -26,9 +23,8 @@ export async function POST(req: NextRequest) {
 
   const payload = {
     photoUrl: photoUrl || null,
-    mesajRo, mesajRu: mesajRu || null, mesajEn: mesajEn || null,
+    mesajRo,
     semnaturaRo: semnaturaRo || 'Pr. Marin Grigoriță, Parohul Bisericii',
-    semnaturaRu: semnaturaRu || null, semnaturaEn: semnaturaEn || null,
     active: active ?? true,
   }
 

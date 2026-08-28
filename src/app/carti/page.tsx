@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick } from '@/lib/i18n/pick'
+import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
@@ -44,7 +43,7 @@ async function getRecentBooks() {
   try {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.libraryBook.findMany({
-      select: { slug: true, titleRo: true, titleRu: true, titleEn: true, type: true },
+      select: { slug: true, titleRo: true, type: true },
       orderBy: { createdAt: 'desc' },
       take: 6,
     })
@@ -54,7 +53,7 @@ async function getRecentBooks() {
 }
 
 export default async function CartiPage() {
-  const [counts, recentBooks, t, locale] = await Promise.all([getCounts(), getRecentBooks(), getServerT(), getServerLocale()])
+  const [counts, recentBooks, t] = await Promise.all([getCounts(), getRecentBooks(), getServerT()])
   const totalBooks = Object.values(counts).reduce((a, b) => a + b, 0)
 
   return (
@@ -164,7 +163,7 @@ export default async function CartiPage() {
                           )}
                           <span className="font-body text-sm group-hover:underline underline-offset-2"
                             style={{ color: '#3A1A1A', textDecorationColor: '#C9A84C' }}>
-                            {pick(locale, book.titleRo, book.titleRu, book.titleEn)}
+                            {book.titleRo}
                           </span>
                         </div>
                         <span className="ml-3 transition-transform group-hover:translate-x-1 shrink-0"

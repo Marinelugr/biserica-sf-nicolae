@@ -12,7 +12,7 @@ import PriestMessageSection from '@/components/homepage/PriestMessageSection'
 import CobaltAurora from '@/components/homepage/CobaltAurora'
 import { getTodayDate } from '@/lib/utils'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
-import { pick, localeToIntl, type Locale } from '@/lib/i18n/pick'
+import { localeToIntl, type Locale } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { publicArticleWhere } from '@/lib/articleVisibility'
 
@@ -93,22 +93,22 @@ async function getDailyData(locale: Locale) {
     const [saints, prayerBook] = await Promise.all([
       prisma.saint.findMany({
         where: { month, day },
-        select: { nameRo: true, nameRu: true, nameEn: true },
+        select: { nameRo: true },
         take: 5,
       }),
       prisma.libraryBook.findUnique({
         where: { slug: prayerSlug },
-        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, contentRo: true, contentRu: true, contentEn: true },
+        select: { slug: true, titleRo: true, contentRo: true },
       }),
     ])
 
     return {
-      saints: saints.map(s => pick(locale, s.nameRo, s.nameRu, s.nameEn)),
+      saints: saints.map(s => s.nameRo),
       gospel: FALLBACK_GOSPEL,
       prayer: prayerBook
         ? {
-            title: pick(locale, prayerBook.titleRo, prayerBook.titleRu, prayerBook.titleEn),
-            text: stripHtml(pick(locale, prayerBook.contentRo, prayerBook.contentRu, prayerBook.contentEn)).slice(0, 200) + '…',
+            title: prayerBook.titleRo,
+            text: stripHtml(prayerBook.contentRo).slice(0, 200) + '…',
             slug: prayerBook.slug,
             day: prayerDay,
           }
@@ -130,12 +130,12 @@ async function getHomeContent(locale: Locale) {
     const [articles, libraryBooks] = await Promise.all([
       prisma.article.findMany({
         where: publicArticleWhere,
-        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, imageUrl: true, publishedAt: true, category: true, contentRo: true, contentRu: true, contentEn: true },
+        select: { slug: true, titleRo: true, imageUrl: true, publishedAt: true, category: true, contentRo: true },
         orderBy: { publishedAt: 'desc' },
         take: 4,
       }),
       prisma.libraryBook.findMany({
-        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, type: true },
+        select: { slug: true, titleRo: true, type: true },
         orderBy: { createdAt: 'desc' },
         take: 8,
       }),
@@ -143,12 +143,12 @@ async function getHomeContent(locale: Locale) {
 
     return {
       articles: articles.map(a => ({
-        slug: a.slug, title: pick(locale, a.titleRo, a.titleRu, a.titleEn),
+        slug: a.slug, title: a.titleRo,
         imageUrl: a.imageUrl, publishedAt: a.publishedAt, category: a.category,
-        excerpt: stripHtml(pick(locale, a.contentRo, a.contentRu, a.contentEn)).slice(0, 220),
+        excerpt: stripHtml(a.contentRo).slice(0, 220),
       })),
       libraryBooks: libraryBooks.map(b => ({
-        slug: b.slug, title: pick(locale, b.titleRo, b.titleRu, b.titleEn), type: b.type,
+        slug: b.slug, title: b.titleRo, type: b.type,
       })),
     }
   } catch {

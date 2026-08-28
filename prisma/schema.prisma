@@ -60,8 +60,6 @@ model BibleBook {
   id       String         @id @default(cuid())
   slug     String         @unique
   nameRo   String
-  nameRu   String
-  nameEn   String
   testament String
   orderNum Int
   chapters BibleChapter[]
@@ -81,8 +79,6 @@ model BibleVerse {
   chapter   BibleChapter @relation(fields: [chapterId], references: [id])
   verseNum  Int
   textRo    String       @db.Text
-  textRu    String?      @db.Text
-  textEn    String?      @db.Text
 }
 
 // ─── Sfinți ──────────────────────────────────────────────────────────────────
@@ -92,12 +88,8 @@ model Saint {
   month     Int
   day       Int
   nameRo    String
-  nameRu    String?
-  nameEn    String?
   slug      String  @unique
   lifeRo    String? @db.Text
-  lifeRu    String? @db.Text
-  lifeEn    String? @db.Text
   iconUrl   String?
   feastType String?
   seoKeywords String?
@@ -111,12 +103,8 @@ model Prayer {
   id        String   @id @default(cuid())
   slug      String   @unique
   titleRo   String
-  titleRu   String?
-  titleEn   String?
   type      String
   textRo    String   @db.Text
-  textRu    String?  @db.Text
-  textEn    String?  @db.Text
   author    String?
   createdAt DateTime @default(now())
 }
@@ -127,11 +115,7 @@ model Article {
   id           String    @id @default(cuid())
   slug         String    @unique
   titleRo      String
-  titleRu      String?
-  titleEn      String?
   contentRo    String    @db.Text
-  contentRu    String?   @db.Text
-  contentEn    String?   @db.Text
   category     String?
   imageUrl     String?
   metaDescRo   String?
@@ -159,14 +143,10 @@ model LibraryBook {
   id         String        @id @default(cuid())
   slug       String        @unique
   titleRo    String
-  titleRu    String?
-  titleEn    String?
   type       String
   categoryId String?
   category   BookCategory? @relation(fields: [categoryId], references: [id])
   contentRo  String        @db.Text
-  contentRu  String?       @db.Text
-  contentEn  String?       @db.Text
   author       String?
   source       String?
   imageUrl     String?
@@ -188,7 +168,6 @@ model ServiceSchedule {
   day       Int
   time      String
   serviceRo String
-  serviceRu String?
   notes     String?
 
   @@index([year, month, day])
@@ -279,24 +258,12 @@ model MediaItem {
 model Priest {
   id           String  @id @default(cuid())
   nameRo       String
-  nameRu       String?
-  nameEn       String?
   titleRo      String
-  titleRu      String?
-  titleEn      String?
   photoUrl     String?
   bioRo        String? @db.Text
-  bioRu        String? @db.Text
-  bioEn        String? @db.Text
   ordained     String?
-  ordainedRu   String?
-  ordainedEn   String?
   parish       String?
-  parishRu     String?
-  parishEn     String?
   education    String? @db.Text
-  educationRu  String? @db.Text
-  educationEn  String? @db.Text
   phone        String?
   email        String?
   facebook     String?
@@ -309,11 +276,7 @@ model Priest {
 model DonationProject {
   id            String   @id @default(cuid())
   titleRo       String
-  titleRu       String?
-  titleEn       String?
   descriptionRo String   @db.Text
-  descriptionRu String?  @db.Text
-  descriptionEn String?  @db.Text
   progress      Int      @default(0)
   target        String
   order         Int      @default(0)
@@ -327,11 +290,7 @@ model PriestMessage {
   id           String   @id @default(cuid())
   photoUrl     String?
   mesajRo      String   @db.Text
-  mesajRu      String?  @db.Text
-  mesajEn      String?  @db.Text
   semnaturaRo  String   @default("Pr. Marin Grigoriță, Parohul Bisericii")
-  semnaturaRu  String?
-  semnaturaEn  String?
   active       Boolean  @default(true)
   updatedAt    DateTime @updatedAt
   createdAt    DateTime @default(now())
@@ -344,15 +303,11 @@ model DonationConfig {
   paypalEmail   String?
   paypalLink    String?
   contactName   String?
-  contactNameRu String?
-  contactNameEn String?
   contactPhone  String?
   facebookUrl   String?
   tiktokUrl     String?
   instagramUrl  String?
   safetyNote    String?  @db.Text
-  safetyNoteRu  String?  @db.Text
-  safetyNoteEn  String?  @db.Text
   videoLinks    Json     @default("[]")
   updatedAt     DateTime @updatedAt
 }

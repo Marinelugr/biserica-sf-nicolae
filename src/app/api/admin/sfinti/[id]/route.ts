@@ -7,14 +7,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
   const { id } = await params
-  const { nameRo, nameRu, nameEn, month, day, feastType, lifeRo, lifeRu, lifeEn, iconUrl, seoKeywords } = await req.json()
+  const { nameRo, month, day, feastType, lifeRo, iconUrl, seoKeywords } = await req.json()
   const saint = await prisma.saint.update({
     where: { id },
     data: {
-      nameRo, nameRu: nameRu || null, nameEn: nameEn || null,
+      nameRo,
       month: parseInt(month), day: parseInt(day),
       feastType: feastType || null,
-      lifeRo: lifeRo || null, lifeRu: lifeRu || null, lifeEn: lifeEn || null,
+      lifeRo: lifeRo || null,
       iconUrl: iconUrl || null,
       seoKeywords: normalizeSeoKeywords(seoKeywords),
     },

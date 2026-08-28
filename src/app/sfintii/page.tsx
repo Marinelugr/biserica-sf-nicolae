@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick } from '@/lib/i18n/pick'
+import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
@@ -28,13 +27,11 @@ async function getSaints(q: string | undefined, month: number | undefined) {
     if (q) {
       where.OR = [
         { nameRo: { contains: q, mode: 'insensitive' } },
-        { nameRu: { contains: q, mode: 'insensitive' } },
-        { nameEn: { contains: q, mode: 'insensitive' } },
       ]
     }
     return await prisma.saint.findMany({
       where,
-      select: { slug: true, nameRo: true, nameRu: true, nameEn: true, month: true, day: true, feastType: true, iconUrl: true },
+      select: { slug: true, nameRo: true, month: true, day: true, feastType: true, iconUrl: true },
       orderBy: [{ month: 'asc' }, { day: 'asc' }],
     })
   } catch {
@@ -43,7 +40,7 @@ async function getSaints(q: string | undefined, month: number | undefined) {
 }
 
 export default async function SfintiiPage({ searchParams }: Props) {
-  const [{ q, luna }, t, locale] = await Promise.all([searchParams, getServerT(), getServerLocale()])
+  const [{ q, luna }, t] = await Promise.all([searchParams, getServerT()])
   const month = luna ? parseInt(luna) : undefined
   const saints = await getSaints(q, month)
 
@@ -151,7 +148,7 @@ export default async function SfintiiPage({ searchParams }: Props) {
                           className="font-body text-sm block group-hover:underline underline-offset-2 line-clamp-1"
                           style={{ color: '#3A1A1A', textDecorationColor: '#C9A84C' }}
                         >
-                          {pick(locale, s.nameRo, s.nameRu, s.nameEn)}
+                          {s.nameRo}
                         </span>
                         {s.feastType && (
                           <span className="font-body text-xs" style={{ color: FEAST_COLORS[s.feastType] || '#8A7050' }}>

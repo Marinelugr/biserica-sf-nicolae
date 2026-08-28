@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { preiaZi, slugSfant } from '@/lib/sfinti-scraper'
-import { translateToAllLanguages } from '@/lib/deepl'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,14 +25,8 @@ export async function GET(req: NextRequest) {
       const existent = await prisma.saint.findUnique({ where: { slug } })
       if (existent) { deja++; continue }
 
-      let nameRu: string | null = null, nameEn: string | null = null
-      try {
-        const t = await translateToAllLanguages(s.text)
-        nameRu = t.ru; nameEn = t.en
-      } catch { /* traducerea e opțională, nu blochează sincronizarea */ }
-
       await prisma.saint.create({
-        data: { month: luna, day: zi, nameRo: s.text, nameRu, nameEn, slug, feastType: s.praznic ? 'praznic' : null },
+        data: { month: luna, day: zi, nameRo: s.text, slug, feastType: s.praznic ? 'praznic' : null },
       })
       adaugati++
     }

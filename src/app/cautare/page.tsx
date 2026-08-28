@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { buildAlternates } from '@/lib/i18n/alternates'
-import { getServerLocale, getServerT } from '@/lib/i18n/server'
-import { pick, type Locale } from '@/lib/i18n/pick'
+import { getServerT } from '@/lib/i18n/server'
 import { scheduledGate } from '@/lib/articleVisibility'
 
 export const dynamic = 'force-dynamic'
@@ -31,7 +30,7 @@ interface SearchResult {
   href: string
 }
 
-async function searchAll(query: string, locale: Locale): Promise<Record<string, SearchResult[]>> {
+async function searchAll(query: string): Promise<Record<string, SearchResult[]>> {
   if (!query) return {}
   const results: Record<string, SearchResult[]> = {}
   const insensitive = { contains: query, mode: 'insensitive' as const }
@@ -44,11 +43,9 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
         where: {
           OR: [
             { titleRo: insensitive },
-            { titleRu: insensitive },
-            { titleEn: insensitive },
           ],
         },
-        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, type: true },
+        select: { slug: true, titleRo: true, type: true },
         take: 8,
       }),
       prisma.article.findMany({
@@ -56,10 +53,10 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
           published: true,
           AND: [
             scheduledGate,
-            { OR: [{ titleRo: insensitive }, { titleRu: insensitive }, { titleEn: insensitive }] },
+            { OR: [{ titleRo: insensitive }] },
           ],
         },
-        select: { slug: true, titleRo: true, titleRu: true, titleEn: true, category: true },
+        select: { slug: true, titleRo: true, category: true },
         take: 8,
         orderBy: { publishedAt: 'desc' },
       }),
@@ -67,11 +64,9 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
         where: {
           OR: [
             { nameRo: insensitive },
-            { nameRu: insensitive },
-            { nameEn: insensitive },
           ],
         },
-        select: { nameRo: true, nameRu: true, nameEn: true, month: true, day: true },
+        select: { nameRo: true, month: true, day: true },
         take: 8,
       }),
     ])
@@ -79,7 +74,7 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
     if (articles.length > 0) {
       results['articole'] = articles.map(a => ({
         category: 'articole',
-        title: pick(locale, a.titleRo, a.titleRu, a.titleEn),
+        title: a.titleRo,
         excerpt: a.category || '',
         href: `/stiri/${a.slug}`,
       }))
@@ -91,7 +86,7 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
     if (rugs.length > 0) {
       results['rugaciuni'] = rugs.map(b => ({
         category: 'rugaciuni',
-        title: pick(locale, b.titleRo, b.titleRu, b.titleEn),
+        title: b.titleRo,
         excerpt: 'Rugăciune ortodoxă',
         href: `/carti/${b.slug}`,
       }))
@@ -100,7 +95,7 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
     if (carti.length > 0) {
       results['carti'] = carti.map(b => ({
         category: 'carti',
-        title: pick(locale, b.titleRo, b.titleRu, b.titleEn),
+        title: b.titleRo,
         excerpt: b.type || '',
         href: `/carti/${b.slug}`,
       }))
@@ -109,7 +104,7 @@ async function searchAll(query: string, locale: Locale): Promise<Record<string, 
     if (saints.length > 0) {
       results['sfinti'] = saints.map(s => ({
         category: 'sfinti',
-        title: pick(locale, s.nameRo, s.nameRu, s.nameEn),
+        title: s.nameRo,
         excerpt: `Prăznuit pe ${s.day} ${getMonthName(s.month)}`,
         href: '/calendar',
       }))
@@ -142,8 +137,7 @@ export default async function CautarePage({
 }) {
   const { q } = await searchParams
   const query = q?.trim() || ''
-  const locale = await getServerLocale()
-  const results = await searchAll(query, locale)
+  const results = await searchAll(query)
   const totalResults = Object.values(results).reduce((sum, arr) => sum + arr.length, 0)
 
   return (

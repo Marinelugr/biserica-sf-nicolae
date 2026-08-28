@@ -28,17 +28,17 @@ export async function POST(req: NextRequest) {
     })
     if (source.length === 0) return NextResponse.json({ error: 'Luna sursă nu are slujbe' }, { status: 400 })
     const created = await prisma.serviceSchedule.createMany({
-      data: source.map(s => ({ year: copyTo.year, month: copyTo.month, day: s.day, time: s.time, serviceRo: s.serviceRo, serviceRu: s.serviceRu, notes: s.notes })),
+      data: source.map(s => ({ year: copyTo.year, month: copyTo.month, day: s.day, time: s.time, serviceRo: s.serviceRo, notes: s.notes })),
     })
     return NextResponse.json({ count: created.count }, { status: 201 })
   }
 
-  const { year, month, day, time, serviceRo, serviceRu, notes } = body
+  const { year, month, day, time, serviceRo, notes } = body
   if (!year || !month || !day || !time || !serviceRo) {
     return NextResponse.json({ error: 'Anul, luna, ziua, ora și slujba sunt obligatorii' }, { status: 400 })
   }
   const slujba = await prisma.serviceSchedule.create({
-    data: { year: parseInt(year), month: parseInt(month), day: parseInt(day), time, serviceRo, serviceRu: serviceRu || null, notes: notes || null },
+    data: { year: parseInt(year), month: parseInt(month), day: parseInt(day), time, serviceRo, notes: notes || null },
   })
   return NextResponse.json(slujba, { status: 201 })
 }

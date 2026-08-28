@@ -3,8 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import PublicGallery from '@/components/PublicGallery'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick } from '@/lib/i18n/pick'
+import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
@@ -23,9 +22,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const saint = await getSaint(slug)
   if (!saint) return {}
-  const locale = await getServerLocale()
-  const title = pick(locale, saint.nameRo, saint.nameRu, saint.nameEn)
-  const life = pick(locale, saint.lifeRo || '', saint.lifeRu, saint.lifeEn)
+  const title = saint.nameRo
+  const life = saint.lifeRo || ''
   const plain = life.replace(/<[^>]*>/g, '').substring(0, 160)
   return {
     title: `${title} | Sfinți`,
@@ -44,7 +42,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SaintPage({ params }: Props) {
   const { slug } = await params
-  const [saint, t, locale] = await Promise.all([getSaint(slug), getServerT(), getServerLocale()])
+  const [saint, t] = await Promise.all([getSaint(slug), getServerT()])
   if (!saint) notFound()
 
   const { prisma } = await import('@/lib/prisma')
@@ -53,8 +51,8 @@ export default async function SaintPage({ params }: Props) {
     orderBy: { order: 'asc' },
   })
 
-  const title = pick(locale, saint.nameRo, saint.nameRu, saint.nameEn)
-  const life = pick(locale, saint.lifeRo || '', saint.lifeRu, saint.lifeEn)
+  const title = saint.nameRo
+  const life = saint.lifeRo || ''
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

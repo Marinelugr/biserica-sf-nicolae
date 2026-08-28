@@ -6,10 +6,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
   const { id } = await params
-  const { time, serviceRo, serviceRu, notes } = await req.json()
+  const { time, serviceRo, notes } = await req.json()
   const slujba = await prisma.serviceSchedule.update({
     where: { id },
-    data: { time, serviceRo, serviceRu: serviceRu || null, notes: notes || null },
+    data: { time, serviceRo, notes: notes || null },
   })
   return NextResponse.json(slujba)
 }

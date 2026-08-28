@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { formatDate, readingTime } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
-import { pick, localeToIntl } from '@/lib/i18n/pick'
+import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ContentCoverImage from '@/components/shared/ContentCoverImage'
 import ShareButtons from '@/components/shared/ShareButtons'
@@ -26,9 +26,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const article = await getArticle(slug)
   if (!article) return {}
-  const locale = await getServerLocale()
-  const title = pick(locale, article.titleRo, article.titleRu, article.titleEn)
-  const content = pick(locale, article.contentRo, article.contentRu, article.contentEn)
+  const title = article.titleRo
+  const content = article.contentRo
   const plainText = content.replace(/<[^>]*>/g, '').substring(0, 160)
   return {
     title,
@@ -59,8 +58,8 @@ export default async function ArticolPage({ params }: Props) {
   const [article, t, locale] = await Promise.all([getArticle(slug), getServerT(), getServerLocale()])
   if (!article) notFound()
 
-  const title = pick(locale, article.titleRo, article.titleRu, article.titleEn)
-  const content = pick(locale, article.contentRo, article.contentRu, article.contentEn)
+  const title = article.titleRo
+  const content = article.contentRo
 
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

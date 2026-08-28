@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
-  const { titleRo, titleRu, titleEn, descriptionRo, descriptionRu, descriptionEn, progress, target, active } = await req.json()
+  const { titleRo, descriptionRo, progress, target, active } = await req.json()
   if (!titleRo || !descriptionRo || !target) {
     return NextResponse.json({ error: 'Titlul, descrierea și ținta sunt obligatorii' }, { status: 400 })
   }
@@ -24,11 +24,7 @@ export async function POST(req: NextRequest) {
   const project = await prisma.donationProject.create({
     data: {
       titleRo,
-      titleRu: titleRu || null,
-      titleEn: titleEn || null,
       descriptionRo,
-      descriptionRu: descriptionRu || null,
-      descriptionEn: descriptionEn || null,
       progress: typeof progress === 'number' ? progress : 0,
       target,
       active: active ?? true,

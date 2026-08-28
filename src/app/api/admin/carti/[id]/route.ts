@@ -10,15 +10,13 @@ export async function PATCH(
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
   const { id } = await params
-  const { titleRo, titleRu, titleEn, type, categoryId, contentRo, contentRu, contentEn, author, source, imageUrl, galleryUrls, videoUrl, videoTitle, seoKeywords } = await req.json()
+  const { titleRo, type, categoryId, contentRo, author, source, imageUrl, galleryUrls, videoUrl, videoTitle, seoKeywords } = await req.json()
   const book = await prisma.libraryBook.update({
     where: { id },
     data: {
-      titleRo, titleRu: titleRu || null, titleEn: titleEn || null, type,
+      titleRo, type,
       categoryId: categoryId || null,
       contentRo: contentRo || '',
-      contentRu: contentRu || null,
-      contentEn: contentEn || null,
       author: author || null,
       source: source || null,
       imageUrl: imageUrl || null,
