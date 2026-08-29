@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getServerT } from '@/lib/i18n/server'
 import { scheduledGate } from '@/lib/articleVisibility'
+import { buildWordWhere } from '@/lib/search'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,18 +34,19 @@ interface SearchResult {
 async function searchAll(query: string): Promise<Record<string, SearchResult[]>> {
   if (!query) return {}
   const results: Record<string, SearchResult[]> = {}
-  const insensitive = { contains: query, mode: 'insensitive' as const }
+
+  // Potrivire pe cuvinte individuale: toate cuvintele din query trebuie găsite
+  // în titlu SAU conținut, dar nu neapărat consecutive sau în aceeași ordine.
+  const bookWhere = buildWordWhere(query, ['titleRo', 'contentRo'])
+  const articleWhere = buildWordWhere(query, ['titleRo', 'contentRo'])
+  const saintWhere = buildWordWhere(query, ['nameRo', 'lifeRo'])
 
   try {
     const { prisma } = await import('@/lib/prisma')
 
     const [books, articles, saints] = await Promise.all([
       prisma.libraryBook.findMany({
-        where: {
-          OR: [
-            { titleRo: insensitive },
-          ],
-        },
+        where: bookWhere,
         select: { slug: true, titleRo: true, type: true },
         take: 8,
       }),
@@ -53,7 +55,7 @@ async function searchAll(query: string): Promise<Record<string, SearchResult[]>>
           published: true,
           AND: [
             scheduledGate,
-            { OR: [{ titleRo: insensitive }] },
+            ...(articleWhere ? [articleWhere] : []),
           ],
         },
         select: { slug: true, titleRo: true, category: true },
@@ -61,11 +63,7 @@ async function searchAll(query: string): Promise<Record<string, SearchResult[]>>
         orderBy: { publishedAt: 'desc' },
       }),
       prisma.saint.findMany({
-        where: {
-          OR: [
-            { nameRo: insensitive },
-          ],
-        },
+        where: saintWhere,
         select: { nameRo: true, month: true, day: true },
         take: 8,
       }),

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { matchesAllWords } from '@/lib/search'
 
 export const dynamic = 'force-dynamic'
 
@@ -103,12 +104,7 @@ const NT_BOOKS = [
 ] // 27 cărți
 
 function matchesQuery(book: { labelRo: string; labelRu: string; labelEn: string }, query: string): boolean {
-  const q = query.toLowerCase()
-  return (
-    book.labelRo.toLowerCase().includes(q) ||
-    book.labelRu.toLowerCase().includes(q) ||
-    book.labelEn.toLowerCase().includes(q)
-  )
+  return matchesAllWords(query, [book.labelRo, book.labelRu, book.labelEn])
 }
 
 export default async function BibliePage({

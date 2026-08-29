@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { buildWordWhere } from '@/lib/search'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,11 +25,8 @@ async function getSaints(q: string | undefined, month: number | undefined) {
     const { prisma } = await import('@/lib/prisma')
     const where: Record<string, unknown> = {}
     if (month) where.month = month
-    if (q) {
-      where.OR = [
-        { nameRo: { contains: q, mode: 'insensitive' } },
-      ]
-    }
+    const wordWhere = q ? buildWordWhere(q, ['nameRo', 'lifeRo']) : undefined
+    if (wordWhere) where.AND = wordWhere.AND
     return await prisma.saint.findMany({
       where,
       select: { slug: true, nameRo: true, month: true, day: true, feastType: true, iconUrl: true },
