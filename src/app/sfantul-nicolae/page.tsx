@@ -145,7 +145,7 @@ export default async function SfantulNicolaePage() {
             </div>
 
             <Link
-              href="/carti"
+              href="/carti/acatistul-sfantului-ierarh-nicolae-arhiepiscopul-de-mira-lichia"
               className="font-body text-sm px-5 py-2.5 rounded border inline-flex items-center gap-2 transition-all hover:bg-amber-50"
               style={{ color: '#8B6014', borderColor: '#C9A84C' }}
             >
@@ -230,7 +230,7 @@ export default async function SfantulNicolaePage() {
             {t.saintNicholasPage.acatistCtaText}
           </p>
           <Link
-            href="/carti"
+            href="/carti/acatistul-sfantului-ierarh-nicolae-arhiepiscopul-de-mira-lichia"
             className="font-body text-sm px-6 py-2.5 rounded border inline-block transition-all hover:bg-white/10"
             style={{ borderColor: '#C9A84C', color: '#C9A84C' }}
           >

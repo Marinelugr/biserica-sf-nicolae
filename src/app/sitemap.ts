@@ -31,7 +31,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/video', changeFrequency: 'weekly', priority: 0.7 },
     { path: '/stiri', changeFrequency: 'daily', priority: 0.8 },
     { path: '/donatii', changeFrequency: 'monthly', priority: 0.7 },
-    { path: '/magazin', changeFrequency: 'weekly', priority: 0.6 },
     { path: '/sfintii', changeFrequency: 'monthly', priority: 0.7 },
     { path: '/contact', changeFrequency: 'monthly', priority: 0.6 },
     { path: '/politica-de-confidentialitate', changeFrequency: 'yearly', priority: 0.3 },

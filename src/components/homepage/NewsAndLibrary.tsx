@@ -280,51 +280,6 @@ export default function NewsAndLibrary({ articles, libraryBooks, showNews, showL
           </div>
           )}
         </div>
-
-        {/* ─── Căutare în Sfânta Scriptură — bară lată, centrată ─── */}
-        {showLibrary && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-50px' }}
-            transition={{ duration: 0.6 }}
-            className="glass-cobalt mt-14 p-6 sm:p-8 max-w-2xl mx-auto text-center"
-          >
-            <p className="font-body text-sm mb-4" style={{ color: '#E9EFFA' }}>
-              {t.home.searchInScripture}
-            </p>
-            <form
-              action="/biblie"
-              method="get"
-              className="flex gap-0 max-w-lg mx-auto overflow-hidden rounded-lg"
-              style={{ border: '1px solid rgba(255,255,255,0.15)' }}
-            >
-              <label htmlFor="scripture-search" className="sr-only">{t.bible.searchPlaceholder}</label>
-              <input
-                id="scripture-search"
-                type="search"
-                name="q"
-                placeholder={t.bible.searchPlaceholder}
-                className="flex-1 px-4 py-3 text-sm font-body outline-none bg-transparent"
-                style={{ color: '#E9EFFA' }}
-              />
-              <button
-                type="submit"
-                className="px-5 py-3 text-sm font-body font-medium transition-all hover:opacity-90"
-                style={{ backgroundColor: '#5A8FE8', color: '#04080F' }}
-              >
-                {t.bible.searchBtn}
-              </button>
-            </form>
-            <Link
-              href="/biblie"
-              className="font-body text-xs mt-4 inline-flex items-center gap-1 transition-colors hover:opacity-80"
-              style={{ color: '#C9A84C' }}
-            >
-              {t.home.orthodoxBibleBtn}
-            </Link>
-          </motion.div>
-        )}
       </div>
     </section>
   )

@@ -2,6 +2,17 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getServerT } from '@/lib/i18n/server'
+import { prisma } from '@/lib/prisma'
+
+export const dynamic = 'force-dynamic'
+
+async function getPriest() {
+  try {
+    return await prisma.priest.findFirst({ select: { nameRo: true, titleRo: true, photoUrl: true } })
+  } catch {
+    return null
+  }
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerT()
@@ -18,7 +29,9 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 }
 
-export default function DesprePage() {
+export default async function DesprePage() {
+  const priest = await getPriest()
+
   return (
     <>
       {/* ─── Banda panoramică 21:9 ─── */}
@@ -42,7 +55,7 @@ export default function DesprePage() {
             Parohia Ortodoxă
           </p>
           <h1 className="font-heading mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
-            Despre Biserică
+            Despre Parohie
           </h1>
           <div className="flex items-center justify-center gap-3">
             <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
@@ -86,20 +99,42 @@ export default function DesprePage() {
             className="flex flex-col sm:flex-row gap-8 p-8 rounded-lg"
             style={{ backgroundColor: '#F8F7F5', border: '1px solid #E8E5E0' }}
           >
-            <div
-              className="shrink-0 w-32 h-32 rounded-full overflow-hidden"
-              style={{ backgroundColor: '#F2EBD9', border: '3px solid #D4C8A0' }}
-            >
-              <div className="w-full h-full flex items-center justify-center">
+            {priest?.photoUrl ? (
+              <img
+                src={priest.photoUrl}
+                alt={priest.nameRo || 'Preot paroh'}
+                className="shrink-0"
+                style={{
+                  width: '190px',
+                  height: '230px',
+                  borderRadius: '10px',
+                  border: '2px solid rgba(212,175,55,0.4)',
+                  objectFit: 'cover',
+                  display: 'block',
+                }}
+              />
+            ) : (
+              <div
+                className="shrink-0 flex items-center justify-center"
+                style={{
+                  width: '190px',
+                  height: '230px',
+                  borderRadius: '10px',
+                  border: '2px solid rgba(212,175,55,0.4)',
+                  backgroundColor: '#F2EBD9',
+                }}
+              >
                 <span style={{ color: '#C9A84C', fontSize: '48px' }} aria-hidden="true">☦</span>
               </div>
-            </div>
+            )}
             <div>
               <h3 className="font-heading text-xl mb-1" style={{ color: '#1C1B3A' }}>
-                Preot paroh
+                {priest?.nameRo || 'Preot paroh'}
               </h3>
               <p className="font-body text-base mb-4" style={{ color: '#8A7050' }}>
-                Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic
+                {priest?.titleRo
+                  ? `${priest.titleRo} · Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic`
+                  : 'Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic'}
               </p>
               <p className="font-body text-base leading-relaxed" style={{ color: '#3A1A1A' }}>
                 Parohia este păstorită cu dragoste și devoțiune, menținând vie tradiția
@@ -107,34 +142,6 @@ export default function DesprePage() {
                 liturgic ortodox, în fiecare duminică și la toate sărbătorile.
               </p>
             </div>
-          </div>
-        </section>
-
-        {/* ─── Program slujbe ─── */}
-        <section className="mb-14">
-          <h2 className="font-heading text-2xl mb-6" style={{ color: '#1C1B3A' }}>
-            Program Slujbe
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {[
-              { zi: 'Duminică', program: 'Sfânta Liturghie — ora 9:00' },
-              { zi: 'Sărbători', program: 'Sfânta Liturghie — conform calendarului' },
-              { zi: 'Miercuri & Vineri', program: 'Acatist — ora 17:00 (în perioadele de post)' },
-              { zi: 'Parastase', program: 'La cerere — contactați preotul paroh' },
-            ].map(item => (
-              <div
-                key={item.zi}
-                className="p-5 rounded-md"
-                style={{ backgroundColor: '#F5EFE0', border: '1px solid #D4C8A0' }}
-              >
-                <h3 className="font-heading text-base font-semibold mb-1" style={{ color: '#8B1A1A' }}>
-                  {item.zi}
-                </h3>
-                <p className="font-body text-sm" style={{ color: '#3A1A1A' }}>
-                  {item.program}
-                </p>
-              </div>
-            ))}
           </div>
         </section>
 

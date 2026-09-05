@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { getLiturgicalDates, formatDate } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
-import { getFixedFeasts, FIXED_FASTS, isApostlesFast } from '@/lib/constants/oldCalendarFeasts'
+import { getFixedFeasts, FIXED_FASTS, isApostlesFast, getSingleDayFast } from '@/lib/constants/oldCalendarFeasts'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 export const dynamic = 'force-dynamic'
@@ -106,6 +106,12 @@ export default async function CalendarPage({
     if (fast.inFast(safeDay, selMonth, selYear)) {
       activeFasts.push({ name: t.calendar.fastNames[fast.nameKey], color: fast.color })
     }
+  }
+
+  // Zile de post aspru cu dată fixă (Tăierea Capului Sf. Ioan, Înălțarea Crucii etc.)
+  const singleDayFast = getSingleDayFast(safeDay, selMonth)
+  if (singleDayFast) {
+    activeFasts.push({ name: t.calendar.fastNames[singleDayFast.nameKey], color: singleDayFast.color })
   }
 
   const selectedDateStr = new Date(selYear, selMonth - 1, safeDay).toLocaleDateString(localeToIntl(locale), {

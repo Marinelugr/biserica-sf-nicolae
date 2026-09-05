@@ -37,14 +37,14 @@ export interface Translations {
       christmas: string; epiphany: string; annunciation: string; transfiguration: string
       dormition: string; nativityMary: string; exaltationCross: string
       entryTemple: string; saintNicholas: string; meetingLord: string
-      peterPaul: string; birthJohnBaptist: string; circumcision: string
+      peterPaul: string; birthJohnBaptist: string; beheadingJohnBaptist: string; circumcision: string
       archangels: string; palmSunday: string; holyThursday: string; holyFriday: string
       easter: string; thomasSunday: string; ascension: string
       pentecost: string; allSaints: string
     }
     fastNames: {
       greatLent: string; apostlesFast: string; dormitionFast: string; christmasFast: string
-      inFast: string
+      inFast: string; strictFast: string
     }
     weeklyTone: string
     julianDate: string
@@ -194,7 +194,7 @@ const ro: Translations = {
     heroMitropolia: 'Mitropolia Chișinăului și a întregii Moldove',
     heroImageAlt: 'Vedere aeriană a Bisericii Sfântul Ierarh Nicolae, Hîrtopul Mic',
     searchPlaceholder: 'Caută pe site...', searchBtn: 'Caută',
-    aboutBtn: 'Despre Biserică', donateBtn: 'Susține Biserica',
+    aboutBtn: 'Despre Parohie', donateBtn: 'Susține Biserica',
     liturgicalLife: 'Viața liturgică a zilei',
     saintsToday: 'Sfinții zilei', gospelToday: 'Evanghelia zilei',
     prayerToday: 'Rugăciunea zilei',
@@ -241,6 +241,7 @@ const ro: Translations = {
       saintNicholas: 'Sfântul Ierarh Nicolae, Arhiepiscopul Mirelor Lichiei',
       meetingLord: 'Întâmpinarea Domnului', peterPaul: 'Sfinții Apostoli Petru și Pavel',
       birthJohnBaptist: 'Nașterea Sfântului Ioan Botezătorul',
+      beheadingJohnBaptist: 'Tăierea Capului Sfântului Ioan Botezătorul',
       circumcision: 'Tăierea împrejur a Domnului · Sf. Vasile cel Mare',
       archangels: 'Soborul Sfinților Arhangheli Mihail și Gavriil',
       palmSunday: 'Duminica Floriilor', holyThursday: 'Joia Mare (Joia Patimirilor)',
@@ -252,6 +253,7 @@ const ro: Translations = {
       greatLent: 'Postul Mare', apostlesFast: 'Postul Sfinților Apostoli',
       dormitionFast: 'Postul Adormirii Maicii Domnului',
       christmasFast: 'Postul Crăciunului', inFast: 'Zi de post',
+      strictFast: 'Zi de post aspru',
     },
     weeklyTone: 'Glasul săptămânii', julianDate: 'Stil vechi', todayWidget: 'Astăzi în calendar',
     julianSuffix: '(iulian)', gaussFooter: 'Stil vechi · Algoritmul Gauss Julian',
@@ -373,7 +375,7 @@ const ro: Translations = {
     galleryTitle: 'Galerie imagini',
     acatistCtaTitle: 'Acatistul Sfântului Ierarh Nicolae',
     acatistCtaText: 'Citiți Acatistul Sfântului Nicolae din Biblioteca Ortodoxă digitală a parohiei.',
-    goToLibrary: 'Mergi la Bibliotecă',
+    goToLibrary: 'Citește Acatistul',
   },
   footer: {
     parish: 'Parohia Ortodoxă', address: 'Hîrtopul Mic, Raionul Criuleni',
@@ -384,7 +386,7 @@ const ro: Translations = {
     copyright: 'Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic',
     phone: 'Telefon', email: 'Email',
     pages: {
-      about: 'Despre Biserică', bible: 'Sfânta Scriptură', books: 'Bibliotecă Ortodoxă',
+      about: 'Despre Parohie', bible: 'Sfânta Scriptură', books: 'Bibliotecă Ortodoxă',
       calendar: 'Calendar Liturgic', history: 'Istoria Bisericii', saint: 'Sfântul Nicolae',
       news: 'Știri & Articole', video: 'Video Ortodox',
     },
@@ -439,9 +441,9 @@ const ro: Translations = {
       twitterDescription: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Moldova.',
     },
     despre: {
-      title: 'Despre Biserică',
+      title: 'Despre Parohie',
       description: 'Istoria Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Moldova. Ctitorire, arhitectură, paroh și galerie foto.',
-      ogTitle: 'Despre Biserică — Parohia Sfântul Nicolae',
+      ogTitle: 'Despre Parohie — Parohia Sfântul Nicolae',
       ogDescription: 'Istoria și prezentul Parohiei Ortodoxe din Hîrtopul Mic, Criuleni.',
     },
     istoriaBisericii: {

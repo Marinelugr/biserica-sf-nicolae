@@ -13,7 +13,7 @@ const en: Translations = {
     heroMitropolia: 'Metropolis of Chișinău and All Moldova',
     heroImageAlt: 'Aerial view of Saint Nicholas Church, Hîrtopul Mic',
     searchPlaceholder: 'Search the site...', searchBtn: 'Search',
-    aboutBtn: 'About the Church', donateBtn: 'Support the Church',
+    aboutBtn: 'About the Parish', donateBtn: 'Support the Church',
     liturgicalLife: 'Liturgical Life of the Day',
     saintsToday: 'Saints of the Day', gospelToday: 'Gospel of the Day',
     prayerToday: 'Prayer of the Day',
@@ -59,6 +59,7 @@ const en: Translations = {
       saintNicholas: 'Saint Nicholas the Hierarch, Archbishop of Myra in Lycia',
       meetingLord: 'Meeting of the Lord (Candlemas)', peterPaul: 'Holy Apostles Peter and Paul',
       birthJohnBaptist: 'Nativity of Saint John the Baptist',
+      beheadingJohnBaptist: 'Beheading of Saint John the Baptist',
       circumcision: 'Circumcision of the Lord · St. Basil the Great',
       archangels: 'Synaxis of Archangels Michael and Gabriel',
       palmSunday: 'Palm Sunday (Entry into Jerusalem)',
@@ -70,7 +71,7 @@ const en: Translations = {
     fastNames: {
       greatLent: 'Great Lent', apostlesFast: "Apostles' Fast",
       dormitionFast: 'Dormition Fast', christmasFast: 'Nativity Fast',
-      inFast: 'Fasting day',
+      inFast: 'Fasting day', strictFast: 'Strict fasting day',
     },
     weeklyTone: 'Weekly tone', julianDate: 'Old Style', todayWidget: 'Today in the calendar',
     julianSuffix: '(Julian)', gaussFooter: 'Old Style · Julian Gauss Algorithm',
@@ -192,7 +193,7 @@ const en: Translations = {
     galleryTitle: 'Photo Gallery',
     acatistCtaTitle: 'The Akathist to Saint Nicholas the Hierarch',
     acatistCtaText: 'Read the Akathist to Saint Nicholas from the parish\'s digital Orthodox Library.',
-    goToLibrary: 'Go to the Library',
+    goToLibrary: 'Read the Akathist',
   },
   footer: {
     parish: 'Orthodox Parish', address: 'Hîrtopul Mic, Criuleni District',
@@ -203,7 +204,7 @@ const en: Translations = {
     copyright: 'Parish of Saint Nicholas, Hîrtopul Mic',
     phone: 'Phone', email: 'Email',
     pages: {
-      about: 'About the Church', bible: 'Holy Scripture', books: 'Orthodox Library',
+      about: 'About the Parish', bible: 'Holy Scripture', books: 'Orthodox Library',
       calendar: 'Liturgical Calendar', history: 'Church History', saint: 'Saint Nicholas',
       news: 'News & Articles', video: 'Orthodox Video',
     },
@@ -258,9 +259,9 @@ const en: Translations = {
       twitterDescription: 'Orthodox Parish in Hîrtopul Mic, Criuleni, Moldova.',
     },
     despre: {
-      title: 'About the Church',
+      title: 'About the Parish',
       description: 'History of Saint Nicholas Parish in Hîrtopul Mic, Criuleni District, Moldova. Founding, architecture, priest, and photo gallery.',
-      ogTitle: 'About the Church — Saint Nicholas Parish',
+      ogTitle: 'About the Parish — Saint Nicholas Parish',
       ogDescription: 'The history and present life of the Orthodox Parish in Hîrtopul Mic, Criuleni.',
     },
     istoriaBisericii: {

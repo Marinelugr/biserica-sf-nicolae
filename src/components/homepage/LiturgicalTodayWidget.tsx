@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { getLiturgicalDates } from '@/lib/utils'
-import { isApostlesFast, FIXED_FASTS } from '@/lib/constants/oldCalendarFeasts'
+import { isApostlesFast, FIXED_FASTS, getSingleDayFast } from '@/lib/constants/oldCalendarFeasts'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import type { Translations } from '@/lib/i18n/ro'
@@ -13,6 +13,9 @@ function getFastInfo(now: Date, t: Translations): string | null {
   const target = new Date(now); target.setHours(0, 0, 0, 0)
   const lentStart = new Date(dates.greatLentStart); lentStart.setHours(0, 0, 0, 0)
   const easterDay = new Date(dates.easter); easterDay.setHours(0, 0, 0, 0)
+
+  const singleDayFast = getSingleDayFast(day, month)
+  if (singleDayFast) return t.calendar.fastNames[singleDayFast.nameKey]
 
   if (target >= lentStart && target < easterDay) return t.calendar.fastNames.greatLent
   if (isApostlesFast(day, month, year, dates.allSaintsDay)) return t.calendar.fastNames.apostlesFast

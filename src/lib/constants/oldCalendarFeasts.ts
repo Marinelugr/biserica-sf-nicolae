@@ -31,6 +31,7 @@ export const OLD_CALENDAR_FEASTS: OldCalendarFeast[] = [
   { month: 8,  day: 19, nameKey: 'transfiguration',     type: 'GREAT',  color: '#8B1A1A', julianDate: '6 aug'  },
   { month: 8,  day: 28, nameKey: 'dormition',           type: 'GREAT',  color: '#8B1A1A', julianDate: '15 aug' },
   // SEPTEMBRIE
+  { month: 9,  day: 11, nameKey: 'beheadingJohnBaptist', type: 'GREAT', color: '#8B1A1A', julianDate: '29 aug' },
   { month: 9,  day: 21, nameKey: 'nativityMary',        type: 'GREAT',  color: '#8B1A1A', julianDate: '8 sep'  },
   { month: 9,  day: 27, nameKey: 'exaltationCross',     type: 'GREAT',  color: '#8B1A1A', julianDate: '14 sep' },
   // NOIEMBRIE
@@ -77,6 +78,32 @@ export const FIXED_FASTS: FastPeriod[] = [
     inFast: (day, month) => month === 8 && day >= 14 && day <= 27,
   },
 ]
+
+/**
+ * Zile de post aspru cu dată FIXĂ (o singură zi, indiferent de perioada de post).
+ * Date gregoriene, stil vechi + 13 zile.
+ *
+ *  - Tăierea Capului Sf. Ioan Botezătorul: 11 sep greg (29 aug iulian)
+ *  - Înălțarea Sfintei Cruci:              27 sep greg (14 sep iulian)
+ *  - Ajunul Botezului Domnului:            18 ian greg (5 ian iulian)
+ */
+export interface SingleDayFast {
+  month: number
+  day: number
+  nameKey: keyof import('../i18n/ro').Translations['calendar']['fastNames']
+  color: string
+}
+
+export const SINGLE_DAY_FASTS: SingleDayFast[] = [
+  { month: 1, day: 18, nameKey: 'strictFast', color: '#4A6A2A' },
+  { month: 9, day: 11, nameKey: 'strictFast', color: '#4A6A2A' },
+  { month: 9, day: 27, nameKey: 'strictFast', color: '#4A6A2A' },
+]
+
+/** Returnează postul de o zi (aspru) pentru o zi/lună gregoriană, dacă există */
+export function getSingleDayFast(day: number, month: number): SingleDayFast | undefined {
+  return SINGLE_DAY_FASTS.find(f => f.month === month && f.day === day)
+}
 
 /**
  * Verifică postul Apostolilor (schimbător).

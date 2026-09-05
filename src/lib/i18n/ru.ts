@@ -13,7 +13,7 @@ const ru: Translations = {
     heroMitropolia: 'Митрополия Кишинёва и всея Молдовы',
     heroImageAlt: 'Вид с воздуха на Храм святителя Николая, Хыртопул Мик',
     searchPlaceholder: 'Поиск по сайту...', searchBtn: 'Искать',
-    aboutBtn: 'О Церкви', donateBtn: 'Поддержать Церковь',
+    aboutBtn: 'О приходе', donateBtn: 'Поддержать Церковь',
     liturgicalLife: 'Литургическая жизнь дня',
     saintsToday: 'Святые дня', gospelToday: 'Евангелие дня',
     prayerToday: 'Молитва дня',
@@ -59,6 +59,7 @@ const ru: Translations = {
       saintNicholas: 'Святитель Николай, Архиепископ Мирликийский',
       meetingLord: 'Сретение Господне', peterPaul: 'Святые Апостолы Пётр и Павел',
       birthJohnBaptist: 'Рождество Святого Иоанна Предтечи',
+      beheadingJohnBaptist: 'Усекновение главы Иоанна Предтечи',
       circumcision: 'Обрезание Господне · Св. Василий Великий',
       archangels: 'Собор Архангелов Михаила и Гавриила',
       palmSunday: 'Вход Господень в Иерусалим (Вербное воскресенье)',
@@ -70,7 +71,7 @@ const ru: Translations = {
     fastNames: {
       greatLent: 'Великий пост', apostlesFast: 'Петров пост',
       dormitionFast: 'Успенский пост', christmasFast: 'Рождественский пост',
-      inFast: 'Постный день',
+      inFast: 'Постный день', strictFast: 'День строгого поста',
     },
     weeklyTone: 'Глас недели', julianDate: 'Старый стиль', todayWidget: 'Сегодня в календаре',
     julianSuffix: '(юлианский)', gaussFooter: 'Старый стиль · Алгоритм Гаусса',
@@ -192,7 +193,7 @@ const ru: Translations = {
     galleryTitle: 'Фотогалерея',
     acatistCtaTitle: 'Акафист святителю Николаю Чудотворцу',
     acatistCtaText: 'Прочитайте Акафист святителю Николаю в цифровой Православной библиотеке прихода.',
-    goToLibrary: 'Перейти в библиотеку',
+    goToLibrary: 'Читать акафист',
   },
   footer: {
     parish: 'Православный приход', address: 'Хыртопул Мик, Район Криулень',
@@ -203,7 +204,7 @@ const ru: Translations = {
     copyright: 'Приход Святителя Николая, Хыртопул Мик',
     phone: 'Телефон', email: 'Эл. почта',
     pages: {
-      about: 'О Церкви', bible: 'Священное Писание', books: 'Православная библиотека',
+      about: 'О приходе', bible: 'Священное Писание', books: 'Православная библиотека',
       calendar: 'Богослужебный календарь', history: 'История Церкви', saint: 'Святой Николай',
       news: 'Новости & Статьи', video: 'Православное видео',
     },

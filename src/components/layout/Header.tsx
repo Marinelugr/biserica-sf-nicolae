@@ -60,7 +60,6 @@ export default function Header() {
     { href: '/istoria-bisericii', label: t.nav.churchHistory },
     { href: '/sfantul-nicolae', label: t.nav.saintNicholas },
     { href: '/paroh', label: t.nav.priest },
-    { href: '/magazin', label: t.nav.shop },
     { href: '/contact', label: t.nav.contact },
     { href: '/live', label: t.nav.live, live: true },
   ].map(link => ({ ...link, href: localizedHref(link.href, locale) }))

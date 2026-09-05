@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
+import { Fragment, type ReactNode } from 'react'
 import Hero from '@/components/homepage/Hero'
 import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
@@ -15,6 +16,7 @@ import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { localeToIntl, type Locale } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { publicArticleWhere } from '@/lib/articleVisibility'
+import { mergeHomepageWidgets, DEFAULT_HOMEPAGE_WIDGETS } from '@/lib/homepageWidgets'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerT()
@@ -24,14 +26,6 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: buildAlternates('/'),
   }
 }
-
-const DEFAULT_WIDGETS = [
-  { section: 'sfintii_zilei', order: 0, enabled: true },
-  { section: 'evanghelia_zilei', order: 1, enabled: true },
-  { section: 'rugaciunea_zilei', order: 2, enabled: true },
-  { section: 'stiri_recente', order: 3, enabled: true },
-  { section: 'biblioteca_ortodoxa', order: 4, enabled: true },
-]
 
 const RUGACIUNI_ZILE: Record<number, string> = {
   0: 'duminica',
@@ -51,23 +45,15 @@ async function getWidgetConfig() {
   try {
     const { prisma } = await import('@/lib/prisma')
     const widgets = await prisma.homepageWidget.findMany({ orderBy: { order: 'asc' } })
-    const list = widgets.length > 0 ? widgets : DEFAULT_WIDGETS
+    const merged = mergeHomepageWidgets(widgets)
 
     const enabled: Record<string, boolean> = {}
-    const order: string[] = []
-    for (const w of list) {
-      enabled[w.section] = w.enabled
-      if (w.enabled) order.push(w.section)
-    }
-    return { enabled, order }
+    for (const w of merged) enabled[w.section] = w.enabled
+    return { enabled, orderedSections: merged.map(w => w.section) }
   } catch {
     const enabled: Record<string, boolean> = {}
-    const order: string[] = []
-    for (const w of DEFAULT_WIDGETS) {
-      enabled[w.section] = true
-      order.push(w.section)
-    }
-    return { enabled, order }
+    for (const w of DEFAULT_HOMEPAGE_WIDGETS) enabled[w.section] = true
+    return { enabled, orderedSections: DEFAULT_HOMEPAGE_WIDGETS.map(w => w.section) }
   }
 }
 
@@ -158,6 +144,15 @@ async function getHomeContent(locale: Locale) {
 
 const DAILY_CARD_SECTIONS = ['sfintii_zilei', 'evanghelia_zilei', 'rugaciunea_zilei']
 
+/** Secțiunile individuale mapate pe blocul vizual în care sunt randate. */
+function unitForSection(section: string): string {
+  if (DAILY_CARD_SECTIONS.includes(section)) return 'daily_cards'
+  if (section === 'stiri_recente' || section === 'biblioteca_ortodoxa') return 'news_library'
+  return section
+}
+
+const UNIT_ORDER_FALLBACK = ['hero', 'astazi_calendar', 'pascal_slujbe', 'mesajul_parintelui', 'daily_cards', 'news_library']
+
 export default async function HomePage() {
   const locale = await getServerLocale()
   const [dailyData, homeContent, widgetConfig] = await Promise.all([
@@ -166,36 +161,68 @@ export default async function HomePage() {
     getWidgetConfig(),
   ])
 
-  const { enabled, order } = widgetConfig
+  const { enabled, orderedSections } = widgetConfig
+  const dailyOrder = orderedSections.filter(s => DAILY_CARD_SECTIONS.includes(s) && enabled[s])
   const showDailyCards = DAILY_CARD_SECTIONS.some(s => enabled[s])
-  const showNews = enabled['stiri_recente']
-  const showLibrary = enabled['biblioteca_ortodoxa']
+  const showNews = !!enabled['stiri_recente']
+  const showLibrary = !!enabled['biblioteca_ortodoxa']
+
+  // Ordinea blocurilor de nivel superior, derivată din configurarea admin
+  const units: string[] = []
+  for (const s of orderedSections) {
+    const u = unitForSection(s)
+    if (!units.includes(u)) units.push(u)
+  }
+  for (const u of UNIT_ORDER_FALLBACK) if (!units.includes(u)) units.push(u)
+
+  const renderUnit = (unit: string): ReactNode => {
+    switch (unit) {
+      case 'hero':
+        return enabled['hero'] === false ? null : <Hero key="hero" />
+      case 'astazi_calendar':
+        return enabled['astazi_calendar'] === false ? null : <LiturgicalTodayWidget key="astazi_calendar" />
+      case 'pascal_slujbe':
+        return enabled['pascal_slujbe'] === false ? null : (
+          <section key="pascal_slujbe" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <PascalCard />
+              <NextServiceWidget />
+            </div>
+          </section>
+        )
+      case 'mesajul_parintelui':
+        return enabled['mesajul_parintelui'] === false ? null : <PriestMessageSection key="mesajul_parintelui" />
+      case 'daily_cards':
+        return showDailyCards
+          ? <DailyCards key="daily_cards" data={dailyData} enabled={enabled} order={dailyOrder} />
+          : null
+      case 'news_library':
+        return (showNews || showLibrary)
+          ? (
+            <NewsAndLibrary
+              key="news_library"
+              articles={homeContent.articles}
+              libraryBooks={homeContent.libraryBooks}
+              showNews={showNews}
+              showLibrary={showLibrary}
+            />
+          )
+          : null
+      default:
+        return null
+    }
+  }
 
   return (
     <div className="relative" style={{ backgroundColor: '#04080F' }}>
       <CobaltAurora />
       <div className="relative" style={{ zIndex: 2 }}>
-        <Hero />
-        <LiveStreamCard />
-        <LiturgicalTodayWidget />
-        <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <PascalCard />
-            <NextServiceWidget />
-          </div>
-        </section>
-        <PriestMessageSection />
-        {showDailyCards && (
-          <DailyCards data={dailyData} enabled={enabled} order={order} />
-        )}
-        {(showNews || showLibrary) && (
-          <NewsAndLibrary
-            articles={homeContent.articles}
-            libraryBooks={homeContent.libraryBooks}
-            showNews={showNews}
-            showLibrary={showLibrary}
-          />
-        )}
+        {units.map(u => (
+          <Fragment key={u}>
+            {renderUnit(u)}
+            {u === 'hero' && <LiveStreamCard />}
+          </Fragment>
+        ))}
       </div>
     </div>
   )
