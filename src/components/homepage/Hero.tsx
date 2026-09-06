@@ -1,15 +1,12 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import Image from 'next/image'
 import { useI18n } from '@/lib/i18n/context'
 import CandleParticles from '@/components/CandleParticles'
 
 export default function Hero() {
-  const [query, setQuery] = useState('')
-  const router = useRouter()
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement>(null)
   const prefersReducedMotion = useReducedMotion()
@@ -24,8 +21,7 @@ export default function Hero() {
   const separatorDelay = titleDoneDelay
   const subtitle1Delay = separatorDelay + 0.15
   const subtitle2Delay = subtitle1Delay + 0.15
-  const searchDelay = subtitle2Delay + 0.25
-  const buttonsDelay = searchDelay + 0.25
+  const buttonsDelay = subtitle2Delay + 0.3
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,13 +32,6 @@ export default function Hero() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (query.trim()) {
-      router.push(`/cautare?q=${encodeURIComponent(query.trim())}`)
-    }
-  }
 
   return (
     <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden">
@@ -114,46 +103,11 @@ export default function Hero() {
           {t.home.heroMitropolia}
         </motion.p>
 
-        {/* Bara de căutare globală */}
-        <motion.form
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: searchDelay }}
-          onSubmit={handleSearch}
-          className="glass-cobalt glass-cobalt-strong flex gap-0 max-w-lg mx-auto overflow-hidden shadow-2xl"
-        >
-          <label htmlFor="site-search" className="sr-only">{t.home.searchPlaceholder}</label>
-          <input
-            id="site-search"
-            type="search"
-            value={query}
-            onChange={e => setQuery(e.target.value)}
-            placeholder={t.home.searchPlaceholder}
-            className="flex-1 px-4 py-3 text-sm font-body outline-none bg-transparent"
-            style={{
-              color: '#F2EBD9',
-            }}
-          />
-          <button
-            type="submit"
-            className="px-5 py-3 text-sm font-body font-medium transition-all hover:opacity-90 flex items-center gap-2"
-            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}
-            aria-label={t.home.searchBtn}
-          >
-            <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-              <path fillRule="evenodd"
-                d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-                clipRule="evenodd" />
-            </svg>
-            {t.home.searchBtn}
-          </button>
-        </motion.form>
-
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: buttonsDelay }}
-          className="mt-10 flex justify-center gap-6"
+          className="flex justify-center gap-6"
           style={{ paddingBottom: '40px' }}
         >
           <a
