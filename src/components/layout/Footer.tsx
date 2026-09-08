@@ -36,8 +36,14 @@ export default async function Footer() {
 
           {/* Coloana 1 — Logo & adresă */}
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl" style={{ color: '#C9A84C' }} aria-hidden="true">☦</span>
+            <div className="flex items-center gap-3 mb-3">
+              <img
+                src="/logo.png"
+                alt="Emblema Parohiei Sfântul Ierarh Nicolae"
+                width={26}
+                height={46}
+                style={{ height: '46px', width: 'auto', display: 'block', flexShrink: 0 }}
+              />
               <span className="font-heading text-base font-semibold" style={{ color: '#C9A84C' }}>
                 Sfântul Ierarh Nicolae
               </span>

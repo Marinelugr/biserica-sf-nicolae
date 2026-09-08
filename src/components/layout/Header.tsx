@@ -96,7 +96,15 @@ export default function Header() {
               </button>
 
               <Link href={homeHref} className="flex items-center gap-2 min-w-0 group" aria-label={t.nav.home}>
-                <span aria-hidden="true" style={{ color: '#E9CE7A', fontSize: '22px', lineHeight: 1 }}>☦</span>
+                <img
+                  src="/logo.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={20}
+                  height={35}
+                  className="shrink-0"
+                  style={{ height: '34px', width: 'auto', display: 'block' }}
+                />
                 <span
                   className="font-heading italic font-semibold leading-none truncate"
                   style={{
@@ -237,10 +245,18 @@ export default function Header() {
           style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}
         >
           <span
-            className="font-heading italic font-semibold"
+            className="flex items-center gap-2 font-heading italic font-semibold"
             style={{ color: '#E9CE7A', fontSize: '18px', fontFamily: 'var(--font-cormorant), Georgia, serif' }}
           >
-            ☦ Sf. Ierarh Nicolae
+            <img
+              src="/logo.png"
+              alt=""
+              aria-hidden="true"
+              width={17}
+              height={30}
+              style={{ height: '30px', width: 'auto', display: 'block' }}
+            />
+            Sf. Ierarh Nicolae
           </span>
           <button
             onClick={() => setMenuOpen(false)}

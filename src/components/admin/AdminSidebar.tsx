@@ -20,7 +20,7 @@ export default function AdminSidebar() {
       }}
     >
       <div style={{ padding: '0 1.25rem 1.25rem', borderBottom: '1px solid #1E1208' }}>
-        <div style={{ fontSize: '1.75rem', color: '#C9A84C', lineHeight: 1 }}>☦</div>
+        <img src="/logo.png" alt="" aria-hidden="true" width={23} height={40} style={{ height: '40px', width: 'auto', display: 'block' }} />
         <div style={{ color: '#C9A84C', fontSize: '0.875rem', fontFamily: 'Georgia, serif', fontWeight: 600, marginTop: '0.5rem' }}>
           Admin Panel
         </div>

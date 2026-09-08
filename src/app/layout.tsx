@@ -39,10 +39,6 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: m.description,
     keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online', 'transmisiune live'],
-    icons: {
-      icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-      apple: '/favicon.svg',
-    },
     manifest: '/manifest.json',
     appleWebApp: { capable: true, title: 'Sf. Nicolae', statusBarStyle: 'black-translucent' },
     openGraph: {
