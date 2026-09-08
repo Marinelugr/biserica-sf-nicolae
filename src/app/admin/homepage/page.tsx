@@ -16,6 +16,7 @@ const LABELS: Record<string, { label: string; icon: string; desc: string }> = {
   rugaciunea_zilei:    { label: 'Rugăciunea zilei',     icon: '🙏', desc: 'Rugăciune zilnică pentru credincioșii parohiei' },
   stiri_recente:       { label: 'Știri recente',        icon: '📰', desc: 'Ultimele articole și anunțuri publicate' },
   biblioteca_ortodoxa: { label: 'Biblioteca ortodoxă',  icon: '📚', desc: 'Cărți și texte din biblioteca digitală a parohiei' },
+  din_viata_bisericii: { label: 'Din viața Bisericii',  icon: '✝️', desc: 'Două carduri cu ultimele articole preluate automat de pe mitropolia.md și protopopiatul-criuleni-dubasari.md' },
 }
 
 function extractYouTubeId(url: string): string | null {

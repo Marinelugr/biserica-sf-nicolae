@@ -27,6 +27,7 @@ export const HOMEPAGE_SECTIONS = [
   'rugaciunea_zilei',
   'stiri_recente',
   'biblioteca_ortodoxa',
+  'din_viata_bisericii',
 ] as const
 
 export type HomepageSection = (typeof HOMEPAGE_SECTIONS)[number]

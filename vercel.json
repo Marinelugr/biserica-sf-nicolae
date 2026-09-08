@@ -1,5 +1,6 @@
 {
   "crons": [
-    { "path": "/api/cron/sfinti", "schedule": "0 0 * * *" }
+    { "path": "/api/cron/sfinti", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/feeds", "schedule": "0 */6 * * *" }
   ]
 }

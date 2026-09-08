@@ -11,6 +11,8 @@ import NextServiceWidget from '@/components/NextServiceWidget'
 import PascalCard from '@/components/PascalCard'
 import PriestMessageSection from '@/components/homepage/PriestMessageSection'
 import CobaltAurora from '@/components/homepage/CobaltAurora'
+import ChurchLifeSection from '@/components/homepage/ChurchLifeSection'
+import { getChurchLifeCards } from '@/lib/externalFeeds'
 import { getTodayDate } from '@/lib/utils'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { localeToIntl, type Locale } from '@/lib/i18n/pick'
@@ -151,14 +153,15 @@ function unitForSection(section: string): string {
   return section
 }
 
-const UNIT_ORDER_FALLBACK = ['hero', 'astazi_calendar', 'pascal_slujbe', 'mesajul_parintelui', 'daily_cards', 'news_library']
+const UNIT_ORDER_FALLBACK = ['hero', 'astazi_calendar', 'pascal_slujbe', 'mesajul_parintelui', 'daily_cards', 'news_library', 'din_viata_bisericii']
 
 export default async function HomePage() {
   const locale = await getServerLocale()
-  const [dailyData, homeContent, widgetConfig] = await Promise.all([
+  const [dailyData, homeContent, widgetConfig, churchLifeCards] = await Promise.all([
     getDailyData(locale),
     getHomeContent(locale),
     getWidgetConfig(),
+    getChurchLifeCards(),
   ])
 
   const { enabled, orderedSections } = widgetConfig
@@ -208,6 +211,10 @@ export default async function HomePage() {
             />
           )
           : null
+      case 'din_viata_bisericii':
+        return enabled['din_viata_bisericii'] === false
+          ? null
+          : <ChurchLifeSection key="din_viata_bisericii" cards={churchLifeCards} />
       default:
         return null
     }
