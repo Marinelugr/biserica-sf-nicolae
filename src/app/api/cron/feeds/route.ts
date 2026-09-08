@@ -5,7 +5,8 @@ export const dynamic = 'force-dynamic'
 
 /**
  * Reîmprospătează cache-ul feed-urilor „Din viața Bisericii" (mitropolia.md +
- * protopopiatul-criuleni-dubasari.md). Programat la 6 ore în vercel.json, după
+ * protopopiatul-criuleni-dubasari.md). Programat zilnic în vercel.json (limita
+ * planului Vercel Hobby — cron-urile pot rula cel mult o dată pe zi), după
  * modelul /api/cron/sfinti. La eșecul unei surse cache-ul vechi rămâne neatins.
  */
 export async function GET(req: NextRequest) {

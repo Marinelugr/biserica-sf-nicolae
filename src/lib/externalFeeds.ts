@@ -7,7 +7,7 @@
  *
  * Portare a mecanismului de pe protopopiatul-criuleni-dubasari.md
  * (includes/mitropolia_feed.php + includes/biserica_sf_nicolae_feed.php):
- * cache cu TTL de 6 ore, timeout strict per cerere, EȘEC SILENȚIOS — orice
+ * cache cu TTL, timeout strict per cerere, EȘEC SILENȚIOS — orice
  * problemă (timeout, HTTP != 200, parsare invalidă) e ignorată, cache-ul vechi
  * rămâne neatins, iar dacă nu există niciun cache cardul afectat pur și simplu
  * nu apare. Nu aruncă niciodată — homepage-ul nu se blochează și nu se rupe.
@@ -15,9 +15,10 @@
  * Cache-ul se ține în tabelul `Setting` (o linie / sursă, valoare = JSON),
  * exact ca restul configurărilor site-ului — fără model Prisma nou, fără
  * migrare de schemă. Reîmprospătarea se face:
- *   - programat, din cron-ul /api/cron/feeds (la 6 ore, ca /api/cron/sfinti);
- *   - leneș, la prima vizită după expirarea TTL-ului (fallback dacă cron-ul
- *     n-a rulat încă — ex. imediat după un deploy).
+ *   - programat, din cron-ul /api/cron/feeds — o dată pe zi (limita planului
+ *     Vercel Hobby: cron-urile pot rula cel mult zilnic), ca /api/cron/sfinti;
+ *   - leneș, la prima vizită după expirarea TTL-ului — fallback dacă cron-ul
+ *     n-a rulat (întârziere, eșec, dev local fără cron, imediat după deploy).
  *
  * Mecanismele de fetch DIFERĂ per sursă (vezi comentariile de la refresh*):
  *   - mitropolia.md      → flux RSS WordPress + oembed pentru imagine;
@@ -56,7 +57,10 @@ interface FeedSource {
   refresh: () => Promise<FeedItem[]>
 }
 
-const TTL_MS = 6 * 60 * 60 * 1000 // 6 ore, ca pe sursă
+// Cron-ul reîmprospătează zilnic (limita Vercel Hobby); TTL-ul lasă o marjă
+// peste 24h, deci reîmprospătarea leneșă (blocantă) se declanșează practic doar
+// dacă un ciclu de cron a fost ratat. Pe sursă (PHP pe TopHost, fără cron) era 6h.
+const TTL_MS = 25 * 60 * 60 * 1000
 const TIMEOUT_MS = 4000 // fail rapid, nu blocăm homepage-ul
 const MAX_ITEMS = 3 // pe card se afișează 1; restul = rezervă în cache
 const UA = 'BisericaSfNicolaeBot/1.0 (+https://biserica-sf-nicolae.org)'
@@ -326,7 +330,7 @@ function firstValid(items: FeedItem[]): FeedItem | null {
  * Întoarce cardul unei surse (sau null): citește cache-ul, iar dacă a expirat
  * încearcă O SINGURĂ reîmprospătare. La eșec păstrează cache-ul vechi; dacă nu
  * există niciun cache vechi scrie un marcaj gol cu timestamp proaspăt, ca
- * vizitele următoare să nu mai încerce o cerere blocantă încă 6 ore.
+ * vizitele următoare să nu mai încerce o cerere blocantă până la expirarea TTL.
  */
 async function loadSource(src: FeedSource): Promise<ChurchLifeCard | null> {
   let cache = await readCache(src.settingKey)
