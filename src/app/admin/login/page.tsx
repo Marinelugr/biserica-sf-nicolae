@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
         padding: '2.5rem',
       }}>
         <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <img src="/logo.png" alt="" aria-hidden="true" width={31} height={54} style={{ height: '54px', width: 'auto', display: 'block', margin: '0 auto 0.6rem' }} />
+          <img src="/logo.png" alt="" aria-hidden="true" width={26} height={54} style={{ height: '54px', width: 'auto', display: 'block', margin: '0 auto 0.6rem' }} />
           <div style={{ color: '#C9A84C', fontSize: '1.1rem', fontFamily: 'Georgia, serif', fontWeight: 600 }}>
             Sfântul Ierarh Nicolae
           </div>

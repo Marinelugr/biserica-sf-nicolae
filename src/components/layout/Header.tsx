@@ -100,7 +100,7 @@ export default function Header() {
                   src="/logo.png"
                   alt=""
                   aria-hidden="true"
-                  width={20}
+                  width={17}
                   height={35}
                   className="shrink-0"
                   style={{ height: '34px', width: 'auto', display: 'block' }}
@@ -252,7 +252,7 @@ export default function Header() {
               src="/logo.png"
               alt=""
               aria-hidden="true"
-              width={17}
+              width={15}
               height={30}
               style={{ height: '30px', width: 'auto', display: 'block' }}
             />

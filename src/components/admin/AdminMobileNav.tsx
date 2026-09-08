@@ -27,7 +27,7 @@ export default function AdminMobileNav() {
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <img src="/logo.png" alt="" aria-hidden="true" width={16} height={28} style={{ height: '28px', width: 'auto', display: 'block' }} />
+          <img src="/logo.png" alt="" aria-hidden="true" width={14} height={28} style={{ height: '28px', width: 'auto', display: 'block' }} />
           <span style={{ color: '#C9A84C', fontSize: '0.9rem', fontFamily: 'Georgia, serif', fontWeight: 600 }}>Admin Panel</span>
         </div>
         <button
@@ -64,7 +64,7 @@ export default function AdminMobileNav() {
         >
           <div style={{ padding: '1.25rem', borderBottom: '1px solid #1E1208', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <img src="/logo.png" alt="" aria-hidden="true" width={18} height={32} style={{ height: '32px', width: 'auto', display: 'block' }} />
+              <img src="/logo.png" alt="" aria-hidden="true" width={16} height={32} style={{ height: '32px', width: 'auto', display: 'block' }} />
               <span style={{ color: '#C9A84C', fontSize: '1rem', fontFamily: 'Georgia, serif', fontWeight: 600 }}>Admin Panel</span>
             </div>
             <button

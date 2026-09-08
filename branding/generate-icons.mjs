@@ -99,16 +99,82 @@ const fullBuf = await sharp(rgba, { raw: { width: W, height: H, channels: 4 } })
 await sharp(fullBuf).toFile(path.join(OUT, 'logo-emblema-full.png'))
 console.log('full:', fW, 'x', fH)
 
-// ---- 6. no-text mark: crop crown+shield, drop banderole ----
-const markCropH = Math.round(fH * 0.762)
-// recompute horizontal bbox within the cropped region
+// ---- 6. no-text mark: crown + shield + cross, banderole removed, shield point
+//         + vertical-bar foot reconstructed (they are occluded by the banderole
+//         in the source, so cropping alone leaves an amputated shield). ----
 const { data: fd, info: fi } = await sharp(fullBuf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
-let mMinX = fW, mMaxX = 0, mMaxY = 0
-for (let y = 0; y < markCropH; y++) for (let x = 0; x < fW; x++) {
-  if (fd[(y * fW + x) * 4 + 3] > 12) { if (x < mMinX) mMinX = x; if (x > mMaxX) mMaxX = x; if (y > mMaxY) mMaxY = y }
+const FW = fi.width, FH = fi.height
+
+// geometry measured from logo-source.png (see branding/README.md)
+const CX = 401              // shield / cross centre x
+const Y_CUT = 889           // last clean shield row before the banderole
+const Y_NAVY_TIP = 1021     // where the navy shield point vanishes
+const Y_GOLD_TIP = 1027     // where the gold outline point vanishes
+const H2 = 1032
+const NAVY = [6, 34, 84]
+// real gold carries a soft top-light gradient; match it so the reconstruction seam disappears
+const goldAt = (y) => {
+  const k = Math.max(0, Math.min(1, (y - Y_CUT) / (Y_GOLD_TIP - Y_CUT)))
+  return [Math.round(233 - 19 * k), Math.round(188 - 18 * k), Math.round(51 - 12 * k)]
 }
-const markBuf = await sharp(fullBuf)
-  .extract({ left: mMinX, top: 0, width: mMaxX - mMinX + 1, height: Math.min(markCropH, mMaxY + 1) })
+
+const canvas = Buffer.alloc(FW * H2 * 4)         // transparent
+// keep every real pixel above the banderole
+for (let y = 0; y < Y_CUT; y++)
+  fd.copy(canvas, y * FW * 4, y * FW * 4, (y + 1) * FW * 4)
+
+const put = (x, y, rgb, a = 255) => {
+  if (x < 0 || x >= FW || y < 0 || y >= H2) return
+  const i = (y * FW + x) * 4
+  if (a >= canvas[i + 3]) { canvas[i] = rgb[0]; canvas[i + 1] = rgb[1]; canvas[i + 2] = rgb[2]; canvas[i + 3] = a }
+}
+const navyHW = (y) => {                          // navy half-width of the shield
+  const t = Math.min(1, (y - (Y_CUT - 5)) / (Y_NAVY_TIP - (Y_CUT - 5)))
+  return t >= 1 ? 0 : 157 * Math.pow(1 - t, 0.85)
+}
+const inTrefoil = (x, y) => {                    // budded foot of the vertical bar
+  const lobes = [[CX, 998, 14], [CX - 19, 1004, 12], [CX + 19, 1004, 12], [CX, 1016, 11]]
+  return lobes.some(([lx, ly, r]) => (x - lx) ** 2 + (y - ly) ** 2 <= r * r)
+}
+for (let y = Y_CUT - 10; y < H2; y++) {
+  const blend = Math.max(0, Math.min(1, (y - (Y_CUT - 10)) / 12))   // ramp drawn pixels in over the seam
+  const t = Math.min(1, (y - (Y_CUT - 5)) / (Y_NAVY_TIP - (Y_CUT - 5)))
+  const hwN = navyHW(y)
+  const border = 17 - 7 * t
+  let hwG = t < 1 ? hwN + border : Math.max(0, 10 - (y - Y_NAVY_TIP) * (10 / (Y_GOLD_TIP - Y_NAVY_TIP)))
+  for (let x = Math.floor(CX - hwG - 2); x <= Math.ceil(CX + hwG + 2); x++) {
+    const ad = Math.abs(x - CX)
+    const gold = goldAt(y)
+    let rgb = null, a = 255
+    if (ad <= hwG - 1) rgb = (ad <= hwN && t < 1) ? NAVY : gold
+    else if (ad <= hwG + 1) { rgb = gold; a = Math.round(255 * (hwG + 1 - ad) / 2) }
+    // cross vertical bar + budded foot (gold, on top of the navy field)
+    if (ad <= 16 && y <= 994 && ad <= hwG) rgb = gold, a = 255
+    if (inTrefoil(x, y) && ad <= hwG + 1) rgb = gold, a = 255
+    if (rgb) {
+      if (y >= Y_CUT) put(x, y, rgb, a)
+      else {
+        // seam zone: blend drawn colour over the (banderole-contaminated) real pixel
+        const i = (y * FW + x) * 4
+        const ba = (a / 255) * blend
+        canvas[i] = Math.round(canvas[i] * (1 - ba) + rgb[0] * ba)
+        canvas[i + 1] = Math.round(canvas[i + 1] * (1 - ba) + rgb[1] * ba)
+        canvas[i + 2] = Math.round(canvas[i + 2] * (1 - ba) + rgb[2] * ba)
+        canvas[i + 3] = Math.max(canvas[i + 3], Math.round(255 * ba))
+      }
+    }
+  }
+}
+
+// trim transparent margins
+let mMinX = FW, mMaxX = 0, mMinY = H2, mMaxY = 0
+for (let y = 0; y < H2; y++) for (let x = 0; x < FW; x++)
+  if (canvas[(y * FW + x) * 4 + 3] > 12) {
+    if (x < mMinX) mMinX = x; if (x > mMaxX) mMaxX = x
+    if (y < mMinY) mMinY = y; if (y > mMaxY) mMaxY = y
+  }
+const markBuf = await sharp(canvas, { raw: { width: FW, height: H2, channels: 4 } })
+  .extract({ left: mMinX, top: mMinY, width: mMaxX - mMinX + 1, height: mMaxY - mMinY + 1 })
   .png().toBuffer()
 await sharp(markBuf).toFile(path.join(OUT, 'logo-mark.png'))
 const mm = await sharp(markBuf).metadata()
@@ -128,16 +194,23 @@ const out = (buf, size, bg) => {
 const CREAM = { r: 247, g: 243, b: 233 }
 const markSq = await squarePad(markBuf, 0.06)
 const fullSq = await squarePad(fullBuf, 0.04)
+// tighter framing for small icons: drop the pointed top of the crown (invisible < 48px
+// anyway) so the shield fills the square and stays legible in a browser tab
+const topCrop = Math.round(mm.height * 0.24)
+const iconBuf = await sharp(markBuf)
+  .extract({ left: 0, top: topCrop, width: mm.width, height: mm.height - topCrop })
+  .png().toBuffer()
+const iconSq = await squarePad(iconBuf, 0.05)
 
 // ---- 7. icons ----
-await out(markSq, 512).toFile(path.join(OUT, 'icon.png'))               // app/icon.png (transparent)
-await out(markSq, 180, CREAM).toFile(path.join(OUT, 'apple-icon.png'))  // app/apple-icon.png (opaque)
-await out(markSq, 192).toFile(path.join(OUT, 'icon-192.png'))           // PWA any
+await out(iconSq, 512).toFile(path.join(OUT, 'icon.png'))               // app/icon.png (transparent)
+await out(iconSq, 180, CREAM).toFile(path.join(OUT, 'apple-icon.png'))  // app/apple-icon.png (opaque)
+await out(iconSq, 192).toFile(path.join(OUT, 'icon-192.png'))           // PWA any
 await out(fullSq, 512).toFile(path.join(OUT, 'icon-512.png'))           // PWA any (full lockup)
-await sharp(await squarePad(markBuf, 0.5)).resize(512, 512, { fit: 'contain', background: CREAM })
+await sharp(await squarePad(iconBuf, 0.5)).resize(512, 512, { fit: 'contain', background: CREAM })
   .flatten({ background: CREAM }).png().toFile(path.join(OUT, 'maskable-icon-512.png')) // PWA maskable
 await out(markSq, 400).toFile(path.join(OUT, 'logo-mark-400.png'))      // header/footer/admin @2-3x
-for (const s of [16, 32, 48]) await out(markSq, s).toFile(path.join(OUT, `favicon-${s}.png`))
+for (const s of [16, 32, 48]) await out(iconSq, s).toFile(path.join(OUT, `favicon-${s}.png`))
 
 // ---- 8. favicon.ico (16/32/48, PNG-compressed) ----
 function buildIco(entries) {
@@ -155,7 +228,7 @@ function buildIco(entries) {
   return Buffer.concat(bufs)
 }
 const ico = []
-for (const s of [16, 32, 48]) ico.push({ size: s, buf: await out(markSq, s).toBuffer() })
+for (const s of [16, 32, 48]) ico.push({ size: s, buf: await out(iconSq, s).toBuffer() })
 fs.writeFileSync(path.join(OUT, 'favicon.ico'), buildIco(ico))
 
 console.log('done ->', OUT)

@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
           flexShrink: 0,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <img src="/logo.png" alt="" aria-hidden="true" width={17} height={30} style={{ height: '30px', width: 'auto', display: 'block' }} />
+            <img src="/logo.png" alt="" aria-hidden="true" width={15} height={30} style={{ height: '30px', width: 'auto', display: 'block' }} />
             <span style={{ color: '#C9A84C', fontSize: '1.05rem', fontFamily: 'Georgia, serif' }}>
               Admin — Sfântul Ierarh Nicolae
             </span>
