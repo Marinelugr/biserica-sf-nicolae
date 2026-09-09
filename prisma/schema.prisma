@@ -296,6 +296,20 @@ model PriestMessage {
   createdAt    DateTime @default(now())
 }
 
+// ─── Anunțuri programabile ───────────────────────────────────────────────────
+
+model Anunt {
+  id           String   @id @default(cuid())
+  titlu        String
+  mesaj        String
+  dataStart    DateTime @default(now()) @db.Date
+  zileAfisare  Int      @default(7)
+  activ        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  @@index([activ, dataStart])
+}
+
 model DonationConfig {
   id            String   @id @default(cuid())
   localAccounts Json

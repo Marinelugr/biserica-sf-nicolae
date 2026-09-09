@@ -4,6 +4,8 @@ import { isApostlesFast, FIXED_FASTS, getSingleDayFast } from '@/lib/constants/o
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import type { Translations } from '@/lib/i18n/ro'
+import { getActiveAnunt } from '@/lib/anunturi.server'
+import AnnouncementCard from './AnnouncementCard'
 
 function getFastInfo(now: Date, t: Translations): string | null {
   const year = now.getFullYear()
@@ -26,7 +28,7 @@ function getFastInfo(now: Date, t: Translations): string | null {
 }
 
 export default async function LiturgicalTodayWidget() {
-  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
+  const [t, locale, anunt] = await Promise.all([getServerT(), getServerLocale(), getActiveAnunt()])
   const now = new Date()
   const year = now.getFullYear()
   const fastInfo = getFastInfo(now, t)
@@ -34,25 +36,43 @@ export default async function LiturgicalTodayWidget() {
   const dateStr = now.toLocaleDateString(localeToIntl(locale), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   const dateLabel = dateStr.charAt(0).toUpperCase() + dateStr.slice(1)
 
-  return (
-    <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <Link
-        href={`/calendar?zi=${now.getDate()}&luna=${now.getMonth() + 1}&an=${year}`}
-        className="glass-cobalt block p-6 sm:p-8 text-center transition-opacity hover:opacity-90"
-        style={{ textDecoration: 'none' }}
-      >
-        <p className="font-heading italic text-2xl sm:text-3xl mb-2" style={{ color: '#E9EFFA' }}>
-          {dateLabel}
+  const dateCard = (
+    <Link
+      href={`/calendar?zi=${now.getDate()}&luna=${now.getMonth() + 1}&an=${year}`}
+      className="glass-cobalt flex flex-col items-center justify-center p-6 sm:p-8 text-center transition-opacity hover:opacity-90 h-full"
+      style={{ textDecoration: 'none' }}
+    >
+      <p className="font-heading italic text-2xl sm:text-3xl mb-2" style={{ color: '#E9EFFA' }}>
+        {dateLabel}
+      </p>
+      {fastInfo && (
+        <p className="font-body text-sm mb-3" style={{ color: '#D4AF37' }}>
+          🕯 {fastInfo}
         </p>
-        {fastInfo && (
-          <p className="font-body text-sm mb-3" style={{ color: '#D4AF37' }}>
-            🕯 {fastInfo}
-          </p>
-        )}
-        <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
-          {t.home.openCalendarLink}
-        </span>
-      </Link>
+      )}
+      <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
+        {t.home.openCalendarLink}
+      </span>
+    </Link>
+  )
+
+  // Fără anunț activ — card full-width, centrat (starea implicită, neschimbată).
+  if (!anunt) {
+    return (
+      <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {dateCard}
+      </section>
+    )
+  }
+
+  // Cu anunț activ — split în 2 coloane, același grid/gap ca la secțiunea logo + Calendarul Pascal.
+  // Pe mobil se stivuiește normal: data sus, anunțul dedesubt.
+  return (
+    <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {dateCard}
+        <AnnouncementCard titlu={anunt.titlu} mesaj={anunt.mesaj} />
+      </div>
     </section>
   )
 }
