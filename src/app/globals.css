@@ -277,11 +277,14 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* Reduce motion nu înseamnă „fără nimic": eliminăm mişcarea/translaţia şi
+     decalajul per-cuvânt, dar păstrăm un fade scurt şi uniform (accesibil) —
+     altfel utilizatorii cu Reduce Motion văd conţinutul apărând brusc. */
   .hero-word,
   .hero-anim-fade,
   .hero-anim-rise {
-    animation: none;
-    opacity: 1;
+    animation: heroFade 0.4s ease both;
+    animation-delay: 0s;
     transform: none;
   }
 }

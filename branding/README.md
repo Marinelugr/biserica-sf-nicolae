@@ -72,7 +72,12 @@ mai foloseşte pe h1 (incompatibil cu culori per-cuvânt).
 **Animaţie de intrare** — pur CSS keyframes (fără framer-motion; `--d` = delay
 setat inline per element, `globals.css` „Hero v4"). Secvenţă strict succesivă:
 cuvinte `heroWordUp` (0.6s ease, delay `i·0.14`) → separator `heroFade` → 2
-subtitluri `heroSoftUp` → butoane. `@media (prefers-reduced-motion: reduce)` →
-`animation:none; opacity:1`.
+subtitluri `heroSoftUp` → butoane.
+
+`@media (prefers-reduced-motion: reduce)` → NU dezactivează complet (asta lăsa
+conţinutul să apară brusc, raportat ca „animaţia nu rulează" — de fapt Reduce
+Motion era activ pe acel sistem). Acum: `animation: heroFade 0.4s both` — fade
+scurt, uniform, **fără translaţie şi fără decalaj** (accesibil). Cascada completă
+cuvânt-cu-cuvânt rulează doar când Reduce Motion e OFF.
 
 Glifele decorative `☦` din titlurile de pagină NU sunt logo — au rămas neatinse.
