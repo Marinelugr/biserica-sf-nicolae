@@ -12,7 +12,7 @@ import CobaltCursorFX from '@/components/CobaltCursorFX'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
-  weight: ['400', '600'],
+  weight: ['400', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
   display: 'swap',

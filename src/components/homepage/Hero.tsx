@@ -1,27 +1,28 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { useEffect, useRef, type CSSProperties } from 'react'
 import Image from 'next/image'
 import { useI18n } from '@/lib/i18n/context'
 import CandleParticles from '@/components/CandleParticles'
 
+// helper: setează variabila CSS `--d` (animation-delay) inline per element
+const d = (seconds: number): CSSProperties => ({ ['--d' as string]: `${seconds.toFixed(2)}s` } as CSSProperties)
+
 export default function Hero() {
   const { t } = useI18n()
   const heroRef = useRef<HTMLDivElement>(null)
-  const prefersReducedMotion = useReducedMotion()
   const titleWords = t.home.heroTitle.split(' ')
 
-  // Secvența de intrare: titlul apare cuvânt cu cuvânt, apoi separatorul și cele
-  // două subtitluri, decalate puțin în timp, imediat după ce ultimul cuvânt al
-  // titlului termină de apărut — calculat dinamic ca titlul să funcționeze
-  // corect indiferent de numărul de cuvinte (RO/RU/EN diferă).
-  const titleWordDelay = (i: number) => 0.15 + i * 0.15
-  const titleDoneDelay = titleWordDelay(titleWords.length - 1) + 0.55
-  const separatorDelay = titleDoneDelay
-  const subtitle1Delay = separatorDelay + 0.15
-  const subtitle2Delay = subtitle1Delay + 0.15
-  const buttonsDelay = subtitle2Delay + 0.3
+  // Secvenţa de intrare (pur CSS keyframes — vezi globals.css). Titlul e primul
+  // element care animă; fiecare etapă porneşte după ce precedenta s-a aşezat.
+  // Delay-urile scalează cu numărul de cuvinte (RO 4 / RU 3 / EN 5).
+  const STEP = 0.14
+  const wordDelay = (i: number) => i * STEP
+  const lastWord = (titleWords.length - 1) * STEP
+  const separatorDelay = lastWord + 0.5
+  const subtitle1Delay = separatorDelay + 0.5
+  const subtitle2Delay = subtitle1Delay + 0.18
+  const buttonsDelay = subtitle2Delay + 0.55
 
   useEffect(() => {
     const handleScroll = () => {
@@ -53,62 +54,52 @@ export default function Hero() {
       <div className="absolute inset-0 hero-overlay" />
       <CandleParticles />
 
-      <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 text-center">
+      <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 text-center">
         <h1
-          className="font-heading italic leading-tight mb-5 hero-title"
-          style={{ fontSize: 'clamp(36px, 6vw, 56px)', fontWeight: 400 }}
+          className="font-heading hero-title-bold leading-tight mb-5"
+          style={{ fontSize: 'clamp(36px, 6vw, 56px)' }}
         >
           {titleWords.map((word, i) => (
-            <motion.span
-              key={i}
-              initial={prefersReducedMotion ? undefined : { opacity: 0, y: 22 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: prefersReducedMotion ? 0 : 0.15 + i * 0.15, ease: [0.2, 0.8, 0.2, 1] }}
-              style={{ display: 'inline-block' }}
-            >
-              {word}
-              {i < titleWords.length - 1 ? ' ' : ''}
-            </motion.span>
+            // wrapper inline (nu inline-block) ca spaţiul dintre cuvinte să rămână
+            // punct valid de rupere pe mobil
+            <span key={i}>
+              <span
+                className={`hero-word ${i % 2 === 0 ? 'hero-word--gold' : 'hero-word--white'}`}
+                style={d(wordDelay(i))}
+              >
+                {word}
+              </span>
+              {i < titleWords.length - 1 ? ' ' : ''}
+            </span>
           ))}
         </h1>
 
-        <motion.div
-          initial={prefersReducedMotion ? undefined : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: prefersReducedMotion ? 0 : separatorDelay }}
-          className="flex items-center justify-center gap-3 mb-6"
+        <div
+          className="hero-anim-fade flex items-center justify-center gap-3 mb-6"
+          style={d(separatorDelay)}
         >
           <span className="h-px w-16 block" style={{ backgroundColor: '#5A4020' }} />
           <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
           <span className="h-px w-16 block" style={{ backgroundColor: '#5A4020' }} />
-        </motion.div>
+        </div>
 
-        <motion.p
-          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: prefersReducedMotion ? 0 : subtitle1Delay, ease: [0.2, 0.8, 0.2, 1] }}
-          className="font-body mb-2"
-          style={{ color: '#F5EFD8', fontSize: '20px', fontWeight: 600, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
+        <p
+          className="hero-anim-rise font-body mb-2"
+          style={{ ...d(subtitle1Delay), color: '#F5EFD8', fontSize: '20px', fontWeight: 600, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
         >
           {t.home.heroSubtitle}
-        </motion.p>
+        </p>
 
-        <motion.p
-          initial={prefersReducedMotion ? undefined : { opacity: 0, y: 14 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: prefersReducedMotion ? 0 : subtitle2Delay, ease: [0.2, 0.8, 0.2, 1] }}
-          className="font-body mb-10"
-          style={{ color: '#E4D9B8', fontSize: '20px', fontWeight: 500, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
+        <p
+          className="hero-anim-rise font-body mb-10"
+          style={{ ...d(subtitle2Delay), color: '#E4D9B8', fontSize: '20px', fontWeight: 500, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
         >
           {t.home.heroMitropolia}
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: buttonsDelay }}
-          className="flex justify-center gap-6"
-          style={{ paddingBottom: '40px' }}
+        <div
+          className="hero-anim-rise flex justify-center gap-6"
+          style={{ ...d(buttonsDelay), paddingBottom: '40px' }}
         >
           <a
             href="/despre"
@@ -124,7 +115,7 @@ export default function Hero() {
           >
             {t.home.donateBtn}
           </a>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -59,9 +59,20 @@ public/logo-emblema.png      ← out/logo-emblema-full.png (560px lat, palette) 
 
 ## Hero
 
-`Hero.tsx` — **fără emblemă** (experimentele cu stema deasupra titlului / pe
-cusătură au fost revenite complet la `ebe7354`). Doar titlul animat cuvânt-cu-
-cuvânt (framer-motion, secvenţa originală), separator ☦, subtitluri, butoane.
-`prefers-reduced-motion` respectat.
+`Hero.tsx` — **fără emblemă** (experimentele cu stema au fost revenite).
+
+**Titlu** (`.hero-title-bold` în globals.css): fontul de brand `font-heading`
+(Cormorant Garamond — 700 adăugat în `@import` + `next/font`), **bold, non-italic**,
+`text-shadow: 0 2px 15px rgba(0,0,0,.62), 0 1px 4px rgba(0,0,0,.78)` — se citeşte
+peste orice zonă a fotografiei (cupole/cer). Alternanţă de culoare per cuvânt:
+`.hero-word--gold` (`#E9CE7A`, cuvinte 1,3) / `.hero-word--white`
+(`rgba(255,255,255,.92)`, cuvinte 2,4). Gradientul-shimmer `.hero-title` NU se
+mai foloseşte pe h1 (incompatibil cu culori per-cuvânt).
+
+**Animaţie de intrare** — pur CSS keyframes (fără framer-motion; `--d` = delay
+setat inline per element, `globals.css` „Hero v4"). Secvenţă strict succesivă:
+cuvinte `heroWordUp` (0.6s ease, delay `i·0.14`) → separator `heroFade` → 2
+subtitluri `heroSoftUp` → butoane. `@media (prefers-reduced-motion: reduce)` →
+`animation:none; opacity:1`.
 
 Glifele decorative `☦` din titlurile de pagină NU sunt logo — au rămas neatinse.
