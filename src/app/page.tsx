@@ -188,8 +188,23 @@ export default async function HomePage() {
         return enabled['pascal_slujbe'] === false ? null : (
           <section key="pascal_slujbe" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card emblemă — logo complet (cu banderola), stil identic cu celelalte carduri */}
+              <div className="glass-cobalt flex items-center justify-center p-6 sm:p-8">
+                <img
+                  src="/logo-emblema.png"
+                  alt="Emblema Parohiei Sfântul Ierarh Nicolae"
+                  width={560}
+                  height={804}
+                  className="w-auto"
+                  style={{ height: 'clamp(172px, 26vw, 224px)', objectFit: 'contain' }}
+                />
+              </div>
               <PascalCard />
-              <NextServiceWidget />
+              {/* Numărătoarea pentru următoarea slujbă — rând propriu sub cele două carduri;
+                  se ascunde complet când componenta nu are ce afișa ([&:empty]:hidden) */}
+              <div className="md:col-span-2 [&:empty]:hidden">
+                <NextServiceWidget />
+              </div>
             </div>
           </section>
         )
