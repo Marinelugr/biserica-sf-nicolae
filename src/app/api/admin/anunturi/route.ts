@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { isValidHttpUrl } from '@/lib/anunturi'
 
 /** Normalizează un input de dată (YYYY-MM-DD sau ISO) la o zi calendaristică, la miezul nopții UTC. */
 function parseDateOnly(input: unknown): Date | null {
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest) {
   const mesaj = typeof body.mesaj === 'string' ? body.mesaj.trim() : ''
   const zileAfisare = Number(body.zileAfisare)
   const dataStart = parseDateOnly(body.dataStart) ?? parseDateOnly(new Date().toISOString())!
+  const linkRaw = typeof body.linkArticol === 'string' ? body.linkArticol.trim() : ''
 
   if (!titlu || !mesaj) {
     return NextResponse.json({ error: 'Titlul și mesajul sunt obligatorii' }, { status: 400 })
@@ -36,11 +38,15 @@ export async function POST(req: NextRequest) {
   if (!Number.isFinite(zileAfisare) || zileAfisare < 1) {
     return NextResponse.json({ error: 'Numărul de zile de afișare trebuie să fie cel puțin 1' }, { status: 400 })
   }
+  if (linkRaw && !isValidHttpUrl(linkRaw)) {
+    return NextResponse.json({ error: 'Linkul articolului trebuie să fie un URL valid (http:// sau https://)' }, { status: 400 })
+  }
 
   const anunt = await prisma.anunt.create({
     data: {
       titlu,
       mesaj,
+      linkArticol: linkRaw || null,
       dataStart,
       zileAfisare: Math.round(zileAfisare),
       activ: body.activ === undefined ? true : !!body.activ,

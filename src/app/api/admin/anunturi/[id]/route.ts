@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { isValidHttpUrl } from '@/lib/anunturi'
 
 function parseDateOnly(input: unknown): Date | null {
   if (typeof input !== 'string' || !input.trim()) return null
@@ -39,6 +40,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     const d = parseDateOnly(body.dataStart)
     if (!d) return NextResponse.json({ error: 'Dată de început invalidă' }, { status: 400 })
     data.dataStart = d
+  }
+  if (body.linkArticol !== undefined) {
+    const link = typeof body.linkArticol === 'string' ? body.linkArticol.trim() : ''
+    if (link && !isValidHttpUrl(link)) {
+      return NextResponse.json({ error: 'Linkul articolului trebuie să fie un URL valid (http:// sau https://)' }, { status: 400 })
+    }
+    data.linkArticol = link || null
   }
   if (body.activ !== undefined) data.activ = !!body.activ
 

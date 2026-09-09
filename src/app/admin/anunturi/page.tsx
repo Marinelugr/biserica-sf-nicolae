@@ -3,12 +3,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
-import { anuntStare, anuntExpiryDate, type AnuntStare } from '@/lib/anunturi'
+import { anuntStare, anuntExpiryDate, isValidHttpUrl, type AnuntStare } from '@/lib/anunturi'
 
 interface Anunt {
   id: string
   titlu: string
   mesaj: string
+  linkArticol: string | null
   dataStart: string
   zileAfisare: number
   activ: boolean
@@ -59,7 +60,7 @@ function ConfirmModal({ message, onConfirm, onCancel, loading }: { message: stri
   )
 }
 
-const emptyForm = { titlu: '', mesaj: '', dataStart: todayInputValue(), zileAfisare: '7', activ: true }
+const emptyForm = { titlu: '', mesaj: '', linkArticol: '', dataStart: todayInputValue(), zileAfisare: '7', activ: true }
 
 export default function AdminAnunturiPage() {
   const [anunturi, setAnunturi] = useState<Anunt[]>([])
@@ -71,6 +72,7 @@ export default function AdminAnunturiPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [togglingId, setTogglingId] = useState<string | null>(null)
+  const [copiedId, setCopiedId] = useState<string | null>(null)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
 
   const showToast = useCallback((message: string, type: 'success' | 'error') => setToast({ message, type }), [])
@@ -101,6 +103,7 @@ export default function AdminAnunturiPage() {
     setForm({
       titlu: a.titlu,
       mesaj: a.mesaj,
+      linkArticol: a.linkArticol ?? '',
       dataStart: a.dataStart.slice(0, 10),
       zileAfisare: String(a.zileAfisare),
       activ: a.activ,
@@ -112,11 +115,13 @@ export default function AdminAnunturiPage() {
     if (!form.titlu.trim() || !form.mesaj.trim()) { showToast('Titlul și mesajul sunt obligatorii', 'error'); return }
     const zile = Number(form.zileAfisare)
     if (!Number.isFinite(zile) || zile < 1) { showToast('Numărul de zile trebuie să fie cel puțin 1', 'error'); return }
+    const link = form.linkArticol.trim()
+    if (link && !isValidHttpUrl(link)) { showToast('Linkul articolului nu este un URL valid (folosiți http:// sau https://)', 'error'); return }
     setSaving(true)
     try {
       const url = editAnunt ? `/api/admin/anunturi/${editAnunt.id}` : '/api/admin/anunturi'
       const method = editAnunt ? 'PATCH' : 'POST'
-      const body = { titlu: form.titlu, mesaj: form.mesaj, dataStart: form.dataStart, zileAfisare: zile, activ: form.activ }
+      const body = { titlu: form.titlu, mesaj: form.mesaj, linkArticol: link, dataStart: form.dataStart, zileAfisare: zile, activ: form.activ }
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || `Eroare ${res.status}`) }
       showToast(editAnunt ? 'Anunț actualizat ✓' : 'Anunț adăugat ✓', 'success')
@@ -141,6 +146,17 @@ export default function AdminAnunturiPage() {
     } catch {
       showToast('Eroare la modificarea stării', 'error')
     } finally { setTogglingId(null) }
+  }
+
+  async function handleCopyLink(a: Anunt) {
+    if (!a.linkArticol) return
+    try {
+      await navigator.clipboard.writeText(a.linkArticol)
+      setCopiedId(a.id)
+      setTimeout(() => setCopiedId(c => (c === a.id ? null : c)), 1800)
+    } catch {
+      showToast('Nu s-a putut copia linkul', 'error')
+    }
   }
 
   async function handleDelete() {
@@ -223,8 +239,33 @@ export default function AdminAnunturiPage() {
                         <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginTop: '0.5rem' }}>
                           {fmtDate(a.dataStart)} → {fmtDate(anuntExpiryDate(a).toISOString())} &nbsp;·&nbsp; {a.zileAfisare} {a.zileAfisare === 1 ? 'zi' : 'zile'}
                         </div>
+                        {a.linkArticol && (
+                          <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginTop: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.35rem', minWidth: 0 }}>
+                            <span aria-hidden="true">🔗</span>
+                            <a href={a.linkArticol} target="_blank" rel="noopener noreferrer" style={{ color: '#8A7350', textDecoration: 'none', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.linkArticol}</a>
+                          </div>
+                        )}
                       </div>
-                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexShrink: 0 }}>
+                      <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center', flexShrink: 0, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
+                        {a.linkArticol && (
+                          <button
+                            onClick={() => handleCopyLink(a)}
+                            title="Copiază linkul articolului"
+                            style={{ background: 'none', border: 'none', color: copiedId === a.id ? '#4ACA4A' : '#9B8050', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem', padding: 0, display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
+                          >
+                            {copiedId === a.id ? (
+                              <>✓ Copiat!</>
+                            ) : (
+                              <>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                                </svg>
+                                Copiază linkul
+                              </>
+                            )}
+                          </button>
+                        )}
                         <button onClick={() => handleToggleActiv(a)} disabled={togglingId === a.id} style={{ background: 'none', border: 'none', color: a.activ ? '#E0A030' : '#4ACA4A', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.85rem', padding: 0 }}>
                           {togglingId === a.id ? '...' : a.activ ? 'Oprește' : 'Repornește'}
                         </button>
@@ -283,6 +324,26 @@ export default function AdminAnunturiPage() {
                   <strong style={{ color: '#9B8050' }}>{fmtDate(new Date(Date.parse(form.dataStart + 'T00:00:00Z') + Number(form.zileAfisare) * 86400000).toISOString())}</strong> (exclusiv).
                 </div>
               )}
+
+              <div>
+                <label style={lbl}>Link articol <span style={{ color: '#5A4020' }}>(opțional)</span></label>
+                <input
+                  type="url"
+                  inputMode="url"
+                  value={form.linkArticol}
+                  onChange={e => setForm(f => ({ ...f, linkArticol: e.target.value }))}
+                  placeholder="https://biserica-sf-nicolae.org/stiri/..."
+                  style={{
+                    ...inp,
+                    border: form.linkArticol.trim() && !isValidHttpUrl(form.linkArticol) ? '1px solid #8B3A3A' : inp.border,
+                  }}
+                />
+                <div style={{ color: form.linkArticol.trim() && !isValidHttpUrl(form.linkArticol) ? '#C77' : '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginTop: '0.25rem' }}>
+                  {form.linkArticol.trim() && !isValidHttpUrl(form.linkArticol)
+                    ? 'URL invalid — folosiți o adresă completă (http:// sau https://)'
+                    : 'Dacă e completat, tot cardul de pe homepage devine link către articol.'}
+                </div>
+              </div>
 
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', cursor: 'pointer', color: '#F2EBD9', fontFamily: 'Georgia, serif', fontSize: '0.9rem' }}>
                 <input type="checkbox" checked={form.activ} onChange={e => setForm(f => ({ ...f, activ: e.target.checked }))} style={{ width: '18px', height: '18px', accentColor: '#8B1A1A' }} />

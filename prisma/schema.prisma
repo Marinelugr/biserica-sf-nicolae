@@ -302,6 +302,7 @@ model Anunt {
   id           String   @id @default(cuid())
   titlu        String
   mesaj        String
+  linkArticol  String?
   dataStart    DateTime @default(now()) @db.Date
   zileAfisare  Int      @default(7)
   activ        Boolean  @default(true)

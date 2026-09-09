@@ -4,10 +4,23 @@ export interface AnuntRecord {
   id: string
   titlu: string
   mesaj: string
+  linkArticol?: string | null
   dataStart: Date | string
   zileAfisare: number
   activ: boolean
   createdAt?: Date | string
+}
+
+/** `true` dacă string-ul e un URL http(s) valid. String gol / whitespace → `false`. */
+export function isValidHttpUrl(value: string): boolean {
+  const trimmed = value.trim()
+  if (!trimmed) return false
+  try {
+    const u = new URL(trimmed)
+    return u.protocol === 'http:' || u.protocol === 'https:'
+  } catch {
+    return false
+  }
 }
 
 export type AnuntStare = 'activ' | 'programat' | 'expirat' | 'oprit'
