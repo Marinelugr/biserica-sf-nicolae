@@ -48,18 +48,30 @@ public/logo-emblema.png      ← out/logo-emblema-full.png (560px lat, palette) 
 - **Marca** (`/logo.png`) — Header, Footer? nu — vezi mai jos; AdminSidebar,
   AdminMobileNav, `admin/page.tsx` (bara sus), `admin/login/page.tsx`.
 - **Header site** (`Header.tsx`) — marca, ~34px, lângă „Sf. Ierarh Nicolae”.
-- **Emblema completă** (`/logo-emblema.png`, cu banderola):
-  - **Footer** (`Footer.tsx`) — 190px, deasupra adresei, înlocuiește vechiul rând
-    „☦ Sfântul Ierarh Nicolae”.
-  - **Hero homepage** (`components/homepage/Hero.tsx`) — stema deasupra titlului,
-    `clamp(128px, 20vw, 170px)`, animată (bounce) — vezi mai jos.
+- **Emblema completă** (`/logo-emblema.png`, cu banderola) — **doar în Footer**
+  (`Footer.tsx`), 190px, deasupra adresei, în locul vechiului rând „☦ Sfântul
+  Ierarh Nicolae”.
+- **Hero homepage** (`components/homepage/Hero.tsx`) — foloseşte **`/logo-mark.png`**
+  (marca, FĂRĂ banderolă: numele e deja în titlul H1; banderola dreptunghiulară
+  dădea aspect de „sticker" pe fotografie). `height: clamp(148px, 23vw, 190px)`,
+  `width:auto`, drop-shadow în 3 straturi (contur 0 0 5px + 2 umbre). Animat — vezi jos.
 
 ## Animația din hero
 
-`Hero.tsx` folosește **framer-motion** (deja în proiect — NU s-a adăugat GSAP),
-nu keyframes CSS. Secvența (calculată din nr. de cuvinte al titlului):
-stema (bounce `cubic-bezier(0.34,1.56,0.64,1)`, delay 0.2s) → titlul cuvânt cu
-cuvânt (de la 0.9s, pas 0.12s) → linia decorativă „se trage” → subtitluri →
-butoane. `prefers-reduced-motion: reduce` ⇒ tot vizibil instant (`initial={false}`).
+`Hero.tsx` foloseşte **framer-motion** (deja în proiect — NU s-a adăugat GSAP),
+nu keyframes CSS. Secvenţă strict succesivă (fiecare etapă porneşte după ce
+precedenta e ~aşezată; delay-urile scalează cu nr. de cuvinte al titlului):
+
+| Etapă | transform | durată | easing | delay (RO, 4 cuv.) |
+| --- | --- | --- | --- | --- |
+| Stema | `opacity 0→1, scale .6→1, y -20→0` | 1.0s | `cubic-bezier(.34,1.56,.64,1)` | 0.2s |
+| Titlu (per cuvânt) | `opacity 0→1, y 35→0` | 0.6s | `ease` `[.25,.1,.25,1]` | 0.9 + i·0.13 |
+| Linie decorativă | `scaleX 0→1` (2×70px ≈ 150px) | 0.8s | `ease` | ≈1.71s |
+| ☦ din linie | `opacity 0→1, scale .4→1` | 0.5s | bounce | ≈1.81s |
+| Subtitlu ×2 | `opacity 0→1, y -15→0` | 0.7s | `ease` | ≈2.27 / 2.41s |
+| Butoane | `opacity 0→1, y 18→0` | 0.6s | `ease` | ≈2.90s |
+
+Total ≈ 3.5s. `prefers-reduced-motion: reduce` ⇒ tot vizibil instant
+(`initial={false}`, `duration:0`).
 
 Glifele decorative `☦` din titlurile de pagină NU sunt logo — au rămas neatinse.

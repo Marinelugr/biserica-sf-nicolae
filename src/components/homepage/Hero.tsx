@@ -8,8 +8,8 @@ import CandleParticles from '@/components/CandleParticles'
 
 // Easing-uri (cubic-bezier)
 type Bezier = [number, number, number, number]
-const EASE_SOFT: Bezier = [0.2, 0.8, 0.2, 1]
-const EASE_BOUNCE: Bezier = [0.34, 1.56, 0.64, 1] // elastic/bounce pentru stemă
+const EASE: Bezier = [0.25, 0.1, 0.25, 1]          // echivalentul CSS `ease` (titlu/subtitlu/linie/butoane)
+const EASE_BOUNCE: Bezier = [0.34, 1.56, 0.64, 1]  // elastic/bounce — stema + ☦
 
 export default function Hero() {
   const { t } = useI18n()
@@ -17,27 +17,29 @@ export default function Hero() {
   const prefersReducedMotion = useReducedMotion()
   const titleWords = t.home.heroTitle.split(' ')
 
-  // Secvența de intrare (CSS-like reveal, dar prin framer-motion care e deja în
-  // proiect — vezi raport). Fiecare etapă pornește după ce precedenta s-a așezat.
-  // Delay-urile sunt calculate dinamic din numărul de cuvinte (RO 4 / RU 3 / EN 5).
-  const crestDelay = 0.2                                   // stema: bounce 1.0s, „așezată" vizual ~0.7s
-  const titleStart = 0.9
-  const titleWordStep = 0.12
-  const titleWordDelay = (i: number) => titleStart + i * titleWordStep
-  const titleDone = titleWordDelay(titleWords.length - 1) + 0.5
-  const separatorDelay = titleDone                          // linia decorativă „se trage"
-  const subtitle1Delay = separatorDelay + 0.28
-  const subtitle2Delay = subtitle1Delay + 0.15
-  const buttonsDelay = subtitle2Delay + 0.3
+  // Secvența de intrare (reveal „CSS-like", implementat prin framer-motion care e
+  // deja în proiect — vezi raport). Fiecare etapă pornește DUPĂ ce precedenta e
+  // vizual așezată (nu simultan). Delay-urile scalează cu numărul de cuvinte al
+  // titlului (RO 4 / RU 3 / EN 5).
+  const crestDelay = 0.2
+  const titleStart = crestDelay + 0.7                     // stema ~așezată la ~0.7s din bounce
+  const titleStep = 0.13
+  const wordDur = 0.6
+  const titleWordDelay = (i: number) => titleStart + i * titleStep
+  const lineDelay = titleWordDelay(titleWords.length - 1) + wordDur * 0.7
+  const lineDur = 0.8
+  const subDur = 0.7
+  const subtitle1Delay = lineDelay + lineDur * 0.7
+  const subtitle2Delay = subtitle1Delay + 0.14
+  const buttonsDelay = subtitle2Delay + subDur * 0.7
 
-  // helper: dezactivează complet animația când utilizatorul cere reduced motion
   const rm = !!prefersReducedMotion
   const anim = (
     initial: Record<string, number>,
     animate: Record<string, number>,
     delay: number,
     duration: number,
-    ease: Bezier = EASE_SOFT,
+    ease: Bezier = EASE,
   ) => ({
     initial: rm ? (false as const) : initial,
     animate,
@@ -75,12 +77,14 @@ export default function Hero() {
       <CandleParticles />
 
       <div className="relative z-10 w-full max-w-3xl mx-auto px-4 sm:px-6 text-center">
-        {/* Stema — apare cu bounce, deasupra titlului */}
+        {/* Stema — mitră + scut + cruce (FĂRĂ banderolă: numele e în titlu).
+            Apare cu bounce, relief pe fotografie prin drop-shadow stratificat. */}
         <motion.img
-          src="/logo-emblema.png"
-          alt={t.home.heroTitle}
-          width={560}
-          height={804}
+          src="/logo-mark.png"
+          alt=""
+          aria-hidden="true"
+          width={400}
+          height={824}
           {...anim(
             { opacity: 0, scale: 0.6, y: -20 },
             { opacity: 1, scale: 1, y: 0 },
@@ -90,9 +94,12 @@ export default function Hero() {
           )}
           className="mx-auto mb-5"
           style={{
-            width: 'clamp(128px, 20vw, 170px)',
-            height: 'auto',
-            filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.5))',
+            height: 'clamp(148px, 23vw, 190px)',
+            width: 'auto',
+            // 3 straturi: contur întunecat de jur-împrejur (separă mitra aurie de
+            // cerul/turnul deschis din poză) + umbră medie + umbră difuză de bază
+            filter:
+              'drop-shadow(0 0 5px rgba(0,0,0,0.45)) drop-shadow(0 4px 9px rgba(0,0,0,0.5)) drop-shadow(0 14px 30px rgba(0,0,0,0.62))',
           }}
         />
 
@@ -101,13 +108,13 @@ export default function Hero() {
           style={{ fontSize: 'clamp(36px, 6vw, 56px)', fontWeight: 400 }}
         >
           {titleWords.map((word, i) => (
-            // spatiul e text node INTRE span-uri (nu in interiorul inline-block),
-            // altfel titlul nu are unde sa se rupa -> overflow pe mobil
+            // spațiul e text node ÎNTRE span-uri (nu în interiorul inline-block),
+            // altfel titlul nu are unde să se rupă → overflow pe mobil
             <span key={i}>
               <motion.span
                 initial={rm ? false : { opacity: 0, y: 35 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={rm ? { duration: 0 } : { duration: 0.6, delay: titleWordDelay(i), ease: EASE_SOFT }}
+                transition={rm ? { duration: 0 } : { duration: wordDur, delay: titleWordDelay(i), ease: EASE }}
                 style={{ display: 'inline-block' }}
               >
                 {word}
@@ -117,32 +124,29 @@ export default function Hero() {
           ))}
         </h1>
 
-        {/* Linie decorativă sub titlu — „se trage" din centru spre exterior */}
-        <motion.div
-          {...anim({ opacity: 0 }, { opacity: 1 }, separatorDelay, 0.4)}
-          className="flex items-center justify-center gap-3 mb-6"
-        >
+        {/* Linie decorativă sub titlu — „se trage" din centru spre exterior (≈150px) */}
+        <div className="flex items-center justify-center gap-3 mb-6">
           <motion.span
             className="h-px block"
-            style={{ backgroundColor: '#5A4020', width: '64px', transformOrigin: 'right center' }}
-            {...anim({ scaleX: 0 }, { scaleX: 1 }, separatorDelay, 0.7)}
+            style={{ backgroundColor: '#5A4020', width: '70px', transformOrigin: 'right center' }}
+            {...anim({ scaleX: 0 }, { scaleX: 1 }, lineDelay, lineDur)}
           />
           <motion.span
             style={{ color: '#C9A84C', fontSize: '18px' }}
             aria-hidden="true"
-            {...anim({ opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1 }, separatorDelay + 0.1, 0.5, EASE_BOUNCE)}
+            {...anim({ opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1 }, lineDelay + 0.1, 0.5, EASE_BOUNCE)}
           >
             ☦
           </motion.span>
           <motion.span
             className="h-px block"
-            style={{ backgroundColor: '#5A4020', width: '64px', transformOrigin: 'left center' }}
-            {...anim({ scaleX: 0 }, { scaleX: 1 }, separatorDelay, 0.7)}
+            style={{ backgroundColor: '#5A4020', width: '70px', transformOrigin: 'left center' }}
+            {...anim({ scaleX: 0 }, { scaleX: 1 }, lineDelay, lineDur)}
           />
-        </motion.div>
+        </div>
 
         <motion.p
-          {...anim({ opacity: 0, y: 14 }, { opacity: 1, y: 0 }, subtitle1Delay, 0.6)}
+          {...anim({ opacity: 0, y: -15 }, { opacity: 1, y: 0 }, subtitle1Delay, subDur)}
           className="font-body mb-2"
           style={{ color: '#F5EFD8', fontSize: '20px', fontWeight: 600, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
         >
@@ -150,7 +154,7 @@ export default function Hero() {
         </motion.p>
 
         <motion.p
-          {...anim({ opacity: 0, y: 14 }, { opacity: 1, y: 0 }, subtitle2Delay, 0.6)}
+          {...anim({ opacity: 0, y: -15 }, { opacity: 1, y: 0 }, subtitle2Delay, subDur)}
           className="font-body mb-10"
           style={{ color: '#E4D9B8', fontSize: '20px', fontWeight: 500, textShadow: '0 2px 10px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.8)' }}
         >
