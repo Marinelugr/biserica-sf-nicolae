@@ -6,6 +6,7 @@ import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ContentCoverImage from '@/components/shared/ContentCoverImage'
+import PublicGallery from '@/components/PublicGallery'
 import ShareButtons from '@/components/shared/ShareButtons'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
@@ -57,6 +58,12 @@ export default async function ArticolPage({ params }: Props) {
   const { slug } = await params
   const [article, t, locale] = await Promise.all([getArticle(slug), getServerT(), getServerLocale()])
   if (!article) notFound()
+
+  const { prisma } = await import('@/lib/prisma')
+  const gallery = await prisma.mediaItem.findMany({
+    where: { entityType: 'article', entityId: article.id },
+    orderBy: { order: 'asc' },
+  })
 
   const title = article.titleRo
   const content = article.contentRo
@@ -122,6 +129,18 @@ export default async function ArticolPage({ params }: Props) {
         style={{ color: '#2A1A0A', lineHeight: 1.85 }}
         dangerouslySetInnerHTML={{ __html: content }}
       />
+
+      {/* Galerie imagini */}
+      {gallery.length > 0 && (
+        <div className="mt-12">
+          <div className="flex items-center gap-3 mb-6">
+            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
+            <span className="font-body text-xs uppercase tracking-[0.3em]" style={{ color: '#8A7050' }}>{t.common.gallery}</span>
+            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
+          </div>
+          <PublicGallery items={gallery} />
+        </div>
+      )}
 
       {/* Share */}
       <div className="mt-10 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
