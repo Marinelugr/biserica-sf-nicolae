@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { createClient } from '@supabase/supabase-js'
+import { processImageBuffer } from '@/lib/imageProcessorServer'
 
 const BUCKET = 'images'
-const MAX_SIZE_MB = 20 // client compresses before upload
+const MAX_SIZE_MB = 20 // client pre-compresses în unele fluxuri; oricum, serverul reprocesează mai jos
 
 const ALLOWED_TYPES = [
   'image/jpeg', 'image/jpg', 'image/png', 'image/webp',
@@ -34,20 +35,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Tip fișier neacceptat. Folosiți JPG, PNG, WebP, HEIC, AVIF sau GIF.' }, { status: 400 })
   }
 
-  const ext = file.type === 'image/webp' ? 'webp'
-    : file.name.split('.').pop()?.toLowerCase() || 'jpg'
   const safeName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60)
+  const inputBuffer = Buffer.from(await file.arrayBuffer())
+  const processed = await processImageBuffer(inputBuffer, file.type)
   const basePath = isThumbnail
-    ? `thumbnails/${Date.now()}-${safeName}.${ext}`
-    : `admin/${Date.now()}-${safeName}.${ext}`
+    ? `thumbnails/${Date.now()}-${safeName}.${processed.ext}`
+    : `admin/${Date.now()}-${safeName}.${processed.ext}`
 
   const supabase = createClient(supabaseUrl, serviceKey)
-  const bytes = await file.arrayBuffer()
 
   const { data, error } = await supabase.storage
     .from(BUCKET)
-    .upload(basePath, bytes, {
-      contentType: file.type,
+    .upload(basePath, processed.buffer, {
+      contentType: processed.contentType,
       upsert: false,
       cacheControl: '31536000',
     })

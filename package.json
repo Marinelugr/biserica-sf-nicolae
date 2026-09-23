@@ -14,6 +14,7 @@
     "db:seed": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/seed.ts",
     "db:backfill-video-slugs": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/backfill-video-slugs.ts",
     "db:backfill-saints": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/backfill-saints.ts",
+    "db:recompress-images": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/recompress-storage.ts",
     "db:studio": "prisma studio"
   },
   "dependencies": {
@@ -44,6 +45,7 @@
     "react-dom": "19.2.4",
     "react-hook-form": "^7.80.0",
     "resend": "^6.17.1",
+    "sharp": "^0.34.5",
     "zod": "^4.4.3"
   },
   "devDependencies": {
