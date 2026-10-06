@@ -2,8 +2,9 @@ import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 import { translatePath } from '@/lib/i18n/slugs'
 import { publicArticleWhere } from '@/lib/articleVisibility'
+import { SITE_URL } from '@/lib/site'
 
-const BASE = 'https://biserica-sf-nicolae.org'
+const BASE = SITE_URL
 
 function langAlternates(path: string) {
   const clean = (p: string) => (p === '/' ? '' : p)

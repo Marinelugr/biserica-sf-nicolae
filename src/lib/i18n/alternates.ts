@@ -1,6 +1,5 @@
 import { translatePath } from './slugs'
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://biserica-sf-nicolae.org'
+import { SITE_URL } from '@/lib/site'
 
 function localeUrl(path: string, locale: 'ro' | 'ru' | 'en'): string {
   const translated = translatePath(path, locale)

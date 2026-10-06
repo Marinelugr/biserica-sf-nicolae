@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { getCombinedLiveStatus, getLastArchivedLive } from '@/lib/live-stream'
 import LiveView from '@/components/live/LiveView'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { SITE_URL } from '@/lib/site'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const description = status.isLive
     ? 'Urmăriți Sfânta Liturghie în direct chiar acum.'
     : DEFAULT_DESCRIPTION
-  const image = status.isLive && status.thumbnail ? status.thumbnail : 'https://biserica-sf-nicolae.org/live/opengraph-image'
+  const image = status.isLive && status.thumbnail ? status.thumbnail : `${SITE_URL}/live/opengraph-image`
 
   return {
     title,
@@ -24,7 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description,
-      url: 'https://biserica-sf-nicolae.org/live',
+      url: `${SITE_URL}/live`,
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       type: 'website',
       locale: 'ro_RO',

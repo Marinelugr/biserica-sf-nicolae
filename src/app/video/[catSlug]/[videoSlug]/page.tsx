@@ -9,10 +9,9 @@ import { prisma } from '@/lib/prisma'
 import ShareButtons from '@/components/shared/ShareButtons'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
+import { SITE_URL } from '@/lib/site'
 
 export const dynamic = 'force-dynamic'
-
-const SITE_URL = 'https://biserica-sf-nicolae.org'
 
 type Props = { params: Promise<{ catSlug: string; videoSlug: string }> }
 

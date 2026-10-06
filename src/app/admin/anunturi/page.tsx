@@ -332,7 +332,7 @@ export default function AdminAnunturiPage() {
                   inputMode="url"
                   value={form.linkArticol}
                   onChange={e => setForm(f => ({ ...f, linkArticol: e.target.value }))}
-                  placeholder="https://biserica-sf-nicolae.org/stiri/..."
+                  placeholder="https://parintelemarin.com/stiri/..."
                   style={{
                     ...inp,
                     border: form.linkArticol.trim() && !isValidHttpUrl(form.linkArticol) ? '1px solid #8B3A3A' : inp.border,

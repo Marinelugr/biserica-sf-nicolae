@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import { SITE_URL } from '@/lib/site'
 
-const SHARE_URL = 'https://biserica-sf-nicolae.org/live'
+const SHARE_URL = `${SITE_URL}/live`
 
 export default function ShareButton({ isLive, liveTitle }: { isLive: boolean; liveTitle: string | null }) {
   const [copied, setCopied] = useState(false)
