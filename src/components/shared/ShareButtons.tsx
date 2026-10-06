@@ -15,26 +15,19 @@ export default function ShareButtons({ url, title }: { url: string; title: strin
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
   const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(title)}`
 
-  const btn: React.CSSProperties = {
-    fontFamily: 'inherit', fontSize: '0.85rem', color: '#8A7050',
-    border: '1px solid #E8E5E0', borderRadius: '6px', padding: '0.5rem 1rem',
-    display: 'inline-flex', alignItems: 'center', gap: '0.4rem', textDecoration: 'none',
-    backgroundColor: 'transparent', cursor: 'pointer',
-  }
-
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={btn}>
+      <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="chip">
         WhatsApp
       </a>
-      <a href={facebookUrl} target="_blank" rel="noopener noreferrer" style={btn}>
+      <a href={facebookUrl} target="_blank" rel="noopener noreferrer" className="chip">
         Facebook
       </a>
-      <a href={telegramUrl} target="_blank" rel="noopener noreferrer" style={btn}>
+      <a href={telegramUrl} target="_blank" rel="noopener noreferrer" className="chip">
         Telegram
       </a>
       <div className="relative inline-block">
-        <button onClick={handleCopy} style={btn}>
+        <button type="button" onClick={handleCopy} className="chip">
           {copied ? '✓ Link copiat' : 'Copiază link'}
         </button>
       </div>

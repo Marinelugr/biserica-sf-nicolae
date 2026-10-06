@@ -1,460 +1,387 @@
-/* ─── Google Fonts — trebuie să fie primele ─────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=EB+Garamond:wght@400;500&display=swap');
-
 @import "tailwindcss";
 
-/* ─── Design System — Paleta de culori ─────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   Tema „Profil și flux" (stilul 9) — doar întunecată („noapte").
+   Tokenii sunt definiți o singură dată aici; restul site-ului îi folosește
+   prin utilitare Tailwind (bg-night, text-ink, text-gold…) sau prin var(--…).
+   Tokenii vechi (parchment/cobalt/navy…) au fost eliminați: grep arăta zero
+   consumatori în src/ (inclusiv admin).
+   ═══════════════════════════════════════════════════════════════════════════ */
 @theme {
-  /* Fonturi */
-  --font-heading: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'EB Garamond', Georgia, serif;
+  /* Fonturi — servite de next/font (variabilele vin din layout.tsx) */
+  --font-heading: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+  --font-body: var(--font-eb-garamond), Georgia, 'Times New Roman', serif;
 
-  /* Dark zone (header, footer, hero) */
-  --color-dark-primary:   #0D0905;
-  --color-gold-accent:    #C9A84C;
-  --color-gold-muted:     #9B8050;
-  --color-gold-dark:      #5A4020;
-  --color-burgundy:       #8B1A1A;
-  --color-burgundy-light: #C06050;
-
-  /* Parchment zone (carduri zilnice) */
-  --color-parchment-bg:     #F2EBD9;
-  --color-parchment-card:   #F5EFE0;
-  --color-parchment-border: #D4C8A0;
-  --color-dark-text:        #3A1A1A;
-  --color-muted-text:       #8A7050;
-
-  /* White editorial zone (conținut) */
-  --color-white-bg:       #FFFFFF;
-  --color-navy:           #1C1B3A;
-  --color-editorial-gray: #F8F7F5;
-  --color-light-border:   #E8E5E0;
-
-  /* Saints dot colors */
-  --color-dot-saints:   #8B6014;
-  --color-dot-gospel:   #8B1A1A;
-  --color-dot-prayer:   #6B4A2A;
-  --color-dot-schedule: #4A6A2A;
+  /* Paleta „noapte" */
+  --color-night:  #050a1a;
+  --color-ink:    #f4ecda;
+  --color-mute:   #b1bad0;
+  --color-gold:   #e0b84a;
+  --color-gold-d: #b98f2c;
+  --color-flame:  #9b1c1c;
+  --color-sky:    #8fb0ff;
+  --color-rose:   #e58a8a;
+  --color-line:   rgba(255, 255, 255, 0.12);
 }
 
-/* ─── Base styles ────────────────────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
+:root {
+  --bg: #050a1a;
+  --ink: #f4ecda;
+  --mute: #b1bad0;
+  --gold: #e0b84a;
+  --gold-d: #b98f2c;
+  --red: #9b1c1c;
+  --blue: #8fb0ff;
+  --rose: #e58a8a;
+  --line: rgba(255, 255, 255, 0.12);
+  --serif: var(--font-cormorant), Georgia, 'Times New Roman', serif;
+  --body: var(--font-eb-garamond), Georgia, 'Times New Roman', serif;
+  --header-h: 71px;
+  color-scheme: dark;
 }
+
+/* ─── Bază ─────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
 
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
 }
 
+/* Fundalul global, definit o singură dată (fără background-attachment: fixed) */
 body {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 1rem;
-  line-height: 1.7;
-  color: #3A1A1A;
-  background-color: #FFFFFF;
+  font-family: var(--body);
+  font-size: 19px;
+  line-height: 1.55;
+  color: var(--ink);
+  background:
+    radial-gradient(1100px 700px at 12% -8%, rgba(44, 76, 160, 0.38), transparent 62%),
+    radial-gradient(900px 560px at 96% 6%, rgba(224, 184, 74, 0.08), transparent 60%),
+    var(--bg);
+  background-repeat: no-repeat;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  line-height: 1.2;
+  font-family: var(--serif);
+  font-weight: 600;
+  line-height: 1.15;
 }
 
-/* ─── Scrollbar custom ────────────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0D0905; }
-::-webkit-scrollbar-thumb { background: #5A4020; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #C9A84C; }
+a { color: inherit; text-decoration: none; }
 
-/* ─── Selection ─────────────────────────────────────────────────────────────── */
-::selection {
-  background-color: #C9A84C;
-  color: #0D0905;
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
 
-/* ─── Utility classes specifice proiectului ─────────────────────────────────── */
-.font-heading { font-family: 'Cormorant Garamond', Georgia, serif; }
-.font-body    { font-family: 'EB Garamond', Georgia, serif; }
+::selection { background-color: var(--gold); color: #0a1330; }
 
-/* Zone Layout */
-.zone-dark {
-  background-color: #0D0905;
-  color: #F2EBD9;
-}
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #26324f; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-d); }
 
-.zone-parchment {
-  background-color: #F2EBD9;
-  color: #3A1A1A;
-}
+.font-heading { font-family: var(--serif); }
+.font-body    { font-family: var(--body); }
 
-.zone-white {
-  background-color: #FFFFFF;
-  color: #3A1A1A;
-}
+/* ─── Componente ───────────────────────────────────────────────────────────── */
+@layer components {
+  /* scala tipografică */
+  .h-xl { font-family: var(--serif); font-weight: 600; font-size: clamp(46px, 7vw, 78px); line-height: 1.02; letter-spacing: -0.01em; }
+  .h-l  { font-family: var(--serif); font-weight: 600; font-size: clamp(34px, 4.6vw, 48px); line-height: 1.08; }
+  .h-m  { font-family: var(--serif); font-weight: 600; font-size: clamp(26px, 3vw, 31px); line-height: 1.15; }
+  .h-s  { font-family: var(--serif); font-weight: 600; font-size: 23px; line-height: 1.22; }
+  .lead { font-family: var(--serif); font-style: italic; font-weight: 500; font-size: clamp(23px, 2.4vw, 26px); line-height: 1.45; color: #eadfc6; }
+  .eyebrow { font-size: 13px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--gold); font-weight: 500; }
+  .kicker  { font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rose); }
+  .kicker.blue { color: var(--blue); }
+  .kicker.gold { color: var(--gold); }
+  .date { font-size: 16px; color: var(--blue); }
+  .mute { color: var(--mute); }
+  .gold { color: var(--gold); }
+  .serif { font-family: var(--serif); }
 
-/* Gold divider ornament */
-.ornament {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: #C9A84C;
-}
+  .link-gold { color: var(--gold); transition: color .2s; }
+  .link-gold:hover { color: #efc95e; text-decoration: underline; text-underline-offset: 3px; }
+  .link-blue { color: var(--blue); }
+  .link-blue:hover { text-decoration: underline; text-underline-offset: 3px; }
 
-.ornament::before,
-.ornament::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: linear-gradient(to right, transparent, #C9A84C, transparent);
-}
+  /* card */
+  .card {
+    border: 1px solid var(--line);
+    border-radius: 24px;
+    background: linear-gradient(160deg, rgba(26, 42, 92, 0.55), rgba(8, 14, 36, 0.74));
+    padding: 30px;
+    min-width: 0;
+  }
+  .card.flush { padding: 0; overflow: hidden; }
+  .card.red-grad {
+    background: linear-gradient(160deg, rgba(155, 28, 28, 0.42), rgba(60, 10, 18, 0.78));
+    border-color: rgba(229, 138, 138, 0.35);
+  }
+  a.card { display: block; transition: border-color .25s; }
+  a.card:hover { border-color: var(--gold-d); }
 
-/* Cross icon */
-.orthodox-cross {
-  font-size: 1.5rem;
-  color: #C9A84C;
-  line-height: 1;
-}
+  /* butoane */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 12px 26px; min-height: 46px;
+    border-radius: 999px; border: 1px solid var(--gold-d);
+    color: var(--ink); font-family: var(--body); font-size: 18px; font-weight: 500; line-height: 1.1;
+    background: transparent; cursor: pointer; text-align: center;
+    transition: background-color .2s, color .2s, border-color .2s;
+  }
+  .btn:hover { background: rgba(224, 184, 74, 0.14); color: var(--gold); }
+  .btn.red { background: var(--red); border-color: var(--red); color: #fff; }
+  .btn.red:hover { background: #b82626; border-color: #b82626; color: #fff; }
+  .btn.gold { background: var(--gold); border-color: var(--gold); color: #0a1330; font-weight: 600; }
+  .btn.gold:hover { background: #efc95e; color: #0a1330; }
+  .btn.sm { padding: 8px 18px; min-height: 44px; font-size: 16px; }
+  .btn:disabled { opacity: .55; cursor: not-allowed; }
 
-/* Card parchment */
-.card-parchment {
-  background-color: #F5EFE0;
-  border: 1px solid #D4C8A0;
-  border-radius: 6px;
-}
+  /* chip */
+  .chip {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 8px 18px; min-height: 44px;
+    border-radius: 999px; border: 1px solid var(--line);
+    font-family: var(--body); font-size: 16px; color: var(--mute); background: transparent; cursor: pointer;
+    transition: border-color .2s, color .2s;
+  }
+  .chip:hover { color: var(--ink); border-color: rgba(255, 255, 255, 0.28); }
+  .chip[aria-pressed="true"], .chip.on { border-color: var(--gold-d); color: var(--gold); }
 
-/* Live stream badge pulse */
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%       { opacity: 0.6; transform: scale(1.15); }
-}
-.live-dot { display: inline-block; animation: live-pulse 1.4s ease-in-out infinite; }
+  /* rețele sociale */
+  .soc {
+    width: 46px; height: 46px; border-radius: 50%; flex: none;
+    border: 1px solid var(--gold-d);
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--ink); transition: background-color .2s, color .2s;
+  }
+  .soc:hover { background: rgba(224, 184, 74, 0.14); color: var(--gold); }
 
-/* Clopote animate — apar când e LIVE */
-@keyframes bellSwing {
-  0%   { transform: rotate(0deg); }
-  15%  { transform: rotate(15deg); }
-  30%  { transform: rotate(-12deg); }
-  45%  { transform: rotate(10deg); }
-  60%  { transform: rotate(-8deg); }
-  75%  { transform: rotate(5deg); }
-  90%  { transform: rotate(-3deg); }
-  100% { transform: rotate(0deg); }
-}
-@keyframes bellGlow {
-  0%, 100% { filter: drop-shadow(0 0 4px #C9A96E); }
-  50%       { filter: drop-shadow(0 0 12px #FFD700); }
-}
-.bell-icon {
-  animation: bellSwing 1.5s ease-in-out infinite,
-             bellGlow 2s ease-in-out infinite;
-  transform-origin: top center;
-  display: inline-block;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.5; }
-}
+  /* card de știre */
+  .news {
+    display: flex; flex-direction: column;
+    border-radius: 22px; border: 1px solid var(--line); overflow: hidden;
+    background: rgba(10, 18, 44, 0.7);
+    transition: border-color .25s;
+    min-width: 0;
+  }
+  .news:hover { border-color: var(--gold-d); }
+  .news .media { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-bottom: 1px solid var(--line); background: linear-gradient(155deg, #17295f, #0a1330 72%); }
+  .news .body { padding: 22px 24px 26px; display: flex; flex-direction: column; gap: 10px; }
 
-/* TipTap rich-text prose — stiluri pentru conținut editat în admin */
-.tiptap-prose {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 1.0625rem;
-  line-height: 1.8;
-  color: #3A2010;
-}
-.tiptap-prose p { margin-bottom: 1.25rem; }
-.tiptap-prose h1, .tiptap-prose h2, .tiptap-prose h3, .tiptap-prose h4 {
-  font-family: 'Cormorant Garamond', Georgia, serif;
-  color: #1C1B3A;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-  line-height: 1.25;
-}
-.tiptap-prose h1 { font-size: 2rem; }
-.tiptap-prose h2 { font-size: 1.5rem; }
-.tiptap-prose h3 { font-size: 1.25rem; color: #4A2010; }
-.tiptap-prose ul, .tiptap-prose ol { padding-left: 1.5rem; margin-bottom: 1.25rem; }
-.tiptap-prose li { margin-bottom: 0.4rem; }
-.tiptap-prose strong { font-weight: 600; color: #2A1A0A; }
-.tiptap-prose em { font-style: italic; }
-.tiptap-prose blockquote { border-left: 3px solid #C9A84C; padding-left: 1rem; color: #5A3010; font-style: italic; margin: 1.5rem 0; }
-.tiptap-prose a { color: #8B6014; text-decoration: underline; }
-.tiptap-prose hr { border: none; border-top: 1px solid #E8E5E0; margin: 2rem 0; }
+  /* rând orizontal (poză 180×112 + text) */
+  .news-row { display: flex; gap: 18px; align-items: center; padding: 14px; }
+  .news-row .thumb { position: relative; flex: 0 0 180px; height: 112px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: linear-gradient(155deg, #17295f, #0a1330 72%); }
 
-/* Aceleași linkuri, dar pentru containerele randate cu clasa "prose" (cărți, articole,
-   sfinți, paroh, despre) — fără asta, linkurile inserate din editor sunt invizibile
-   pe pagina publică (Tailwind Preflight elimină culoarea/underline-ul implicit). */
-.prose a { color: #8B6014; text-decoration: underline; }
+  /* tile */
+  .tile {
+    display: flex; flex-direction: column; gap: 6px;
+    padding: 26px; border-radius: 22px; border: 1px solid var(--line);
+    background: linear-gradient(160deg, rgba(26, 42, 92, 0.5), rgba(8, 14, 36, 0.7));
+    transition: border-color .25s;
+    min-width: 0;
+  }
+  .tile:hover { border-color: var(--gold-d); }
+  .tile .ic {
+    width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--gold-d);
+    display: flex; align-items: center; justify-content: center; color: var(--gold); margin-bottom: 10px;
+  }
 
-/* Animație fade-in la scroll */
-.fade-in {
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
+  /* placeholder de imagine */
+  .ph {
+    position: relative; overflow: hidden;
+    background: linear-gradient(155deg, #17295f, #0a1330 72%);
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(224, 184, 74, 0.6);
+  }
 
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
+  .sec-head {
+    display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    margin-bottom: 22px; padding-bottom: 14px; border-bottom: 1px solid var(--line);
+  }
+  .sep { height: 1px; background: var(--line); border: 0; margin: 0; }
 
-/* Hero — gradient overlay animat */
-@keyframes gradientShift {
-  0%   { opacity: 0.6; }
-  50%  { opacity: 0.75; }
-  100% { opacity: 0.6; }
-}
+  /* calendar */
+  .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+  .cal-h { text-align: center; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); }
+  .cal-d {
+    aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    border-radius: 50%; font-size: 17px; color: var(--ink); border: 1px solid transparent;
+    background: transparent; cursor: pointer; font-family: var(--body); line-height: 1;
+    transition: background-color .2s, border-color .2s;
+    min-width: 0; padding: 0; position: relative;
+  }
+  .cal-d:hover { background: rgba(224, 184, 74, 0.12); }
+  .cal-d.sun { color: var(--rose); }
+  .cal-d.feast { border-color: var(--gold-d); color: var(--gold); }
+  .cal-d.sel { background: rgba(143, 176, 255, 0.2); border-color: var(--blue); }
+  .cal-d.today { background: var(--gold); color: #0a1330; font-weight: 600; border-color: var(--gold); }
+  .cal-d.empty { visibility: hidden; }
 
-.hero-overlay {
-  background: linear-gradient(
-    180deg,
-    rgba(13, 9, 5, 0.3) 0%,
-    rgba(13, 9, 5, 0.5) 50%,
-    rgba(13, 9, 5, 0.8) 100%
-  );
-  animation: gradientShift 4s ease-in-out infinite;
-}
+  /* play */
+  .play {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: var(--gold); color: #0a1330;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    transition: transform .25s;
+  }
+  .play.sm { width: 56px; height: 56px; }
+  a:hover .play { transform: scale(1.06); }
 
-/* Hero — titlu cu shimmer auriu */
-@keyframes goldenShimmer {
-  0%   { background-position: -200% center; }
-  100% { background-position: 200% center; }
-}
+  /* poza părintelui — dreptunghi rotunjit 4:5, niciodată cerc sau arc */
+  .portrait {
+    position: relative; display: block; width: 100%; aspect-ratio: 4 / 5; overflow: hidden;
+    border-radius: 22px; border: 1px solid var(--gold-d);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.4);
+    background: linear-gradient(155deg, #17295f, #0a1330 72%);
+  }
+  .portrait.sm { border-radius: 14px; }
+  .portrait img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 18%; display: block; }
 
-.hero-title {
-  background: linear-gradient(
-    90deg,
-    #C9A96E 0%,
-    #FFD700 25%,
-    #C9A96E 50%,
-    #FFD700 75%,
-    #C9A96E 100%
-  );
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: goldenShimmer 4s linear infinite;
-}
+  /* coloana de citire */
+  .reading { max-width: 68ch; font-size: 20px; line-height: 1.75; }
 
-/* ─── Hero v4 — titlu bold cu contrast garantat pe fotografie + reveal CSS ─────
-   Fără bibliotecă JS: keyframe-uri + `--d` (delay) setat inline per element.     */
-.hero-title-bold {
-  font-weight: 700;
-  font-style: normal;
-  /* umbră puternică — titlul trebuie să se citească peste cupole/cer deschis */
-  text-shadow: 0 2px 15px rgba(0, 0, 0, 0.62), 0 1px 4px rgba(0, 0, 0, 0.78);
-}
-.hero-word--gold  { color: #E9CE7A; }
-.hero-word--white { color: rgba(255, 255, 255, 0.92); }
+  /* conținut HTML din editor (TipTap) */
+  .rich { font-size: 20px; line-height: 1.75; color: var(--ink); overflow-wrap: break-word; }
+  .rich > * + * { margin-top: 1.1em; }
+  .rich h1, .rich h2, .rich h3, .rich h4 { font-family: var(--serif); color: var(--ink); line-height: 1.2; margin-top: 1.6em; }
+  .rich h1 { font-size: 34px; }
+  .rich h2 { font-size: 30px; }
+  .rich h3 { font-size: 25px; color: #eadfc6; }
+  .rich h4 { font-size: 22px; }
+  .rich ul, .rich ol { padding-left: 1.4em; }
+  .rich ul { list-style: disc; }
+  .rich ol { list-style: decimal; }
+  .rich li + li { margin-top: .35em; }
+  .rich strong { font-weight: 600; color: #fff6e2; }
+  .rich em { font-style: italic; }
+  .rich blockquote { border-left: 3px solid var(--gold-d); padding-left: 1em; font-style: italic; color: #eadfc6; }
+  .rich a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+  .rich hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
+  .rich img { max-width: 100%; height: auto; border-radius: 14px; }
+  .rich table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+  .rich td, .rich th { border: 1px solid var(--line); padding: .4em .6em; }
+  .rich iframe, .rich video { max-width: 100%; }
+  .rich pre { white-space: pre-wrap; }
 
-@keyframes heroWordUp {
-  from { opacity: 0; transform: translateY(35px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes heroSoftUp {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-@keyframes heroFade {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
+  /* câmpuri de formular */
+  .field {
+    width: 100%; min-height: 48px; padding: 12px 16px;
+    border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(5, 10, 26, 0.6); color: var(--ink);
+    font-family: var(--body); font-size: 18px;
+  }
+  .field::placeholder { color: #8d97b0; }
+  .field:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold-d); }
+  .label { display: block; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
 
-.hero-word {
-  display: inline-block;
-  opacity: 0;
-  animation: heroWordUp 0.6s ease var(--d, 0s) forwards;
-}
-.hero-anim-fade {
-  opacity: 0;
-  animation: heroFade 0.55s ease var(--d, 0s) forwards;
-}
-.hero-anim-rise {
-  opacity: 0;
-  animation: heroSoftUp 0.6s ease var(--d, 0s) forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* Reduce motion nu înseamnă „fără nimic": eliminăm mişcarea/translaţia şi
-     decalajul per-cuvânt, dar păstrăm un fade scurt şi uniform (accesibil) —
-     altfel utilizatorii cu Reduce Motion văd conţinutul apărând brusc. */
-  .hero-word,
-  .hero-anim-fade,
-  .hero-anim-rise {
-    animation: heroFade 0.4s ease both;
-    animation-delay: 0s;
-    transform: none;
+  /* pastila LIVE */
+  .live-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 16px; min-height: 44px; border-radius: 999px;
+    background: var(--red); color: #fff; font-weight: 600; font-size: 15px; letter-spacing: .14em;
   }
 }
 
-/* Hover elegant pe carduri */
-.card-parchment,
-.category-card {
-  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
-              box-shadow 0.3s ease;
-}
-.card-parchment:hover,
-.category-card:hover {
-  transform: translateY(-6px) scale(1.02);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15),
-              0 0 30px rgba(201, 169, 110, 0.1);
+@media (max-width: 760px) {
+  .card { padding: 22px 20px; border-radius: 20px; }
+  .news-row { flex-direction: column; align-items: stretch; }
+  .news-row .thumb { flex-basis: auto; height: auto; aspect-ratio: 16 / 9; }
 }
 
-/* Widget — timp până la următoarea slujbă */
-.next-service-widget {
-  padding: 24px 32px;
-  text-align: center;
+/* ─── Shell: profil stânga + flux dreapta ─────────────────────────────────── */
+.shell { width: 100%; max-width: 1200px; margin: 0 auto; padding: 32px 32px 72px; }
+.shell-row { display: flex; gap: 32px; align-items: flex-start; }
+.shell-aside { flex: 1 1 320px; max-width: 380px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.shell-flow { flex: 2 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.shell.with-cover { padding-top: 0; }
+.shell.with-cover .shell-aside { margin-top: -72px; position: relative; z-index: 2; }
+.shell.with-cover .shell-flow { padding-top: 28px; }
+@media (min-width: 1024px) {
+  .shell-aside.is-sticky { position: sticky; top: var(--aside-top, calc(var(--header-h) + 20px)); }
+  .aside-bar { display: none !important; }
 }
-.widget-label {
-  font-size: 13px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: #C9A84C;
-  margin-bottom: 8px;
+@media (max-width: 1023px) {
+  .shell-row { flex-direction: column; align-items: stretch; gap: 20px; }
+  .shell-aside { max-width: none; flex-basis: auto; }
+  .shell-aside.desktop-only { display: none; }
+  /* full: cardul de profil sus, fluxul, apoi rețelele + programul */
+  .shell.aside-full .shell-aside { display: contents; }
+  .shell.aside-full .profile-card { order: 0; }
+  .shell.aside-full .shell-flow { order: 1; }
+  .shell.aside-full .aside-extra { order: 2; }
+  .shell.with-cover .shell-aside { margin-top: 0; }
+  .shell.with-cover .profile-card { margin-top: -72px; position: relative; z-index: 2; }
+  .shell.with-cover .shell-flow { padding-top: 0; }
+  .shell.aside-compact .shell-row { margin-top: 20px; }
 }
-.widget-service-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 22px;
-  color: #E9EFFA;
-  margin-bottom: 4px;
+@media (min-width: 640px) and (max-width: 1023px) {
+  /* tabletă: poza lângă text, ca să nu ocupe un ecran întreg */
+  .profile-card { display: grid !important; grid-template-columns: 240px minmax(0, 1fr); column-gap: 28px; align-items: start; }
+  .profile-card > [data-intro-photo] { grid-row: span 6; }
 }
-.widget-service-time {
-  font-size: 14px;
-  color: #828EA8;
-  margin-bottom: 16px;
+@media (max-width: 760px) {
+  .shell { padding: 20px 20px 56px; }
+  .shell.with-cover { padding-top: 0; }
 }
-.widget-countdown {
-  display: flex;
-  justify-content: center;
-  gap: 16px;
+
+.cover { position: relative; height: 220px; overflow: hidden; border-bottom: 1px solid var(--line); }
+.cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 10, 26, 0.05) 0%, rgba(5, 10, 26, 0.35) 55%, var(--bg) 100%); }
+
+/* ─── Animații ─────────────────────────────────────────────────────────────── */
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.55; transform: scale(1.2); }
 }
-.countdown-unit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.countdown-number {
-  font-size: 32px;
-  font-weight: 700;
-  color: #5A8FE8;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-.countdown-label {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: #828EA8;
-  margin-top: 4px;
-}
-.next-service-widget.skeleton {
-  min-height: 148px;
-  animation: skeletonPulse 1.4s ease-in-out infinite;
-}
-@keyframes skeletonPulse {
-  0%, 100% { opacity: 0.5; }
-  50%       { opacity: 0.9; }
+.live-dot { display: inline-block; animation: live-pulse 1.4s ease-in-out infinite; }
+
+@keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
+.page-fade { animation: page-in .3s ease-out both; }
+
+@keyframes skeletonPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .page-fade, .live-dot { animation: none; }
+  [data-reveal] { opacity: 1 !important; transform: none !important; }
+  .card, .news, .tile, .btn, .chip, .soc, .play { transition: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   Tema Cobalt — fundal aurora, sticlă reactivă, lumină de cursor
+   Moștenire — clase folosite doar de componente scoase din layout
+   (Hero, CobaltAurora, CobaltCursorFX). Păstrate minimal ca acele fișiere
+   să rămână utilizabile; nu se mai randează pe site.
    ═══════════════════════════════════════════════════════════════════════════ */
-@theme {
-  --color-cobalt-bg:      #04080F;
-  --color-cobalt-1:       #0a2a5c;
-  --color-cobalt-2:       #0d1a3d;
-  --color-cobalt-3:       #1a336b;
-  --color-cobalt-accent:  #5A8FE8;
-  --color-cobalt-text:    #E9EFFA;
-  --color-cobalt-muted:   #828EA8;
-}
+.hero-overlay { background: linear-gradient(180deg, rgba(5, 10, 26, 0.3) 0%, rgba(5, 10, 26, 0.5) 50%, rgba(5, 10, 26, 0.85) 100%); }
+.hero-title-bold { font-weight: 700; text-shadow: 0 2px 15px rgba(0, 0, 0, 0.62), 0 1px 4px rgba(0, 0, 0, 0.78); }
+.hero-word--gold  { color: #E9CE7A; }
+.hero-word--white { color: rgba(255, 255, 255, 0.92); }
+.cobalt-spotlight { position: fixed; inset: 0; z-index: 1; pointer-events: none; background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(90, 143, 232, 0.06), transparent 70%); }
+.cobalt-aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.cobalt-blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.4; }
+.cobalt-blob-1 { width: 520px; height: 520px; background: #0a2a5c; top: -12%; left: -10%; }
+.cobalt-blob-2 { width: 460px; height: 460px; background: #0d1a3d; top: 15%; right: -15%; }
+.cobalt-blob-3 { width: 480px; height: 480px; background: #1a336b; bottom: -15%; left: 25%; }
 
-/* Sticlă reactivă — luminează marginea spre poziția cursorului */
-.glass-cobalt {
-  position: relative;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 20px;
+/* ─── Reveal (GSAP) — stare inițială doar când mișcarea e permisă ──────────
+   Fără JS: <noscript> din layout anulează ascunderea. Dacă JS întârzie peste
+   2.5s, o animație CSS de rezervă afișează conținutul; când GSAP preia
+   controlul (data-reveal-ready), rezerva se dezactivează.                   */
+@keyframes reveal-fallback { to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal]:not([data-revealed]), [data-intro-text]:not([data-revealed]) {
+    opacity: 0;
+    transform: translateY(24px);
+    animation: reveal-fallback .6s ease-out 2.5s forwards;
+  }
+  [data-intro-text]:not([data-revealed]) { transform: translateY(14px); }
+  [data-reveal-ready] [data-reveal],
+  [data-reveal-ready] [data-intro-text] { animation: none; }
+  a.card:hover, .news:hover, .tile:hover { transform: translateY(-2px); }
+  a.card, .news, .tile { transition: border-color .25s, transform .25s; }
 }
-.glass-cobalt::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: radial-gradient(220px circle at var(--x, 50%) var(--y, 50%), rgba(90, 143, 232, 0.55), transparent 60%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.glass-cobalt:hover::after {
-  opacity: 1;
-}
-
-/* Variantă de contrast ridicat — pentru sticlă peste fotografie (ex: bara de căutare din hero) */
-.glass-cobalt-strong {
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
-}
-
-/* Lumină fixă ce urmărește cursorul pe toată pagina */
-.cobalt-spotlight {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 50%), rgba(90, 143, 232, 0.06), transparent 70%);
-}
-
-/* Aurora animată — doar pe homepage */
-.cobalt-aurora {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-.cobalt-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(100px);
-  opacity: 0.4;
-  animation: cobaltDrift 24s ease-in-out infinite;
-}
-@media (max-width: 640px) {
-  .cobalt-blob { filter: blur(60px); opacity: 0.3; }
-}
-.cobalt-blob-1 { width: 520px; height: 520px; background: var(--color-cobalt-1); top: -12%; left: -10%; }
-.cobalt-blob-2 { width: 460px; height: 460px; background: var(--color-cobalt-2); top: 15%; right: -15%; animation-delay: -8s; }
-.cobalt-blob-3 { width: 480px; height: 480px; background: var(--color-cobalt-3); bottom: -15%; left: 25%; animation-delay: -16s; }
-@keyframes cobaltDrift {
-  0%, 100% { transform: translate(0, 0) scale(1); }
-  33%      { transform: translate(40px, -30px) scale(1.08); }
-  66%      { transform: translate(-30px, 30px) scale(0.95); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cobalt-blob { animation: none; }
-}
-
-/* Puls auriu-albastru pe butonul de Donații */
-@keyframes cobaltPulse {
-  0%, 100% { box-shadow: 0 0 16px rgba(90, 143, 232, 0.3); }
-  50%      { box-shadow: 0 0 28px rgba(90, 143, 232, 0.6); }
-}
-.cobalt-donate-pulse {
-  animation: cobaltPulse 3s ease-in-out infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-  .cobalt-donate-pulse { animation: none; }
-}
-

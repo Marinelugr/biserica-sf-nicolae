@@ -8,16 +8,19 @@ import ViewTracker from '@/components/ViewTracker'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
+
 export const dynamic = 'force-dynamic'
 
 const CATEGORY_META = [
-  { key: 'ACATIST',   slug: 'acatist',   icon: '☦', color: '#8B1A1A' },
-  { key: 'CANON',     slug: 'canon',     icon: '✝', color: '#8B6014' },
-  { key: 'RUGACIUNE', slug: 'rugaciune', icon: '🕯', color: '#6B4A2A' },
-  { key: 'SLUJBA',    slug: 'slujba',    icon: '⛪', color: '#4A6A2A' },
-  { key: 'VIATA',     slug: 'viata',     icon: '✦', color: '#1C4A6A' },
-  { key: 'PREDICA',   slug: 'predica',   icon: '📖', color: '#4A1A6A' },
-  { key: 'ALTELE',    slug: 'altele',    icon: '◆', color: '#5A5050' },
+  { key: 'ACATIST',   slug: 'acatist',   icon: '☦' },
+  { key: 'CANON',     slug: 'canon',     icon: '✝' },
+  { key: 'RUGACIUNE', slug: 'rugaciune', icon: '🕯' },
+  { key: 'SLUJBA',    slug: 'slujba',    icon: '⛪' },
+  { key: 'VIATA',     slug: 'viata',     icon: '✦' },
+  { key: 'PREDICA',   slug: 'predica',   icon: '📖' },
+  { key: 'ALTELE',    slug: 'altele',    icon: '◆' },
 ] as const
 
 function extractYouTubeId(url: string): string | null {
@@ -83,130 +86,59 @@ export default async function CartePage({ params }: Props) {
   const categoryLabel = t.books.categories[cat.key]
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <PageShell aside="compact">
       <ViewTracker type="carte" id={book.id} />
-
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 mb-10 font-body text-sm flex-wrap" style={{ color: '#8A7050' }}>
-        <Link href="/" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          {t.nav.home}
-        </Link>
-        <span aria-hidden="true">›</span>
-        <Link href="/carti" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          {t.books.title}
-        </Link>
-        <span aria-hidden="true">›</span>
-        <Link href={`/carti/categorie/${cat.slug}`} className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          {categoryLabel}
-        </Link>
-        <span aria-hidden="true">›</span>
-        <span className="truncate max-w-[200px]">{title}</span>
-      </nav>
-
-      {/* Header */}
-      <div className="text-center mb-10">
-        <span className="text-4xl block mb-4" style={{ color: cat.color }} aria-hidden="true">
-          {cat.icon}
-        </span>
-        <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
-          {categoryLabel}
-        </p>
-        <h1 className="font-heading leading-tight mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(22px, 4vw, 36px)' }}>
-          {title}
-        </h1>
-        <p className="font-body text-sm" style={{ color: '#8A7050' }}>
-          {book.author && <span>{book.author}</span>}
-          {book.author && <span> · </span>}
-          {book.source && <span>{book.source}</span>}
-          {book.source && <span> · </span>}
-          <ViewBadge value={book.views} locale={locale} />
-        </p>
-        <div className="flex items-center justify-center gap-3 mt-5">
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-          <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-        </div>
-      </div>
-
-      {/* Imagine principală (cover) */}
-      {book.imageUrl && (
-        <ContentCoverImage
-          src={book.imageUrl}
-          alt={title}
-          className="w-full mb-10 rounded-xl shadow-md"
-          priority
-        />
-      )}
-
-      {/* Video */}
-      {ytId && (
-        <div className="mb-10">
-          {book.videoTitle && (
-            <p className="font-body text-sm font-semibold mb-3" style={{ color: '#5A4A3A' }}>
-              🎬 {book.videoTitle}
-            </p>
-          )}
-          <div className="rounded-xl overflow-hidden shadow-md" style={{ aspectRatio: '16/9' }}>
-            <iframe
-              src={`https://www.youtube.com/embed/${ytId}`}
-              title={book.videoTitle || title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* Conținut */}
-      <div
-        className="font-body prose prose-lg max-w-none"
-        style={{ color: '#2A1A0A', lineHeight: 1.9, fontSize: '1.05rem' }}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-
-      {/* Galerie imagini */}
-      {galleryItems.length > 0 && (
-        <div className="mt-12">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-            <span className="font-body text-xs uppercase tracking-[0.3em]" style={{ color: '#8A7050' }}>{t.common.gallery}</span>
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-          </div>
-          <PublicGallery items={galleryItems} />
-        </div>
-      )}
-
-      {/* Footer */}
-      <div className="mt-14 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ borderTop: '1px solid #E8E5E0' }}>
-        <Link
-          href={`/carti/categorie/${cat.slug}`}
-          className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
-          style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
+      <article className="flex flex-col gap-5">
+        <PageHead
+          size="m"
+          crumbs={[{ href: '/', label: t.nav.home }, { href: '/carti', label: t.books.title }, { href: `/carti/categorie/${cat.slug}`, label: categoryLabel }, { label: title }]}
+          eyebrow={<><span aria-hidden="true">{cat.icon}</span> {categoryLabel}</>}
+          title={title}
         >
-          ← {t.common.backTo} {categoryLabel}
-        </Link>
-        <Link
-          href="/carti"
-          className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
-          style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
-        >
-          {t.common.allCategories}
-        </Link>
-      </div>
+          <p className="mute text-[16px]">
+            {book.author && <span>{book.author}</span>}
+            {book.author && <span> · </span>}
+            {book.source && <span>{book.source}</span>}
+            {book.source && <span> · </span>}
+            <ViewBadge value={book.views} locale={locale} />
+          </p>
+        </PageHead>
 
-      <style>{`
-        .prose h2 { color: #1C1B3A; font-size: 1.3rem; margin: 2rem 0 0.75rem; font-family: 'Cormorant Garamond', Georgia, serif; }
-        .prose h3 { color: #3A2A1A; font-size: 1.1rem; margin: 1.5rem 0 0.5rem; font-family: 'Cormorant Garamond', Georgia, serif; }
-        .prose p { margin-bottom: 1.1rem; }
-        .prose strong { color: #1C1B3A; }
-        .prose em { color: #5A4A3A; }
-        .prose ul, .prose ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-        .prose li { margin-bottom: 0.4rem; }
-        .prose hr { border-color: #E8E5E0; margin: 2rem 0; }
-        .prose blockquote { border-left: 3px solid #C9A84C; padding-left: 1rem; color: #5A4A3A; font-style: italic; margin: 1.5rem 0; }
-        .prose a { color: #8B1A1A; text-decoration: underline; text-underline-offset: 2px; }
-      `}</style>
-    </div>
+        {book.imageUrl && (
+          <ContentCoverImage src={book.imageUrl} alt={title} className="w-full overflow-hidden" sizes="(max-width: 1024px) 100vw, 760px" priority />
+        )}
+
+        {ytId && (
+          <div className="card flush">
+            {book.videoTitle && <p className="h-s" style={{ padding: '16px 24px' }}>🎬 {book.videoTitle}</p>}
+            <div style={{ aspectRatio: '16/9' }}>
+              <iframe
+                src={`https://www.youtube.com/embed/${ytId}`}
+                title={book.videoTitle || title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                style={{ width: '100%', height: '100%', border: 'none', display: 'block' }}
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="card">
+          <div className="rich reading" dangerouslySetInnerHTML={{ __html: content }} />
+        </div>
+
+        {galleryItems.length > 0 && (
+          <section className="card" aria-labelledby="galerie-carte">
+            <h2 id="galerie-carte" className="eyebrow mb-5">{t.common.gallery}</h2>
+            <PublicGallery items={galleryItems} />
+          </section>
+        )}
+
+        <div className="card flex flex-wrap items-center justify-between gap-4" style={{ padding: '20px 24px' }}>
+          <Link href={`/carti/categorie/${cat.slug}`} className="link-gold text-[17px]">← {t.common.backTo} {categoryLabel}</Link>
+          <Link href="/carti" className="link-gold text-[17px]">{t.common.allCategories}</Link>
+        </div>
+      </article>
+    </PageShell>
   )
 }

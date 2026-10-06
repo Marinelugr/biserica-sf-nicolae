@@ -8,12 +8,13 @@ import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import PageTransition from '@/components/PageTransition'
 import ScrollToTop from '@/components/ScrollToTop'
 import CookieNotice from '@/components/CookieNotice'
-import CobaltCursorFX from '@/components/CobaltCursorFX'
 import { SITE_URL } from '@/lib/site'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
-  weight: ['400', '600', '700'],
+  // Cormorant: 500/600/700 + italic 500/600 (next/font generează produsul
+  // greutăți × stiluri; fața italic 700 e declarată, dar nu se descarcă — nu e folosită)
+  weight: ['500', '600', '700'],
   style: ['normal', 'italic'],
   variable: '--font-cormorant',
   display: 'swap',
@@ -21,7 +22,7 @@ const cormorant = Cormorant_Garamond({
 
 const ebGaramond = EB_Garamond({
   subsets: ['latin', 'latin-ext', 'cyrillic'],
-  weight: ['400', '500'],
+  weight: ['400', '500', '600'],
   variable: '--font-eb-garamond',
   display: 'swap',
 })
@@ -108,13 +109,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             }),
           }}
         />
+        {/* Fără JavaScript conținutul animat apare direct */}
+        <noscript>
+          <style>{'[data-reveal],[data-intro-text]{opacity:1!important;transform:none!important;animation:none!important}'}</style>
+        </noscript>
       </head>
-      <body
-        className="min-h-full flex flex-col antialiased"
-        style={{ fontFamily: 'var(--font-eb-garamond), Georgia, serif' }}
-      >
+      <body className="min-h-full flex flex-col antialiased">
         <I18nProvider initialLocale={initialLocale}>
-          <CobaltCursorFX />
           <Header />
           <main className="flex-1">
             <PageTransition>{children}</PageTransition>

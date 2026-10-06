@@ -1,13 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
 import { localizedHref } from '@/lib/i18n/href'
 import { useLiveStatus } from '@/lib/hooks/useLiveStatus'
 
-function SearchIcon({ size = 15 }: { size?: number }) {
+function SearchIcon({ size = 18 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
       <path
@@ -19,14 +20,38 @@ function SearchIcon({ size = 15 }: { size?: number }) {
   )
 }
 
+function Chevron({ open }: { open: boolean }) {
+  return (
+    <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true" style={{ transition: 'transform .2s', transform: open ? 'rotate(180deg)' : 'none' }}>
+      <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+function LiveDot() {
+  return (
+    <span className="live-dot" style={{ color: '#ff5a5a', fontSize: '0.6rem' }} aria-hidden="true">●</span>
+  )
+}
+
+interface NavItem { href: string; label: string; live?: boolean }
+
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
-  const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [parishOpen, setParishOpen] = useState(false)
+  const [mobileParishOpen, setMobileParishOpen] = useState(false)
   const [query, setQuery] = useState('')
   const router = useRouter()
+  const pathname = usePathname()
   const { t, locale } = useI18n()
   const isLive = useLiveStatus()?.isLive ?? false
-  const mobileInputRef = useRef<HTMLInputElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const parishRef = useRef<HTMLDivElement>(null)
+  const parishBtnRef = useRef<HTMLButtonElement>(null)
+  const menuBtnRef = useRef<HTMLButtonElement>(null)
+  const parishMenuId = useId()
+  const mobileParishId = useId()
 
   // Blochează scroll-ul paginii cât timp panoul lateral e deschis
   useEffect(() => {
@@ -37,263 +62,324 @@ export default function Header() {
   }, [menuOpen])
 
   useEffect(() => {
-    if (mobileSearchOpen) mobileInputRef.current?.focus()
-  }, [mobileSearchOpen])
+    if (searchOpen) searchInputRef.current?.focus()
+  }, [searchOpen])
+
+  // Închide meniurile la schimbarea rutei
+  const [prevPath, setPrevPath] = useState(pathname)
+  if (prevPath !== pathname) {
+    setPrevPath(pathname)
+    setParishOpen(false)
+    setMenuOpen(false)
+  }
+
+  // „Parohia ▾": se închide la click în afară și cu Esc (focusul revine pe buton)
+  useEffect(() => {
+    if (!parishOpen) return
+    const onDown = (e: PointerEvent) => {
+      if (!parishRef.current?.contains(e.target as Node)) setParishOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setParishOpen(false)
+        parishBtnRef.current?.focus()
+      }
+    }
+    const onFocusOut = (e: FocusEvent) => {
+      if (e.relatedTarget && !parishRef.current?.contains(e.relatedTarget as Node)) setParishOpen(false)
+    }
+    const node = parishRef.current
+    document.addEventListener('pointerdown', onDown)
+    document.addEventListener('keydown', onKey)
+    node?.addEventListener('focusout', onFocusOut)
+    return () => {
+      document.removeEventListener('pointerdown', onDown)
+      document.removeEventListener('keydown', onKey)
+      node?.removeEventListener('focusout', onFocusOut)
+    }
+  }, [parishOpen])
+
+  // Panoul mobil se închide cu Esc
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false)
+        menuBtnRef.current?.focus()
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [menuOpen])
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault()
     const q = query.trim()
     if (!q) return
-    setMobileSearchOpen(false)
+    setSearchOpen(false)
     setMenuOpen(false)
     router.push(localizedHref(`/cautare?q=${encodeURIComponent(q)}`, locale))
   }
 
-  const navLinks = [
-    { href: '/', label: t.nav.home },
-    { href: '/biblie', label: t.nav.bible },
-    { href: '/calendar', label: t.nav.calendar },
-    { href: '/calendar-pascal', label: t.nav.pascalCalendar },
-    { href: '/carti', label: t.nav.books },
-    { href: '/video', label: t.nav.video },
-    { href: '/stiri', label: t.nav.news },
-    { href: '/istoria-bisericii', label: t.nav.churchHistory },
-    { href: '/sfantul-nicolae', label: t.nav.saintNicholas },
-    { href: '/paroh', label: t.nav.priest },
-    { href: '/contact', label: t.nav.contact },
-    { href: '/live', label: t.nav.live, live: true },
-  ].map(link => ({ ...link, href: localizedHref(link.href, locale) }))
+  const L = (href: string) => localizedHref(href, locale)
+  const isCurrent = (href: string) => {
+    if (href === '/' || href === `/${locale}`) return pathname === href
+    return pathname === href || pathname.startsWith(`${href}/`)
+  }
 
-  const donateHref = localizedHref('/donatii', locale)
-  const homeHref = localizedHref('/', locale)
+  const primary: NavItem[] = [
+    { href: L('/mesajul-parintelui'), label: t.shell.navWord },
+    { href: L('/video'), label: t.nav.video },
+    { href: L('/calendar'), label: t.nav.calendar },
+    { href: L('/carti'), label: t.nav.books },
+  ]
+  const parish: NavItem[] = [
+    { href: L('/stiri'), label: t.nav.news },
+    { href: L('/despre'), label: t.shell.navAbout },
+    { href: L('/istoria-bisericii'), label: t.nav.churchHistory },
+    { href: L('/sfantul-nicolae'), label: t.nav.saintNicholas },
+    { href: L('/paroh'), label: t.shell.navFather },
+    { href: L('/live'), label: t.nav.live, live: true },
+  ]
+  const contact: NavItem = { href: L('/contact'), label: t.nav.contact }
+  const mobileTop: NavItem[] = [
+    { href: L('/'), label: t.nav.home },
+    primary[0],
+    primary[1],
+    primary[2],
+    { href: L('/calendar-pascal'), label: t.nav.pascalCalendar },
+    primary[3],
+    { href: L('/biblie'), label: t.shell.navBible },
+  ]
+
+  const donateHref = L('/donatii')
+  const homeHref = L('/')
+  const liveHref = L('/live')
+  const parishActive = parish.some(p => isCurrent(p.href))
+  const mobileParishExpanded = mobileParishOpen || parishActive
+
+  const linkCls = 'relative inline-flex items-center min-h-[44px] transition-colors hover:text-gold aria-[current=page]:text-gold'
 
   return (
     <>
       <header
-        style={{
-          backgroundColor: 'rgba(4, 8, 15, 0.72)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.2)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-        }}
         className="sticky top-0 z-50"
+        style={{
+          backgroundColor: 'rgba(5, 10, 26, 0.86)',
+          borderBottom: '1px solid var(--line)',
+          backdropFilter: 'blur(14px)',
+          WebkitBackdropFilter: 'blur(14px)',
+        }}
       >
-        <div className="px-4 sm:px-6 lg:px-10">
-          <div className="flex md:grid md:grid-cols-[1fr_auto_1fr] items-center gap-4 h-16">
+        <div className="flex items-center gap-3 lg:gap-5 xl:gap-7 px-4 sm:px-6 xl:px-10" style={{ minHeight: 70 }}>
+          {/* Siglă + nume */}
+          <Link
+            href={homeHref}
+            className="flex items-center gap-2.5 sm:gap-3 min-w-0 min-h-[44px] shrink-0"
+            aria-label={`${t.shell.brand} — ${t.nav.home}`}
+          >
+            <Image src="/logo-mark.png" alt="" width={20} height={42} preload style={{ height: 42, width: 'auto' }} />
+            <span className="serif italic font-medium leading-none whitespace-nowrap text-gold text-[21px] sm:text-[25px]">
+              {t.shell.brand}
+            </span>
+          </Link>
 
-            {/* Stânga: hamburger + logo */}
-            <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-              <button
-                onClick={() => setMenuOpen(true)}
-                className="flex flex-col justify-center gap-[5px] p-2 -ml-2 shrink-0 transition-opacity hover:opacity-80"
-                aria-label="Deschide meniul"
-                aria-expanded={menuOpen}
-                aria-controls="site-menu-panel"
-              >
-                <span className="block w-5 h-0.5 rounded-full" style={{ backgroundColor: '#E9CE7A' }} />
-                <span className="block w-5 h-0.5 rounded-full" style={{ backgroundColor: '#E9CE7A' }} />
-                <span className="block w-5 h-0.5 rounded-full" style={{ backgroundColor: '#E9CE7A' }} />
-              </button>
-
-              <Link href={homeHref} className="flex items-center gap-2 min-w-0 group" aria-label={t.nav.home}>
-                <img
-                  src="/logo.png"
-                  alt=""
-                  aria-hidden="true"
-                  width={17}
-                  height={35}
-                  className="shrink-0"
-                  style={{ height: '34px', width: 'auto', display: 'block' }}
-                />
-                <span
-                  className="font-heading italic font-semibold leading-none truncate"
-                  style={{
-                    color: '#E9CE7A',
-                    fontSize: '19px',
-                    fontFamily: 'var(--font-cormorant), Georgia, serif',
-                  }}
-                >
-                  <span className="hidden sm:inline">Sf. Ierarh Nicolae</span>
-                  <span className="sm:hidden">Sf. Nicolae</span>
-                </span>
+          {/* Linkuri desktop */}
+          <nav className="hidden lg:flex items-center gap-[18px] xl:gap-[26px] ml-auto text-[17px] xl:text-[18px]" aria-label={t.shell.mainMenu}>
+            {primary.map(link => (
+              <Link key={link.href} href={link.href} className={linkCls} aria-current={isCurrent(link.href) ? 'page' : undefined}>
+                {link.label}
               </Link>
+            ))}
+
+            <div className="relative" ref={parishRef}>
+              <button
+                ref={parishBtnRef}
+                type="button"
+                className={`${linkCls} gap-1.5 cursor-pointer ${parishActive ? 'text-gold' : ''}`}
+                aria-expanded={parishOpen}
+                aria-controls={parishMenuId}
+                aria-haspopup="true"
+                onClick={() => setParishOpen(o => !o)}
+              >
+                {t.shell.navParish}
+                <Chevron open={parishOpen} />
+              </button>
+              <div
+                id={parishMenuId}
+                data-parish-menu
+                hidden={!parishOpen}
+                className="absolute right-0 top-full mt-2 min-w-[240px] card"
+                style={{ padding: 8, background: 'rgba(8, 14, 36, 0.98)', borderRadius: 18, boxShadow: '0 18px 50px rgba(0,0,0,.45)' }}
+              >
+                <ul className="flex flex-col">
+                  {parish.map(link => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="flex items-center gap-2 px-4 rounded-xl min-h-[44px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+                        aria-current={isCurrent(link.href) ? 'page' : undefined}
+                        onClick={() => setParishOpen(false)}
+                      >
+                        {link.label}
+                        {link.live && isLive && <LiveDot />}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
 
-            {/* Centru: bară de căutare (desktop/tabletă) */}
-            <form
-              onSubmit={submitSearch}
-              role="search"
-              className="hidden md:flex items-center gap-2 w-[270px] justify-self-center"
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.18)',
-                borderRadius: '20px',
-                padding: '7px 7px 7px 16px',
-              }}
+            <Link href={contact.href} className={linkCls} aria-current={isCurrent(contact.href) ? 'page' : undefined}>
+              {contact.label}
+            </Link>
+          </nav>
+
+          {/* Dreapta: LIVE, căutare, Donații, hamburger */}
+          <div className="flex items-center gap-2 sm:gap-2.5 ml-auto lg:ml-0">
+            {isLive && (
+              <Link href={liveHref} className="live-pill" aria-label={`${t.shell.liveBadge} — ${t.nav.live}`}>
+                <span className="live-dot" aria-hidden="true">●</span>
+                {t.shell.liveBadge}
+              </Link>
+            )}
+            <button
+              type="button"
+              onClick={() => setSearchOpen(o => !o)}
+              className="soc"
+              style={{ width: 44, height: 44, borderColor: 'rgba(255,255,255,0.22)' }}
+              aria-label={t.home.searchBtn}
+              aria-expanded={searchOpen}
+              aria-controls="site-search-row"
             >
-              <label htmlFor="site-search" className="sr-only">{t.home.searchPlaceholder}</label>
-              <input
-                id="site-search"
-                type="search"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder={t.home.searchPlaceholder}
-                className="flex-1 min-w-0 bg-transparent outline-none font-body text-[13px]"
-                style={{ color: '#F2EBD9' }}
-              />
-              <button
-                type="submit"
-                aria-label={t.home.searchBtn}
-                className="shrink-0 flex items-center justify-center rounded-full transition-opacity hover:opacity-90"
-                style={{ backgroundColor: '#9B1C1C', color: '#fff', width: '28px', height: '28px' }}
-              >
-                <SearchIcon />
-              </button>
-            </form>
-
-            {/* Dreapta: căutare-iconiță (mobil) + Donații */}
-            <div className="flex items-center gap-2 sm:gap-3 ml-auto md:ml-0 justify-self-end">
-              <button
-                onClick={() => setMobileSearchOpen(o => !o)}
-                className="md:hidden flex items-center justify-center w-9 h-9 rounded-full transition-colors"
-                style={{ color: '#E9CE7A', border: '1px solid rgba(255,255,255,0.18)' }}
-                aria-label={t.home.searchBtn}
-                aria-expanded={mobileSearchOpen}
-              >
-                <SearchIcon size={16} />
-              </button>
-
-              <Link
-                href={donateHref}
-                className="cobalt-donate-pulse font-body font-bold whitespace-nowrap rounded-lg transition-all hover:opacity-90"
-                style={{
-                  backgroundColor: '#9B1C1C',
-                  color: '#fff',
-                  fontSize: '13px',
-                  padding: '9px 18px',
-                }}
-              >
-                {t.nav.donate}
-              </Link>
-            </div>
+              <SearchIcon />
+            </button>
+            <Link href={donateHref} className="btn red sm hidden min-[440px]:inline-flex">
+              {t.nav.donate}
+            </Link>
+            <button
+              ref={menuBtnRef}
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              className="lg:hidden flex flex-col items-center justify-center gap-[5px] w-11 h-11 -mr-1.5 rounded-full transition-colors hover:bg-white/5"
+              aria-label={t.shell.openMenu}
+              aria-expanded={menuOpen}
+              aria-controls="site-menu-panel"
+            >
+              <span className="block w-5 h-0.5 rounded-full bg-gold" />
+              <span className="block w-5 h-0.5 rounded-full bg-gold" />
+              <span className="block w-5 h-0.5 rounded-full bg-gold" />
+            </button>
           </div>
+        </div>
 
-          {/* Căutare mobil — se expandează sub rândul principal */}
-          {mobileSearchOpen && (
-            <form
-              onSubmit={submitSearch}
-              role="search"
-              className="md:hidden flex items-center gap-2 pb-3"
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.08)',
-                border: '1px solid rgba(255, 255, 255, 0.18)',
-                borderRadius: '20px',
-                padding: '8px 8px 8px 16px',
-                marginBottom: '10px',
-              }}
-            >
-              <label htmlFor="site-search-mobile" className="sr-only">{t.home.searchPlaceholder}</label>
-              <input
-                id="site-search-mobile"
-                ref={mobileInputRef}
-                type="search"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder={t.home.searchPlaceholder}
-                className="flex-1 min-w-0 bg-transparent outline-none font-body text-sm"
-                style={{ color: '#F2EBD9' }}
-              />
-              <button
-                type="submit"
-                aria-label={t.home.searchBtn}
-                className="shrink-0 flex items-center justify-center rounded-full"
-                style={{ backgroundColor: '#9B1C1C', color: '#fff', width: '30px', height: '30px' }}
-              >
-                <SearchIcon size={16} />
-              </button>
-            </form>
-          )}
+        {/* Rând de căutare — se expandează sub bara principală (desktop + mobil) */}
+        <div id="site-search-row" hidden={!searchOpen} className="px-4 sm:px-6 xl:px-10 pb-3">
+          <form
+            onSubmit={submitSearch}
+            role="search"
+            className="flex items-center gap-2 mx-auto max-w-[640px]"
+            style={{ border: '1px solid rgba(255,255,255,0.22)', borderRadius: 999, padding: '5px 5px 5px 18px', background: 'rgba(5,10,26,.6)' }}
+          >
+            <label htmlFor="site-search" className="sr-only">{t.home.searchPlaceholder}</label>
+            <input
+              id="site-search"
+              ref={searchInputRef}
+              type="search"
+              value={query}
+              onChange={e => setQuery(e.target.value)}
+              placeholder={t.home.searchPlaceholder}
+              className="flex-1 min-w-0 bg-transparent outline-none text-[17px] text-ink placeholder:text-[#8d97b0]"
+            />
+            <button type="submit" className="btn red sm">
+              <SearchIcon size={16} />
+              <span>{t.home.searchBtn}</span>
+            </button>
+          </form>
         </div>
       </header>
 
-      {/* Backdrop */}
+      {/* Fundal panou mobil */}
       <div
         onClick={() => setMenuOpen(false)}
-        className={`fixed inset-0 z-[60] transition-opacity duration-300 ${
-          menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-        }`}
-        style={{ backgroundColor: 'rgba(2, 4, 9, 0.6)' }}
+        className={`fixed inset-0 z-[60] transition-opacity duration-300 lg:hidden ${menuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        style={{ backgroundColor: 'rgba(2, 4, 12, 0.66)' }}
         aria-hidden="true"
       />
 
-      {/* Panou lateral — glisează din stânga */}
+      {/* Panou lateral (mobil/tabletă) */}
       <aside
         id="site-menu-panel"
-        className={`fixed inset-y-0 left-0 z-[70] w-[290px] max-w-[85vw] flex flex-col transition-transform duration-300 ease-out ${
-          menuOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
-        style={{
-          backgroundColor: 'rgba(6, 10, 20, 0.98)',
-          borderRight: '1px solid rgba(212, 175, 55, 0.25)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-        }}
-        aria-hidden={!menuOpen}
+        className={`lg:hidden fixed inset-y-0 right-0 z-[70] w-[310px] max-w-[88vw] flex flex-col transition-transform duration-300 ease-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}
+        style={{ backgroundColor: 'rgba(6, 11, 28, 0.98)', borderLeft: '1px solid var(--gold-d)' }}
+        aria-label={t.shell.mainMenu}
+        inert={!menuOpen}
       >
-        <div
-          className="flex items-center justify-between px-5 h-16 shrink-0"
-          style={{ borderBottom: '1px solid rgba(212, 175, 55, 0.2)' }}
-        >
-          <span
-            className="flex items-center gap-2 font-heading italic font-semibold"
-            style={{ color: '#E9CE7A', fontSize: '18px', fontFamily: 'var(--font-cormorant), Georgia, serif' }}
-          >
-            <img
-              src="/logo.png"
-              alt=""
-              aria-hidden="true"
-              width={15}
-              height={30}
-              style={{ height: '30px', width: 'auto', display: 'block' }}
-            />
-            Sf. Ierarh Nicolae
+        <div className="flex items-center justify-between px-5 shrink-0" style={{ minHeight: 70, borderBottom: '1px solid var(--line)' }}>
+          <span className="flex items-center gap-2.5 serif italic font-medium text-gold text-[22px]">
+            <Image src="/logo-mark.png" alt="" width={17} height={36} style={{ height: 36, width: 'auto' }} />
+            {t.shell.brand}
           </span>
           <button
+            type="button"
             onClick={() => setMenuOpen(false)}
-            className="flex items-center justify-center w-9 h-9 -mr-2 transition-opacity hover:opacity-70"
-            style={{ color: '#E9CE7A', fontSize: '22px', lineHeight: 1 }}
-            aria-label="Închide meniul"
+            className="flex items-center justify-center w-11 h-11 -mr-2 rounded-full text-gold text-[22px] hover:bg-white/5"
+            aria-label={t.shell.closeMenu}
           >
             ✕
           </button>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-3">
-          {navLinks.map(link => (
+        <nav className="flex-1 overflow-y-auto py-3 text-[18px]" aria-label={t.shell.mainMenu}>
+          {mobileTop.map(link => (
             <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-2 px-6 py-3 font-body transition-colors hover:bg-white/5"
-              style={{ color: '#D9C48A', fontSize: '1.02rem' }}
+              className="flex items-center gap-2 px-6 min-h-[48px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
             >
               {link.label}
-              {link.live && isLive && (
-                <span className="live-dot" style={{ color: '#EF4444', fontSize: '0.6rem' }} aria-label="LIVE">
-                  ●
-                </span>
-              )}
             </Link>
           ))}
+
+          <button
+            type="button"
+            className="w-full flex items-center justify-between px-6 min-h-[48px] transition-colors hover:bg-white/5 hover:text-gold"
+            aria-expanded={mobileParishExpanded}
+            aria-controls={mobileParishId}
+            onClick={() => setMobileParishOpen(!mobileParishExpanded)}
+          >
+            {t.shell.navParish}
+            <Chevron open={mobileParishExpanded} />
+          </button>
+          <div id={mobileParishId} hidden={!mobileParishExpanded} style={{ borderLeft: '1px solid var(--gold-d)', marginLeft: 24 }}>
+            {parish.map(link => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center gap-2 px-5 min-h-[44px] text-[17px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+                aria-current={isCurrent(link.href) ? 'page' : undefined}
+              >
+                {link.label}
+                {link.live && isLive && <LiveDot />}
+              </Link>
+            ))}
+          </div>
+
+          <Link
+            href={contact.href}
+            onClick={() => setMenuOpen(false)}
+            className="flex items-center gap-2 px-6 min-h-[48px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+            aria-current={isCurrent(contact.href) ? 'page' : undefined}
+          >
+            {contact.label}
+          </Link>
         </nav>
 
-        <div className="px-6 py-4 shrink-0" style={{ borderTop: '1px solid rgba(212, 175, 55, 0.2)' }}>
-          <Link
-            href={donateHref}
-            onClick={() => setMenuOpen(false)}
-            className="block text-center font-body font-bold rounded-lg py-3 transition-opacity hover:opacity-90"
-            style={{ backgroundColor: '#9B1C1C', color: '#fff', fontSize: '0.95rem' }}
-          >
+        <div className="px-6 py-4 shrink-0" style={{ borderTop: '1px solid var(--line)' }}>
+          <Link href={donateHref} onClick={() => setMenuOpen(false)} className="btn red w-full">
             {t.nav.donate}
           </Link>
         </div>

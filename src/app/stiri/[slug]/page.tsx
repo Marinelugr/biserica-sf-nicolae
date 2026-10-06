@@ -12,6 +12,8 @@ import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
 import { scheduledGate } from '@/lib/articleVisibility'
 import { SITE_URL } from '@/lib/site'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,94 +70,58 @@ export default async function ArticolPage({ params }: Props) {
   const content = article.contentRo
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <PageShell aside="compact">
       <ViewTracker type="articol" id={article.id} />
-
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 mb-8 font-body text-sm" style={{ color: '#8A7050' }}>
-        <Link href="/" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>{t.nav.home}</Link>
-        <span aria-hidden="true">›</span>
-        <Link href="/stiri" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>{t.newsPage.title}</Link>
-        <span aria-hidden="true">›</span>
-        <span className="truncate max-w-[180px]">{title}</span>
-      </nav>
-
-      {/* Categorie */}
-      {article.category && (
-        <p className="font-body text-xs uppercase tracking-widest mb-3" style={{ color: '#8B1A1A' }}>
-          {article.category}
-        </p>
-      )}
-
-      {/* Titlu */}
-      <h1 className="font-heading leading-tight mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(24px, 4vw, 38px)' }}>
-        {title}
-      </h1>
-
-      {/* Dată · timp de citire */}
-      <p className="font-body text-sm mb-8" style={{ color: '#8A7050' }}>
-        {article.publishedAt && (
-          <time dateTime={article.publishedAt.toISOString()}>
-            {formatDate(article.publishedAt, localeToIntl(locale))}
-          </time>
-        )}
-        {article.publishedAt && ' · '}
-        ~{readingTime(content)} min citire
-        {' · '}
-        <ViewBadge value={article.views} locale={locale} />
-      </p>
-
-      {/* Separator */}
-      <div className="flex items-center gap-3 mb-10">
-        <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-        <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
-        <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-      </div>
-
-      {/* Imagine principală */}
-      {article.imageUrl && (
-        <ContentCoverImage
-          src={article.imageUrl}
-          alt={title}
-          className="w-full mb-10 rounded-lg"
-          priority
-        />
-      )}
-
-      {/* Conținut */}
-      <div
-        className="font-body prose prose-lg max-w-none"
-        style={{ color: '#2A1A0A', lineHeight: 1.85 }}
-        dangerouslySetInnerHTML={{ __html: content }}
-      />
-
-      {/* Galerie imagini */}
-      {gallery.length > 0 && (
-        <div className="mt-12">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-            <span className="font-body text-xs uppercase tracking-[0.3em]" style={{ color: '#8A7050' }}>{t.common.gallery}</span>
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-          </div>
-          <PublicGallery items={gallery} />
-        </div>
-      )}
-
-      {/* Share */}
-      <div className="mt-10 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
-        <ShareButtons url={`${SITE_URL}/stiri/${slug}`} title={title} />
-      </div>
-
-      {/* Back */}
-      <div className="mt-8 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
-        <Link
-          href="/stiri"
-          className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
-          style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
+      <article className="flex flex-col gap-5">
+        <PageHead
+          size="m"
+          crumbs={[{ href: '/', label: t.nav.home }, { href: '/stiri', label: t.newsPage.title }, { label: title }]}
+          eyebrow={article.category ? <span className="kicker">{article.category}</span> : undefined}
+          title={title}
         >
-          ← {t.common.backTo} {t.newsPage.title}
-        </Link>
-      </div>
-    </div>
+          <p className="date">
+            {article.publishedAt && (
+              <time dateTime={article.publishedAt.toISOString()}>
+                {formatDate(article.publishedAt, localeToIntl(locale))}
+              </time>
+            )}
+            {article.publishedAt && ' · '}
+            <span className="mute">
+              ~{readingTime(content)} min citire
+              {' · '}
+              <ViewBadge value={article.views} locale={locale} />
+            </span>
+          </p>
+        </PageHead>
+
+        {article.imageUrl && (
+          <ContentCoverImage
+            src={article.imageUrl}
+            alt={title}
+            className="w-full overflow-hidden"
+            sizes="(max-width: 1024px) 100vw, 760px"
+            priority
+          />
+        )}
+
+        <div className="card">
+          <div className="rich reading" dangerouslySetInnerHTML={{ __html: content }} />
+        </div>
+
+        {gallery.length > 0 && (
+          <section className="card" aria-labelledby="galerie-articol">
+            <h2 id="galerie-articol" className="eyebrow mb-5">{t.common.gallery}</h2>
+            <PublicGallery items={gallery} />
+          </section>
+        )}
+
+        <div className="card flex flex-wrap items-center justify-between gap-4" style={{ padding: '20px 24px' }}>
+          <Link href="/stiri" className="link-gold text-[17px]">
+            ← {t.common.backTo} {t.newsPage.title}
+          </Link>
+          <ShareButtons url={`${SITE_URL}/stiri/${slug}`} title={title} />
+        </div>
+      </article>
+    </PageShell>
   )
 }

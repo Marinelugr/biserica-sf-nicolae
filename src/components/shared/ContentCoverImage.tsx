@@ -44,10 +44,11 @@ export default function ContentCoverImage({
         justifyContent: 'center',
         overflow: 'hidden',
         maxHeight,
-        // Fundalul auriu/crem rămâne doar pentru peisaj (unde e nevoie de el ca
+        // Fundalul (bleumarin „noapte”) rămâne doar pentru peisaj (unde e nevoie de el ca
         // "letterbox" discret); pentru portret e transparent, ca să nu mai apară
         // chenarul lateral.
-        backgroundColor: isPortrait ? 'transparent' : '#F2EBD9',
+        backgroundColor: isPortrait ? 'transparent' : 'rgba(10, 18, 44, 0.7)',
+        borderRadius: 22,
       }}
     >
       <Image
@@ -56,14 +57,14 @@ export default function ContentCoverImage({
         width={1200}
         height={800}
         sizes={sizes}
-        priority={priority}
+        preload={priority}
         onLoad={e => {
           const img = e.currentTarget
           setOrientation(img.naturalHeight > img.naturalWidth ? 'portrait' : 'landscape')
         }}
         style={
           isPortrait
-            ? { width: 'auto', height: 'auto', maxWidth: '100%', maxHeight, objectFit: 'contain' }
+            ? { width: 'auto', height: 'auto', maxWidth: '100%', maxHeight, objectFit: 'contain', borderRadius: 22 }
             : { width: '100%', height: 'auto', maxHeight, objectFit: 'contain' }
         }
       />

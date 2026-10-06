@@ -1,10 +1,7 @@
-'use client'
-
 import Link from 'next/link'
 import Image from 'next/image'
-import { motion } from 'framer-motion'
 import { formatDate } from '@/lib/utils'
-import { useI18n } from '@/lib/i18n/context'
+import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 
 interface Article {
@@ -29,258 +26,94 @@ interface NewsAndLibraryProps {
   showLibrary: boolean
 }
 
-export default function NewsAndLibrary({ articles, libraryBooks, showNews, showLibrary }: NewsAndLibraryProps) {
-  const { t, locale } = useI18n()
+/** Știrile recente (rânduri cu poză) și Biblioteca (rânduri text) ca postări în flux. */
+export default async function NewsAndLibrary({ articles, libraryBooks, showNews, showLibrary }: NewsAndLibraryProps) {
+  const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
   const typeLabels: Record<string, string> = t.books.categories
-  const [featured, ...restArticles] = articles
 
   if (!showNews && !showLibrary) return null
 
   return (
-    <section className="py-16" style={{ position: 'relative', zIndex: 2 }}>
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-
-          {/* ─── Ultimele Știri ─── */}
-          {showNews && (
-          <div className={showLibrary ? 'lg:col-span-3' : 'lg:col-span-5'}>
-            <motion.div
-              className="flex items-end justify-between mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-            >
-              <div>
-                <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#828EA8' }}>
-                  {t.home.ourParish}
-                </p>
-                <h2 className="font-heading text-3xl" style={{ color: '#E9EFFA' }}>
-                  {t.home.latestNews}
-                </h2>
-              </div>
-              <Link
-                href="/stiri"
-                className="font-body text-sm transition-colors hover:opacity-70"
-                style={{ color: '#C9A84C' }}
-              >
-                {t.home.viewAllLink}
-              </Link>
-            </motion.div>
-
-            {/* Divider */}
-            <div className="h-px mb-8" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
-
-            {articles.length === 0 ? (
-              <p className="font-body italic" style={{ color: '#828EA8' }}>
-                {t.home.noNews}
-              </p>
-            ) : (
-              <>
-                {/* Featured — prima știre */}
-                <motion.article
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5 }}
-                  className="mb-10 group"
-                >
-                  <Link href={`/stiri/${featured.slug}`} className="flex flex-col sm:flex-row gap-5">
-                    <div
-                      className="relative shrink-0 overflow-hidden rounded-lg sm:w-3/5"
-                      style={{ aspectRatio: '16/10', backgroundColor: 'rgba(255,255,255,0.05)' }}
-                    >
-                      {featured.imageUrl ? (
-                        <Image
-                          src={featured.imageUrl}
-                          alt={featured.title}
-                          fill
-                          sizes="(max-width: 640px) 100vw, 40vw"
-                          style={{ objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <span style={{ color: '#828EA8', fontSize: '36px' }} aria-hidden="true">☦</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      {featured.category && (
-                        <span className="font-body text-xs tracking-wide uppercase mb-1" style={{ color: '#C06050' }}>
-                          {featured.category}
-                        </span>
-                      )}
-                      <h3
-                        className="font-heading leading-snug group-hover:underline underline-offset-2 line-clamp-3"
-                        style={{ color: '#E9EFFA', textDecorationColor: '#C9A84C', fontSize: 'clamp(22px, 2.6vw, 28px)' }}
-                      >
-                        {featured.title}
-                      </h3>
-                      {featured.excerpt && (
-                        <p className="font-body text-sm leading-relaxed mt-2 line-clamp-3" style={{ color: '#A8B4CC' }}>
-                          {featured.excerpt}…
-                        </p>
-                      )}
-                      <div className="flex items-center gap-3 mt-3">
-                        {featured.publishedAt && (
-                          <time
-                            dateTime={featured.publishedAt.toISOString()}
-                            className="font-body text-xs"
-                            style={{ color: '#828EA8' }}
-                          >
-                            {formatDate(featured.publishedAt, localeToIntl(locale))}
-                          </time>
-                        )}
-                        <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
-                          Citește mai mult →
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </motion.article>
-
-                {/* Restul știrilor — grid compact */}
-                {restArticles.length > 0 && (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                    {restArticles.map((article, i) => (
-                      <motion.article
-                        key={article.slug}
-                        initial={{ opacity: 0, y: 10 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: i * 0.1, duration: 0.5 }}
-                        className="group"
-                      >
-                        <Link href={`/stiri/${article.slug}`}>
-                          <div
-                            className="relative overflow-hidden rounded mb-2"
-                            style={{ aspectRatio: '16/10', backgroundColor: 'rgba(255,255,255,0.05)' }}
-                          >
-                            {article.imageUrl ? (
-                              <Image
-                                src={article.imageUrl}
-                                alt={article.title}
-                                fill
-                                sizes="(max-width: 640px) 100vw, 20vw"
-                                style={{ objectFit: 'cover' }}
-                              />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <span style={{ color: '#828EA8', fontSize: '20px' }} aria-hidden="true">☦</span>
-                              </div>
-                            )}
-                          </div>
-                          <h3
-                            className="font-heading text-sm leading-snug group-hover:underline underline-offset-2 line-clamp-2"
-                            style={{ color: '#E9EFFA', textDecorationColor: '#C9A84C' }}
-                          >
-                            {article.title}
-                          </h3>
-                          {article.publishedAt && (
-                            <time
-                              dateTime={article.publishedAt.toISOString()}
-                              className="font-body text-xs mt-1 block"
-                              style={{ color: '#828EA8' }}
-                            >
-                              {formatDate(article.publishedAt, localeToIntl(locale))}
-                            </time>
-                          )}
-                        </Link>
-                      </motion.article>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-          )}
-
-          {/* ─── Divider vertical ─── */}
-          {showNews && showLibrary && (
-          <div className="hidden lg:flex justify-center">
-            <div className="w-px" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }} />
-          </div>
-          )}
-
-          {/* ─── Biblioteca Ortodoxă ─── */}
-          {showLibrary && (
-          <div className={showNews ? 'lg:col-span-1' : 'lg:col-span-5'}>
-            <motion.div
-              className="flex items-end justify-between mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-            >
-              <div>
-                <p className="font-body text-xs tracking-widest uppercase mb-1" style={{ color: '#828EA8' }}>
-                  {t.home.sacredTexts}
-                </p>
-                <h2 className="font-heading text-3xl" style={{ color: '#E9EFFA' }}>
-                  {t.home.libraryLabel}
-                </h2>
-              </div>
-              <Link
-                href="/carti"
-                className="font-body text-sm transition-colors hover:opacity-70"
-                style={{ color: '#C9A84C' }}
-              >
-                {t.home.viewAllLink}
-              </Link>
-            </motion.div>
-
-            {/* Card sticlă — listă bibliotecă */}
-            <div className="glass-cobalt p-6">
-              {libraryBooks.length === 0 ? (
-                <p className="font-body italic" style={{ color: '#828EA8' }}>
-                  {t.home.libraryInProgress}
-                </p>
-              ) : (
-                <ul className="space-y-0">
-                  {libraryBooks.map((book, i) => (
-                    <motion.li
-                      key={book.slug}
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.08 }}
-                    >
-                      <Link
-                        href={`/carti/${book.slug}`}
-                        className="flex items-center justify-between py-3.5 group border-b"
-                        style={{ borderColor: 'rgba(255,255,255,0.1)' }}
-                      >
-                        <div className="flex-1 min-w-0 pr-3">
-                          <span
-                            className="font-body text-xs font-medium tracking-widest uppercase block mb-0.5"
-                            style={{ color: '#C06050' }}
-                          >
-                            {typeLabels[book.type] || book.type}
-                          </span>
-                          <span
-                            className="font-body text-sm leading-snug group-hover:underline underline-offset-2 line-clamp-2"
-                            style={{ color: '#E9EFFA', textDecorationColor: '#C9A84C' }}
-                          >
-                            {book.title}
-                          </span>
-                        </div>
-                        <span
-                          className="shrink-0 transition-transform group-hover:translate-x-1"
-                          style={{ color: '#C9A84C' }}
-                          aria-hidden="true"
-                        >
-                          →
-                        </span>
-                      </Link>
-                    </motion.li>
-                  ))}
-                </ul>
-              )}
+    <>
+      {showNews && (
+        <>
+          <div className="sec-head" style={{ marginTop: 18, marginBottom: 2 }} data-kind="parohie">
+            <div>
+              <p className="eyebrow">{t.home.ourParish}</p>
+              <h2 className="h-m">{t.home.latestNews}</h2>
             </div>
+            <Link href="/stiri" className="link-gold text-[17px]">{t.home.viewAllLink}</Link>
           </div>
+          {articles.length === 0 ? (
+            <p className="mute italic" data-kind="parohie">{t.home.noNews}</p>
+          ) : (
+            articles.map((article, i) => (
+              <Link key={article.slug} href={`/stiri/${article.slug}`} className="card news-row" data-kind="parohie" data-reveal>
+                <div className="thumb">
+                  {article.imageUrl ? (
+                    <Image
+                      src={article.imageUrl}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 760px) 100vw, 180px"
+                      style={{ objectFit: 'cover' }}
+                    />
+                  ) : (
+                    <div className="ph w-full h-full" aria-hidden="true"><span style={{ fontSize: 28 }}>☦</span></div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-1.5 min-w-0">
+                  <span className="kicker">{article.category || t.shell.kindParish}</span>
+                  <h3 className="h-s line-clamp-3">{article.title}</h3>
+                  {i === 0 && article.excerpt && (
+                    <p className="mute text-[17px] leading-snug line-clamp-2">{article.excerpt}…</p>
+                  )}
+                  <span className="flex flex-wrap items-center gap-x-3 text-[16px]">
+                    {article.publishedAt && (
+                      <time dateTime={article.publishedAt.toISOString()} className="date">
+                        {formatDate(article.publishedAt, localeToIntl(locale))}
+                      </time>
+                    )}
+                    <span className="gold">Citește mai mult →</span>
+                  </span>
+                </div>
+              </Link>
+            ))
           )}
-        </div>
-      </div>
-    </section>
+        </>
+      )}
+
+      {showLibrary && (
+        <>
+          <div className="sec-head" style={{ marginTop: 18, marginBottom: 2 }} data-kind="biblioteca">
+            <div>
+              <p className="eyebrow">{t.home.sacredTexts}</p>
+              <h2 className="h-m">{t.home.libraryLabel}</h2>
+            </div>
+            <Link href="/carti" className="link-gold text-[17px]">{t.home.viewAllLink}</Link>
+          </div>
+          {libraryBooks.length === 0 ? (
+            <p className="mute italic" data-kind="biblioteca">{t.home.libraryInProgress}</p>
+          ) : (
+            libraryBooks.map(book => (
+              <Link
+                key={book.slug}
+                href={`/carti/${book.slug}`}
+                className="card flex items-center justify-between gap-4"
+                style={{ padding: '18px 24px' }}
+                data-kind="biblioteca"
+                data-reveal
+              >
+                <span className="min-w-0">
+                  <span className="kicker blue block">{typeLabels[book.type] || book.type}</span>
+                  <span className="h-s block">{book.title}</span>
+                </span>
+                <span className="gold shrink-0 text-[17px]">{t.shell.read}</span>
+              </Link>
+            ))
+          )}
+        </>
+      )}
+    </>
   )
 }

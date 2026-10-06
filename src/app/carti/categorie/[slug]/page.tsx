@@ -3,17 +3,19 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export const dynamic = 'force-dynamic'
 
 const CATEGORY_META = [
-  { key: 'ACATIST',  slug: 'acatist',  icon: '☦', color: '#8B1A1A', bg: '#FDF5F5', border: '#F0D5D5' },
-  { key: 'CANON',    slug: 'canon',    icon: '✝', color: '#8B6014', bg: '#FDF8EF', border: '#E8D8B0' },
-  { key: 'RUGACIUNE',slug: 'rugaciune',icon: '🕯', color: '#6B4A2A', bg: '#FAF5EE', border: '#DDD0B8' },
-  { key: 'SLUJBA',   slug: 'slujba',   icon: '⛪', color: '#4A6A2A', bg: '#F5FAF0', border: '#C8D8B8' },
-  { key: 'VIATA',    slug: 'viata',    icon: '✦', color: '#1C4A6A', bg: '#F0F5FA', border: '#B8C8D8' },
-  { key: 'PREDICA',  slug: 'predica',  icon: '📖', color: '#4A1A6A', bg: '#F5F0FA', border: '#C8B8D8' },
-  { key: 'ALTELE',   slug: 'altele',   icon: '◆', color: '#5A5050', bg: '#F8F7F5', border: '#E0DEDA' },
+  { key: 'ACATIST',  slug: 'acatist',  icon: '☦' },
+  { key: 'CANON',    slug: 'canon',    icon: '✝' },
+  { key: 'RUGACIUNE',slug: 'rugaciune',icon: '🕯' },
+  { key: 'SLUJBA',   slug: 'slujba',   icon: '⛪' },
+  { key: 'VIATA',    slug: 'viata',    icon: '✦' },
+  { key: 'PREDICA',  slug: 'predica',  icon: '📖' },
+  { key: 'ALTELE',   slug: 'altele',   icon: '◆' },
 ] as const
 
 type CategoryMeta = typeof CATEGORY_META[number]
@@ -61,105 +63,47 @@ export default async function CategoriePage({ params }: Props) {
   const description = t.books.categoryDescriptions[cat.key]
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <PageShell aside="compact">
+      <PageHead
+        crumbs={[{ href: '/', label: t.nav.home }, { href: '/carti', label: t.books.title }, { label }]}
+        eyebrow={<><span aria-hidden="true">{cat.icon}</span> {t.books.title}</>}
+        title={label}
+      >
+        <p className="mute text-[19px]">{description}</p>
+      </PageHead>
 
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 mb-10 font-body text-sm" style={{ color: '#8A7050' }}>
-        <Link href="/" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          {t.nav.home}
-        </Link>
-        <span aria-hidden="true">›</span>
-        <Link href="/carti" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>
-          {t.books.title}
-        </Link>
-        <span aria-hidden="true">›</span>
-        <span>{label}</span>
-      </nav>
-
-      {/* Header */}
-      <div className="text-center mb-12">
-        <span className="text-5xl block mb-4" style={{ color: cat.color }} aria-hidden="true">
-          {cat.icon}
-        </span>
-        <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
-          {t.books.title}
-        </p>
-        <h1 className="font-heading text-4xl md:text-5xl mb-4" style={{ color: '#1C1B3A' }}>
-          {label}
-        </h1>
-        <p className="font-body text-base" style={{ color: '#5A4A3A' }}>
-          {description}
-        </p>
-        <div className="flex items-center justify-center gap-3 mt-5">
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-          <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-        </div>
-      </div>
-
-      {/* Lista cărți */}
       {books.length === 0 ? (
-        <div className="text-center py-16">
-          <span style={{ color: '#D4C8A0', fontSize: '48px' }} aria-hidden="true">☦</span>
-          <p className="font-body mt-4 text-lg" style={{ color: '#8A7050' }}>
-            {t.books.noTextsInCategory}
-          </p>
-          <p className="font-body text-sm mt-2" style={{ color: '#C9A84C' }}>
-            {t.books.comingSoon}
-          </p>
+        <div className="card text-center">
+          <span className="gold" style={{ fontSize: '44px' }} aria-hidden="true">☦</span>
+          <p className="mute mt-3 text-[19px]">{t.books.noTextsInCategory}</p>
+          <p className="gold mt-2">{t.books.comingSoon}</p>
         </div>
       ) : (
-        <div>
-          <p className="font-body text-sm mb-6 text-right" style={{ color: '#8A7050' }}>
+        <section className="card" style={{ padding: '14px 24px' }}>
+          <p className="mute text-[16px] text-right pt-2">
             {books.length} {books.length === 1 ? t.books.textSingular : t.books.textPlural}
           </p>
-          <ul
-            className="rounded-xl overflow-hidden divide-y shadow-sm"
-            style={{ border: `1px solid ${cat.border}`, backgroundColor: cat.bg }}
-          >
-            {books.map(book => (
-              <li key={book.slug}>
-                <Link
-                  href={`/carti/${book.slug}`}
-                  className="flex items-center justify-between px-6 py-4 group transition-colors hover:bg-white/60"
-                >
-                  <div>
-                    <span
-                      className="font-body text-base group-hover:underline underline-offset-2 block"
-                      style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}
-                    >
-                      {book.titleRo}
-                    </span>
-                    {book.author && (
-                      <span className="font-body text-xs mt-0.5 block" style={{ color: '#8A7050' }}>
-                        {book.author}
-                      </span>
-                    )}
-                  </div>
-                  <span
-                    className="ml-4 shrink-0 transition-transform group-hover:translate-x-1"
-                    style={{ color: cat.color }}
-                    aria-hidden="true"
-                  >
-                    →
+          <ul>
+            {books.map((book, i) => (
+              <li key={book.slug} style={i < books.length - 1 ? { borderBottom: '1px solid var(--line)' } : undefined}>
+                <Link href={`/carti/${book.slug}`} className="flex items-center justify-between gap-4 py-4 group">
+                  <span className="min-w-0">
+                    <span className="h-s block group-hover:text-gold transition-colors" style={{ fontSize: 21 }}>{book.titleRo}</span>
+                    {book.author && <span className="mute text-[16px] block mt-0.5">{book.author}</span>}
                   </span>
+                  <span className="gold shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       )}
 
-      {/* Back */}
-      <div className="mt-10 text-center">
-        <Link
-          href="/carti"
-          className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
-          style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
-        >
+      <div className="card" style={{ padding: '20px 24px' }}>
+        <Link href="/carti" className="link-gold text-[17px]">
           ← {t.common.backTo} {t.books.title}
         </Link>
       </div>
-    </div>
+    </PageShell>
   )
 }

@@ -1,11 +1,12 @@
 import Link from 'next/link'
-import { getLiturgicalDates } from '@/lib/utils'
-import { isApostlesFast, FIXED_FASTS, getSingleDayFast } from '@/lib/constants/oldCalendarFeasts'
+import { getLiturgicalDates, toJulianDate } from '@/lib/utils'
+import { isApostlesFast, FIXED_FASTS, getSingleDayFast, getFixedFeasts } from '@/lib/constants/oldCalendarFeasts'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import type { Translations } from '@/lib/i18n/ro'
 import { getActiveAnunt } from '@/lib/anunturi.server'
 import AnnouncementCard from './AnnouncementCard'
+import FeedCard from '@/components/shell/FeedCard'
 
 function getFastInfo(now: Date, t: Translations): string | null {
   const year = now.getFullYear()
@@ -27,52 +28,63 @@ function getFastInfo(now: Date, t: Translations): string | null {
   return null
 }
 
-export default async function LiturgicalTodayWidget() {
+interface Props {
+  /** Primul sfânt al zilei (din datele deja încărcate de homepage), dacă nu e praznic fix. */
+  saint?: string | null
+  /** Linkul „Rugăciunea zilei" (cartea zilei din bibliotecă). */
+  prayerHref: string
+}
+
+/** Postarea „Astăzi" (dată, stil vechi, sărbătoarea) + anunțul programabil activ, dacă există. */
+export default async function LiturgicalTodayWidget({ saint, prayerHref }: Props) {
   const [t, locale, anunt] = await Promise.all([getServerT(), getServerLocale(), getActiveAnunt()])
   const now = new Date()
   const year = now.getFullYear()
   const fastInfo = getFastInfo(now, t)
+  const intl = localeToIntl(locale)
 
-  const dateStr = now.toLocaleDateString(localeToIntl(locale), { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+  const dateStr = now.toLocaleDateString(intl, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   const dateLabel = dateStr.charAt(0).toUpperCase() + dateStr.slice(1)
+  const shortDate = now.toLocaleDateString(intl, { day: 'numeric', month: 'long' })
+  const jd = toJulianDate(now)
+  const julianLabel = new Date(jd.year, jd.month - 1, jd.day).toLocaleDateString(intl, { day: 'numeric', month: 'long' })
+  const feast = getFixedFeasts(now.getDate(), now.getMonth() + 1)[0]
+  const feastName = feast ? t.calendar.feastNames[feast.nameKey] : saint || null
+  const calendarHref = `/calendar?zi=${now.getDate()}&luna=${now.getMonth() + 1}&an=${year}`
 
-  const dateCard = (
-    <Link
-      href={`/calendar?zi=${now.getDate()}&luna=${now.getMonth() + 1}&an=${year}`}
-      className="glass-cobalt flex flex-col items-center justify-center p-6 sm:p-8 text-center transition-opacity hover:opacity-90 h-full"
-      style={{ textDecoration: 'none' }}
-    >
-      <p className="font-heading italic text-2xl sm:text-3xl mb-2" style={{ color: '#E9EFFA' }}>
-        {dateLabel}
-      </p>
-      {fastInfo && (
-        <p className="font-body text-sm mb-3" style={{ color: '#D4AF37' }}>
-          🕯 {fastInfo}
-        </p>
-      )}
-      <span className="font-body text-xs" style={{ color: '#C9A84C' }}>
-        {t.home.openCalendarLink}
-      </span>
-    </Link>
-  )
-
-  // Fără anunț activ — card full-width, centrat (starea implicită, neschimbată).
-  if (!anunt) {
-    return (
-      <section className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {dateCard}
-      </section>
-    )
-  }
-
-  // Cu anunț activ — split în 2 coloane, același grid/gap ca la secțiunea logo + Calendarul Pascal.
-  // Pe mobil se stivuiește normal: data sus, anunțul dedesubt.
   return (
-    <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {dateCard}
-        <AnnouncementCard titlu={anunt.titlu} mesaj={anunt.mesaj} linkArticol={anunt.linkArticol} />
-      </div>
-    </section>
+    <>
+      <FeedCard kind="parohie" kicker={t.calendar.todayWidget} author={t.shell.brand}>
+        <div className="flex flex-col gap-2.5">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <span className="eyebrow">{t.shell.today} · {shortDate}</span>
+            <span className="mute italic text-[17px]">{julianLabel}, {t.shell.oldStyle}</span>
+          </div>
+          <h2 className="h-s">
+            <Link href={calendarHref} className="hover:text-gold transition-colors">{feastName || dateLabel}</Link>
+          </h2>
+          {feastName && <p className="mute text-[17px]">{dateLabel}</p>}
+          {fastInfo && (
+            <p className="text-[17px]" style={{ color: 'var(--gold)' }}>
+              🕯 {fastInfo}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-x-5 gap-y-1 mt-1 text-[17px]">
+            <Link href={calendarHref} className="link-gold">{t.home.saintsToday} →</Link>
+            <Link href={prayerHref} className="link-blue">{t.home.prayerToday} →</Link>
+            <Link href={calendarHref} className="mute hover:text-gold transition-colors">{t.home.openCalendarLink}</Link>
+          </div>
+        </div>
+      </FeedCard>
+      {anunt && (
+        <AnnouncementCard
+          titlu={anunt.titlu}
+          mesaj={anunt.mesaj}
+          linkArticol={anunt.linkArticol}
+          author={t.shell.brand}
+          kicker={t.shell.kindAnnouncement}
+        />
+      )}
+    </>
   )
 }
