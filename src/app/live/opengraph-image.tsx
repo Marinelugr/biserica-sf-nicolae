@@ -1,11 +1,17 @@
 import { ImageResponse } from 'next/og'
+import { join } from 'node:path'
+import { readFile } from 'node:fs/promises'
+import { SITE_HOST } from '@/lib/site'
 
-export const runtime = 'edge'
 export const alt = 'Transmisiune LIVE — Biserica Sfântul Ierarh Nicolae'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
 export default async function Image() {
+  // Fundalul se citește local, nu prin fetch pe propriul domeniu — altfel imaginea
+  // depinde de DNS și de redirectul de domeniu.
+  const background = await readFile(join(process.cwd(), 'public/images/12.jpg'), 'base64')
+
   return new ImageResponse(
     (
       <div style={{
@@ -16,7 +22,7 @@ export default async function Image() {
       }}>
         {/* Fotografia aeriană ca fundal */}
         <img
-          src="https://biserica-sf-nicolae.org/images/12.jpg"
+          src={`data:image/jpeg;base64,${background}`}
           style={{
             position: 'absolute', top: 0, left: 0,
             width: '100%', height: '100%', objectFit: 'cover'
@@ -50,7 +56,7 @@ export default async function Image() {
           position: 'absolute', top: '44px', right: '48px',
           color: '#5A4020', fontSize: '14px', letterSpacing: '1px'
         }}>
-          biserica-sf-nicolae.org
+          {SITE_HOST}
         </span>
         {/* Conținut central */}
         <div style={{
