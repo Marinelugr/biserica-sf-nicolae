@@ -11,8 +11,7 @@ import ShareButtons from '@/components/shared/ShareButtons'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
 import { scheduledGate } from '@/lib/articleVisibility'
-
-const SITE_URL = 'https://biserica-sf-nicolae.org'
+import { SITE_URL } from '@/lib/site'
 
 export const dynamic = 'force-dynamic'
 

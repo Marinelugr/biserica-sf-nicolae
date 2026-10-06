@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ShareButtons from '@/components/shared/ShareButtons'
 import { FALLBACK_MESAJ, FALLBACK_SEMNATURA, FALLBACK_PHOTO_URL } from '@/lib/priestMessage'
+import { SITE_URL } from '@/lib/site'
 
 export const dynamic = 'force-dynamic'
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://biserica-sf-nicolae.org'
 const SHARE_URL = `${SITE_URL}/mesajul-parintelui`
 const SHARE_TEXT = 'Mesajul Părintelui Marin Grigoriță, Parohul Bisericii Sfântul Ierarh Nicolae din Hîrtopul Mic'
 

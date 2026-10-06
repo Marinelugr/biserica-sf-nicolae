@@ -9,6 +9,7 @@ import PageTransition from '@/components/PageTransition'
 import ScrollToTop from '@/components/ScrollToTop'
 import CookieNotice from '@/components/CookieNotice'
 import CobaltCursorFX from '@/components/CobaltCursorFX'
+import { SITE_URL } from '@/lib/site'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
@@ -32,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const m = t.meta.site
 
   return {
-    metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://biserica-sf-nicolae.org'),
+    metadataBase: new URL(SITE_URL),
     title: {
       default: m.title,
       template: `%s | ${m.twitterTitle}`,
@@ -44,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: 'website',
       locale: OG_LOCALE[locale],
-      url: 'https://biserica-sf-nicolae.org',
+      url: SITE_URL,
       siteName: m.twitterTitle,
       title: m.ogTitle,
       description: m.ogDescription,
@@ -58,14 +59,14 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: { index: true, follow: true },
     themeColor: '#0D0905',
     alternates: {
-      canonical: 'https://biserica-sf-nicolae.org',
+      canonical: SITE_URL,
       languages: {
-        'ro': 'https://biserica-sf-nicolae.org',
-        'ro-MD': 'https://biserica-sf-nicolae.org',
-        'ru': 'https://biserica-sf-nicolae.org/ru',
-        'ru-MD': 'https://biserica-sf-nicolae.org/ru',
-        'en': 'https://biserica-sf-nicolae.org/en',
-        'x-default': 'https://biserica-sf-nicolae.org',
+        'ro': SITE_URL,
+        'ro-MD': SITE_URL,
+        'ru': `${SITE_URL}/ru`,
+        'ru-MD': `${SITE_URL}/ru`,
+        'en': `${SITE_URL}/en`,
+        'x-default': SITE_URL,
       },
     },
   }
@@ -88,7 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               '@type': 'Church',
               name: 'Parohia Sfântul Ierarh Nicolae',
               alternateName: 'Biserica Sfântul Nicolae, Hîrtopul Mic',
-              url: 'https://biserica-sf-nicolae.org',
+              url: SITE_URL,
               telephone: '+373-67-306-191',
               address: {
                 '@type': 'PostalAddress',

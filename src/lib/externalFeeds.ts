@@ -27,6 +27,7 @@
 
 import { decode } from 'he'
 import { prisma } from '@/lib/prisma'
+import { SITE_URL } from '@/lib/site'
 
 export interface FeedItem {
   title: string
@@ -63,7 +64,7 @@ interface FeedSource {
 const TTL_MS = 25 * 60 * 60 * 1000
 const TIMEOUT_MS = 4000 // fail rapid, nu blocăm homepage-ul
 const MAX_ITEMS = 3 // pe card se afișează 1; restul = rezervă în cache
-const UA = 'BisericaSfNicolaeBot/1.0 (+https://biserica-sf-nicolae.org)'
+const UA = `BisericaSfNicolaeBot/1.0 (+${SITE_URL})`
 
 const MONTHS_RO = [
   'ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie',
