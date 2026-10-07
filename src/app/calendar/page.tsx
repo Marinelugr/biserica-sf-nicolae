@@ -185,8 +185,8 @@ export default async function CalendarPage({
             <span className="hidden sm:inline">{t.calendar.months[nextMonth - 1]}</span> →
           </Link>
         </div>
-        <div className="cal-grid" role="grid">
-          {weekdayNames.map(w => <div key={w} className="cal-h" role="columnheader">{w}</div>)}
+        <div className="cal-grid">
+          {weekdayNames.map(w => <div key={w} className="cal-h" aria-hidden="true">{w}</div>)}
           {Array.from({ length: firstWeekday }, (_, i) => <span key={`e${i}`} className="cal-d empty" aria-hidden="true" />)}
           {Array.from({ length: monthDays }, (_, i) => i + 1).map(d => {
             const cls = ['cal-d', isSunday(d) && 'sun', isFeastDay(d) && 'feast', d === safeDay && 'sel', isToday(d) && 'today'].filter(Boolean).join(' ')

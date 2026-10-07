@@ -40,51 +40,53 @@
   color-scheme: dark;
 }
 
-/* ─── Bază ─────────────────────────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; }
+/* ─── Bază (în @layer base, ca utilitarele și componentele să le poată suprascrie) ─── */
+@layer base {
+  *, *::before, *::after { box-sizing: border-box; }
 
-html {
-  scroll-behavior: smooth;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: var(--bg);
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg);
+  }
+
+  /* Fundalul global, definit o singură dată (fără background-attachment: fixed) */
+  body {
+    font-family: var(--body);
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink);
+    background:
+      radial-gradient(1100px 700px at 12% -8%, rgba(44, 76, 160, 0.38), transparent 62%),
+      radial-gradient(900px 560px at 96% 6%, rgba(224, 184, 74, 0.08), transparent 60%),
+      var(--bg);
+    background-repeat: no-repeat;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--serif);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 3px;
+  }
+
+  ::selection { background-color: var(--gold); color: #0a1330; }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #26324f; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold-d); }
+
+  .font-heading { font-family: var(--serif); }
+  .font-body    { font-family: var(--body); }
 }
-
-/* Fundalul global, definit o singură dată (fără background-attachment: fixed) */
-body {
-  font-family: var(--body);
-  font-size: 19px;
-  line-height: 1.55;
-  color: var(--ink);
-  background:
-    radial-gradient(1100px 700px at 12% -8%, rgba(44, 76, 160, 0.38), transparent 62%),
-    radial-gradient(900px 560px at 96% 6%, rgba(224, 184, 74, 0.08), transparent 60%),
-    var(--bg);
-  background-repeat: no-repeat;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--serif);
-  font-weight: 600;
-  line-height: 1.15;
-}
-
-a { color: inherit; text-decoration: none; }
-
-:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 3px;
-}
-
-::selection { background-color: var(--gold); color: #0a1330; }
-
-::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: #26324f; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: var(--gold-d); }
-
-.font-heading { font-family: var(--serif); }
-.font-body    { font-family: var(--body); }
 
 /* ─── Componente ───────────────────────────────────────────────────────────── */
 @layer components {
@@ -289,7 +291,8 @@ a { color: inherit; text-decoration: none; }
 }
 
 @media (max-width: 760px) {
-  .card { padding: 22px 20px; border-radius: 20px; }
+  .card:not(.flush) { padding: 22px 20px; }
+  .card { border-radius: 20px; }
   .news-row { flex-direction: column; align-items: stretch; }
   .news-row .thumb { flex-basis: auto; height: auto; aspect-ratio: 16 / 9; }
 }
@@ -341,7 +344,7 @@ a { color: inherit; text-decoration: none; }
 .live-dot { display: inline-block; animation: live-pulse 1.4s ease-in-out infinite; }
 
 @keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
-.page-fade { animation: page-in .3s ease-out both; }
+.page-fade { animation: page-in .3s ease-out backwards; }
 
 @keyframes skeletonPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
 
