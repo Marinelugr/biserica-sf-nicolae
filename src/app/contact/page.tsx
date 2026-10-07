@@ -3,6 +3,8 @@ import ContactForm from './ContactForm'
 import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getContactInfo } from '@/lib/contact-info'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerT()
@@ -19,9 +21,9 @@ export default async function ContactPage() {
   const infoCards = [
     { icon: '📍', label: t.contactPage.addressLabel, content: contact.address.split('\n').map((line, i, arr) => <span key={i}>{line}{i < arr.length - 1 && <br />}</span>) },
     { icon: '⛪', label: t.contactPage.hramLabel, content: t.contactPage.hramValue },
-    { icon: '📞', label: t.contactPage.phoneLabel, content: <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="hover:underline" style={{ color: '#C9A84C' }}>{contact.phone}</a> },
-    { icon: '✉️', label: t.contactPage.emailLabel, content: <a href={`mailto:${contact.email}`} className="hover:underline" style={{ color: '#C9A84C' }}>{contact.email}</a> },
-    { icon: '🌐', label: t.contactPage.facebookLabel, content: <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="hover:underline" style={{ color: '#C9A84C' }}>{contact.facebook.replace(/^https?:\/\/(www\.)?/, '')}</a> },
+    { icon: '📞', label: t.contactPage.phoneLabel, content: <a href={`tel:${contact.phone.replace(/\s+/g, '')}`} className="link-gold break-all">{contact.phone}</a> },
+    { icon: '✉️', label: t.contactPage.emailLabel, content: <a href={`mailto:${contact.email}`} className="link-gold break-all">{contact.email}</a> },
+    { icon: '🌐', label: t.contactPage.facebookLabel, content: <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="link-gold break-all">{contact.facebook.replace(/^https?:\/\/(www\.)?/, '')}</a> },
   ]
 
   const scheduleItems = contact.schedule.split('\n').filter(Boolean).map(line => {
@@ -30,94 +32,54 @@ export default async function ContactPage() {
   })
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <PageShell aside="compact">
+      <PageHead eyebrow={t.contactPage.subtitle} title={t.contactPage.title}>
+        {contact.message && <div className="rich" style={{ fontSize: 19 }} dangerouslySetInnerHTML={{ __html: contact.message }} />}
+      </PageHead>
 
-      {/* Hero */}
-      <div className="text-center mb-14">
-        <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: '#8A7050' }}>
-          {t.contactPage.subtitle}
-        </p>
-        <h1 className="font-heading mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
-          {t.contactPage.title}
-        </h1>
-        <div className="flex items-center justify-center gap-3">
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-          <span style={{ color: '#C9A84C', fontSize: '20px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-        </div>
-      </div>
-
-      {contact.message && (
-        <div className="tiptap-prose max-w-3xl mx-auto mb-14 text-center" dangerouslySetInnerHTML={{ __html: contact.message }} />
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-
-        <div className="lg:col-span-2 space-y-6">
-          {/* Date de contact */}
-          <div className="rounded-lg p-6" style={{ backgroundColor: '#F8F7F5', border: '1px solid #E8E5E0' }}>
-            <h2 className="font-heading text-xl mb-6" style={{ color: '#1C1B3A' }}>
-              Parohia Sfântul Ierarh Nicolae
-            </h2>
-            <div className="space-y-4">
-              {infoCards.map((card, i) => (
-                <div key={card.label}>
-                  {i > 0 && <div className="h-px mb-4" style={{ backgroundColor: '#E8E5E0' }} />}
-                  <div className="flex gap-3">
-                    <span aria-hidden="true">{card.icon}</span>
-                    <div>
-                      <p className="font-body text-xs uppercase tracking-wide mb-1" style={{ color: '#8A7050' }}>
-                        {card.label}
-                      </p>
-                      <p className="font-body text-sm" style={{ color: '#3A1A1A' }}>
-                        {card.content}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+      <section className="card" aria-labelledby="contact-date">
+        <h2 id="contact-date" className="h-m mb-5">Parohia Sfântul Ierarh Nicolae</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-5">
+          {infoCards.map(card => (
+            <div key={card.label} className="flex gap-3">
+              <span aria-hidden="true">{card.icon}</span>
+              <div className="min-w-0">
+                <p className="label" style={{ marginBottom: 4 }}>{card.label}</p>
+                <p className="text-[18px]">{card.content}</p>
+              </div>
             </div>
-          </div>
-
-          {/* Program slujbe */}
-          <div className="rounded-lg p-6" style={{ backgroundColor: '#F8F7F5', border: '1px solid #E8E5E0' }}>
-            <h2 className="font-heading text-lg mb-4" style={{ color: '#1C1B3A' }}>
-              {t.contactPage.scheduleTitle}
-            </h2>
-            <ul className="space-y-2.5">
-              {scheduleItems.map((item, i) => (
-                <li key={i} className="flex items-baseline gap-3">
-                  <span className="font-body text-xs w-20 shrink-0" style={{ color: '#8A7050' }}>{item.zi}</span>
-                  <span className="font-heading text-sm font-semibold" style={{ color: '#C9A84C' }}>{item.ora}</span>
-                  <span className="font-body text-sm" style={{ color: '#3A1A1A' }}>{item.slujba}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Harta */}
-          <div className="rounded-lg overflow-hidden" style={{ border: '1px solid #E8E5E0' }}>
-            <p className="font-body text-xs uppercase tracking-wide px-4 pt-4 pb-2" style={{ color: '#8A7050' }}>
-              {t.contactPage.mapTitle}
-            </p>
-            <iframe
-              src={contact.mapEmbed}
-              width="100%"
-              height="300"
-              style={{ border: 0, display: 'block' }}
-              allowFullScreen
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-              title="Hîrtopul Mic, Criuleni, Moldova"
-            />
-          </div>
+          ))}
         </div>
+        <hr className="sep my-6" />
+        <h3 className="eyebrow mb-3">{t.contactPage.scheduleTitle}</h3>
+        <ul className="flex flex-col">
+          {scheduleItems.map((item, i) => (
+            <li key={i} className="flex items-baseline gap-3 py-2" style={i < scheduleItems.length - 1 ? { borderBottom: '1px solid var(--line)' } : undefined}>
+              <span className="w-24 shrink-0 mute text-[16px]">{item.zi}</span>
+              <span className="gold serif font-semibold">{item.ora}</span>
+              <span>{item.slujba}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-        {/* Formular contact */}
-        <div className="lg:col-span-3">
-          <ContactForm />
-        </div>
-      </div>
-    </div>
+      <section className="card" aria-label={t.contactPage.formTitle}>
+        <ContactForm />
+      </section>
+
+      <section className="card flush" aria-labelledby="contact-harta">
+        <h2 id="contact-harta" className="eyebrow" style={{ padding: '18px 24px 14px' }}>{t.contactPage.mapTitle}</h2>
+        <iframe
+          src={contact.mapEmbed}
+          width="100%"
+          height="320"
+          style={{ border: 0, display: 'block' }}
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="Hîrtopul Mic, Criuleni, Moldova"
+        />
+      </section>
+    </PageShell>
   )
 }

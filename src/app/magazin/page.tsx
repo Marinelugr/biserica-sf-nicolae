@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { localizedHref } from '@/lib/i18n/href'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,94 +39,43 @@ export default async function MagazinPage() {
   const contactHref = localizedHref('/contact', locale)
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* Header */}
-      <div className="text-center mb-12">
-        <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
-          {t.shop.subtitle}
-        </p>
-        <h1 className="font-heading mb-5" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
-          {t.shop.title}
-        </h1>
-        <div className="flex items-center justify-center gap-3">
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-          <span style={{ color: '#C9A84C', fontSize: '20px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-        </div>
-      </div>
+    <PageShell aside="compact">
+      <PageHead eyebrow={t.shop.subtitle} title={t.shop.title} />
 
       {products.length === 0 ? (
-        <div className="text-center py-16">
-          <span style={{ color: '#D4C8A0', fontSize: '56px' }} aria-hidden="true">☦</span>
-          <p className="font-body mt-4 text-lg" style={{ color: '#8A7050' }}>
-            {t.shop.inProgress}
-          </p>
-          <p className="font-body text-sm mt-2 flex items-center justify-center gap-2" style={{ color: '#C9A84C' }}>
-            <span>☦</span> {t.shop.comingSoon}
-          </p>
+        <div className="card text-center">
+          <span className="gold" style={{ fontSize: '44px' }} aria-hidden="true">☦</span>
+          <p className="mute mt-3 text-[19px]">{t.shop.inProgress}</p>
+          <p className="gold mt-2 flex items-center justify-center gap-2"><span aria-hidden="true">☦</span> {t.shop.comingSoon}</p>
         </div>
       ) : (
-        <div className="category-card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {products.map(product => {
             const inStock = product.stock > 0
             const description = product.descriptionRo ? stripHtml(product.descriptionRo) : null
             const price = Number(product.price).toLocaleString('ro-MD')
             return (
-              <article
-                key={product.id}
-                className="category-card flex flex-col rounded-xl overflow-hidden"
-                style={{ backgroundColor: '#FDF8EF', border: '1px solid #E8D8B0' }}
-              >
-                <div className="relative w-full" style={{ aspectRatio: '4/3', backgroundColor: '#F2EBD9' }}>
+              <article key={product.id} className="news" data-reveal>
+                <div className="media">
                   {product.imageUrl ? (
-                    <Image
-                      src={product.imageUrl}
-                      alt={product.nameRo}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      style={{ objectFit: 'cover' }}
-                    />
+                    <Image src={product.imageUrl} alt={product.nameRo} fill sizes="(max-width: 640px) 100vw, 380px" style={{ objectFit: 'cover' }} />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <span style={{ color: '#D4C8A0', fontSize: '40px' }} aria-hidden="true">☦</span>
-                    </div>
+                    <div className="ph w-full h-full" aria-hidden="true"><span style={{ fontSize: 40 }}>☦</span></div>
                   )}
                   <span
-                    className="absolute top-3 right-3 font-body text-xs px-2.5 py-1 rounded-full"
-                    style={{
-                      backgroundColor: inStock ? '#1A5A1A' : '#5A1A1A',
-                      color: '#F2EBD9',
-                    }}
+                    className="absolute top-3 right-3 text-[14px] px-3 py-1 rounded-full"
+                    style={{ backgroundColor: inStock ? '#1f6b3a' : 'var(--red)', color: '#fff' }}
                   >
                     {inStock ? t.shop.inStock : t.shop.outOfStock}
                   </span>
                 </div>
-
-                <div className="p-5 flex flex-col flex-1">
-                  {product.category && (
-                    <span className="font-body text-xs uppercase tracking-wide mb-1" style={{ color: '#8B6014' }}>
-                      {product.category}
-                    </span>
-                  )}
-                  <h2 className="font-heading text-lg mb-2" style={{ color: '#1C1B3A' }}>
-                    {product.nameRo}
-                  </h2>
-                  {description && (
-                    <p className="font-body text-sm mb-3 line-clamp-3 flex-1" style={{ color: '#5A4A3A' }}>
-                      {description}
-                    </p>
-                  )}
-                  <div className="flex items-center justify-between mt-auto pt-3" style={{ borderTop: '1px solid #E8D8B0' }}>
-                    <span className="font-heading text-lg" style={{ color: '#8B1A1A' }}>
-                      {price} MDL
-                    </span>
-                    <Link
-                      href={contactHref}
-                      className="font-body text-xs px-3 py-2 rounded transition-opacity hover:opacity-90"
-                      style={{ backgroundColor: '#1C1B3A', color: '#F2EBD9' }}
-                    >
-                      {t.shop.contactToOrder}
-                    </Link>
+                <div className="body flex-1">
+                  {product.category && <span className="kicker gold">{product.category}</span>}
+                  <h2 className="h-s">{product.nameRo}</h2>
+                  {description && <p className="mute text-[17px] line-clamp-3 flex-1">{description}</p>}
+                  <div className="flex items-center justify-between gap-3 mt-auto pt-3" style={{ borderTop: '1px solid var(--line)' }}>
+                    <span className="serif text-[22px] font-semibold gold">{price} MDL</span>
+                    <Link href={contactHref} className="btn sm">{t.shop.contactToOrder}</Link>
                   </div>
                 </div>
               </article>
@@ -132,6 +83,6 @@ export default async function MagazinPage() {
           })}
         </div>
       )}
-    </div>
+    </PageShell>
   )
 }

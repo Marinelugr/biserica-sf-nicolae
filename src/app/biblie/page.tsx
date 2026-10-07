@@ -4,6 +4,10 @@ import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { matchesAllWords } from '@/lib/search'
 
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
+import SearchForm from '@/components/shell/SearchForm'
+
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -123,168 +127,73 @@ export default async function BibliePage({
   const ntResults = query ? ntNumbered.filter(b => matchesQuery(b, query)) : ntNumbered
   const totalResults = vtResults.length + ntResults.length
 
+  const bookList = (books: typeof vtResults, start?: number) => (
+    <ol className="grid grid-cols-1 xl:grid-cols-2 gap-x-6" start={start}>
+      {books.map(book => (
+        <li key={book.slug} style={{ borderBottom: '1px solid var(--line)' }}>
+          <a href={`/biblie/${book.slug}`} className="flex items-baseline gap-3 py-2.5 group">
+            <span className="text-[14px] shrink-0 w-6 text-right mute">{book.num}</span>
+            <span className="serif text-[20px] leading-snug group-hover:text-gold transition-colors">
+              {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  )
+  const testament = (title: string, subtitle: string, list: React.ReactNode) => (
+    <section className="card" aria-label={title} data-reveal>
+      <div className="sec-head">
+        <h2 className="eyebrow" style={{ fontSize: 14 }}>{title}</h2>
+        <p className="mute text-[15px]">{subtitle}</p>
+      </div>
+      {list}
+    </section>
+  )
+
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-      {/* Header */}
-      <div className="text-center mb-12">
-        <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
-          {t.bible.pageSubtitle}
-        </p>
-        <h1 className="font-heading mb-5" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
-          {t.bible.title}
-        </h1>
-        <div className="flex items-center justify-center gap-3 mb-8">
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-          <span style={{ color: '#C9A84C', fontSize: '20px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
+    <PageShell aside="compact">
+      <PageHead eyebrow={t.bible.pageSubtitle} title={t.bible.title}>
+        <div className="mt-2">
+          <SearchForm action="/biblie" id="bible-search" placeholder={t.bible.searchPlaceholder} button={t.bible.searchBtn} defaultValue={query} />
         </div>
-
-        {/* Căutare */}
-        <form className="flex gap-0 max-w-xl mx-auto rounded-md overflow-hidden shadow-sm" action="/biblie" method="get">
-          <label htmlFor="bible-search" className="sr-only">{t.bible.searchPlaceholder}</label>
-          <input
-            id="bible-search"
-            type="search"
-            name="q"
-            defaultValue={query}
-            placeholder={t.bible.searchPlaceholder}
-            className="flex-1 px-4 py-3 text-sm font-body outline-none"
-            style={{ border: '1px solid #E8E5E0', borderRight: 'none', color: '#3A1A1A', backgroundColor: '#FAFAF8' }}
-          />
-          <button type="submit" className="px-6 py-3 font-body text-sm transition-opacity hover:opacity-90"
-            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}>
-            {t.bible.searchBtn}
-          </button>
-        </form>
-
         {query && (
-          <p className="font-body text-xs mt-4" style={{ color: '#8A7050' }}>
+          <p className="mute text-[16px]">
             {totalResults > 0
               ? `${totalResults} ${totalResults === 1 ? 'carte găsită' : 'cărți găsite'} pentru „${query}"`
               : `Nu s-au găsit cărți pentru „${query}"`}
           </p>
         )}
-      </div>
+      </PageHead>
 
       {query && totalResults === 0 ? (
-        <div className="text-center py-16">
-          <span style={{ color: '#D4C8A0', fontSize: '48px' }} aria-hidden="true">☦</span>
-          <p className="font-body mt-4 text-lg" style={{ color: '#8A7050' }}>
-            Nu s-au găsit rezultate pentru &ldquo;{query}&rdquo;
-          </p>
-          <p className="font-body text-sm mt-2" style={{ color: '#B0A080' }}>
-            Încercați un alt termen sau răsfoiți lista completă mai jos.
-          </p>
-          <div className="flex justify-center mt-6">
-            <a href="/biblie"
-              className="font-body text-sm px-5 py-2 rounded border transition-all hover:border-amber-400"
-              style={{ color: '#8A7050', borderColor: '#E8E5E0' }}>
-              Vezi toate cărțile
-            </a>
-          </div>
+        <div className="card text-center">
+          <span className="gold" style={{ fontSize: '44px' }} aria-hidden="true">☦</span>
+          <p className="mt-3 text-[19px]">Nu s-au găsit rezultate pentru &ldquo;{query}&rdquo;</p>
+          <p className="mute text-[16px] mt-2">Încercați un alt termen sau răsfoiți lista completă mai jos.</p>
+          <a href="/biblie" className="btn mt-5">Vezi toate cărțile</a>
         </div>
       ) : (
         <>
-          {/* ═══ VECHIUL TESTAMENT ═══ */}
-          {vtResults.length > 0 && (
-          <section className="mb-12" aria-label={t.bible.oldTestament}>
-            <div className="flex items-center gap-4 mb-6">
-              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-              <div className="text-center shrink-0">
-                <h2 className="font-body tracking-[0.4em]"
-                  style={{ color: '#8B1A1A', fontSize: '13px', letterSpacing: '0.4em' }}>
-                  {t.bible.oldTestament}
-                </h2>
-                <p className="font-body text-xs mt-0.5" style={{ color: '#B0A080' }}>
-                  {t.bible.oldTestamentBooks}
-                </p>
-              </div>
-              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-            </div>
-
-            <ol className="space-y-px">
-              {vtResults.map(book => (
-                <li key={book.slug}>
-                  <a
-                    href={`/biblie/${book.slug}`}
-                    className="font-heading flex items-baseline gap-3 py-1.5 group transition-colors"
-                    style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '18px' }}
-                  >
-                    <span className="text-xs shrink-0 w-5 text-right" style={{ color: '#D4C8A0' }}>
-                      {book.num}
-                    </span>
-                    <span
-                      className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
-                      style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
-                    >
-                      {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </section>
-          )}
-
-          {/* ═══ NOUL TESTAMENT ═══ */}
-          {ntResults.length > 0 && (
-          <section aria-label={t.bible.newTestament}>
-            <div className="flex items-center gap-4 mb-6">
-              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-              <div className="text-center shrink-0">
-                <h2 className="font-body tracking-[0.4em]"
-                  style={{ color: '#8B1A1A', fontSize: '13px', letterSpacing: '0.4em' }}>
-                  {t.bible.newTestament}
-                </h2>
-                <p className="font-body text-xs mt-0.5" style={{ color: '#B0A080' }}>
-                  {t.bible.newTestamentBooks}
-                </p>
-              </div>
-              <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-            </div>
-
-            <ol className="space-y-px" start={54}>
-              {ntResults.map(book => (
-                <li key={book.slug}>
-                  <a
-                    href={`/biblie/${book.slug}`}
-                    className="font-heading flex items-baseline gap-3 py-1.5 group transition-colors"
-                    style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: '18px' }}
-                  >
-                    <span className="text-xs shrink-0 w-5 text-right" style={{ color: '#D4C8A0' }}>
-                      {book.num}
-                    </span>
-                    <span
-                      className="group-hover:underline transition-colors duration-150 group-hover:text-amber-700"
-                      style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C', textUnderlineOffset: '3px' }}
-                    >
-                      {pick(locale, book.labelRo, book.labelRu, book.labelEn)}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </section>
-          )}
+          {vtResults.length > 0 && testament(t.bible.oldTestament, t.bible.oldTestamentBooks, bookList(vtResults))}
+          {ntResults.length > 0 && testament(t.bible.newTestament, t.bible.newTestamentBooks, bookList(ntResults, 54))}
         </>
       )}
 
-      {/* Totaluri */}
-      <div className="mt-10 pt-6 flex justify-center gap-8 text-center" style={{ borderTop: '1px solid #E8E5E0' }}>
+      <div className="card flex justify-center gap-10 text-center" style={{ padding: '20px 24px' }}>
         <div>
-          <p className="font-heading text-2xl" style={{ color: '#8B1A1A' }}>53</p>
-          <p className="font-body text-xs" style={{ color: '#8A7050' }}>{t.bible.otBooksLabel}</p>
+          <p className="h-m" style={{ color: 'var(--rose)' }}>53</p>
+          <p className="mute text-[15px]">{t.bible.otBooksLabel}</p>
         </div>
         <div>
-          <p className="font-heading text-2xl" style={{ color: '#8B6014' }}>27</p>
-          <p className="font-body text-xs" style={{ color: '#8A7050' }}>{t.bible.ntBooksLabel}</p>
+          <p className="h-m gold">27</p>
+          <p className="mute text-[15px]">{t.bible.ntBooksLabel}</p>
         </div>
         <div>
-          <p className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>80</p>
-          <p className="font-body text-xs" style={{ color: '#8A7050' }}>{t.bible.totalLabel}</p>
+          <p className="h-m">80</p>
+          <p className="mute text-[15px]">{t.bible.totalLabel}</p>
         </div>
       </div>
-    </div>
+    </PageShell>
   )
 }

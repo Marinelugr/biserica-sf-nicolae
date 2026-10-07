@@ -4,6 +4,9 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 import { getServerT } from '@/lib/i18n/server'
 import { scheduledGate } from '@/lib/articleVisibility'
 import { buildWordWhere } from '@/lib/search'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
+import SearchForm from '@/components/shell/SearchForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -121,11 +124,11 @@ function getMonthName(month: number): string {
 }
 
 const categoryMeta: Record<string, { label: string; color: string }> = {
-  biblie: { label: 'Biblie', color: '#1C4A6A' },
-  articole: { label: 'Articole', color: '#4A6A2A' },
-  rugaciuni: { label: 'Rugăciuni', color: '#6B4A2A' },
-  carti: { label: 'Cărți', color: '#8B6014' },
-  sfinti: { label: 'Sfinți', color: '#8B1A1A' },
+  biblie: { label: 'Biblie', color: 'var(--blue)' },
+  articole: { label: 'Articole', color: 'var(--rose)' },
+  rugaciuni: { label: 'Rugăciuni', color: 'var(--gold)' },
+  carti: { label: 'Cărți', color: 'var(--gold-d)' },
+  sfinti: { label: 'Sfinți', color: 'var(--red)' },
 }
 
 export default async function CautarePage({
@@ -139,154 +142,71 @@ export default async function CautarePage({
   const totalResults = Object.values(results).reduce((sum, arr) => sum + arr.length, 0)
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-      {/* Header */}
-      <div className="text-center mb-10">
-        <h1 className="font-heading text-4xl mb-4" style={{ color: '#1C1B3A' }}>
-          Căutare
-        </h1>
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <span className="h-px w-16 block" style={{ backgroundColor: '#E8E5E0' }} />
-          <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-16 block" style={{ backgroundColor: '#E8E5E0' }} />
+    <PageShell aside="compact">
+      <PageHead title="Căutare">
+        <div className="mt-2">
+          <SearchForm action="/cautare" id="search-input" placeholder="Caută pe site..." button="Caută" defaultValue={query} />
         </div>
-      </div>
+        <div className="flex flex-wrap gap-2 mt-1">
+          {CATEGORIES.map(cat => (
+            <Link key={cat.key} href={`/cautare?q=${encodeURIComponent(query || cat.label)}&cat=${cat.key}`} className="chip">
+              {cat.icon} {cat.label}
+            </Link>
+          ))}
+        </div>
+      </PageHead>
 
-      {/* Formular căutare */}
-      <form className="flex gap-0 max-w-xl mx-auto mb-12 rounded-md overflow-hidden shadow-md" method="get">
-        <label htmlFor="search-input" className="sr-only">Caută pe site</label>
-        <input
-          id="search-input"
-          type="search"
-          name="q"
-          defaultValue={query}
-          placeholder="Caută pe site..."
-          className="flex-1 px-4 py-3 text-sm font-body outline-none"
-          style={{
-            border: '1px solid #E8E5E0',
-            borderRight: 'none',
-            color: '#3A1A1A',
-            backgroundColor: '#FAFAF8',
-          }}
-        />
-        <button
-          type="submit"
-          className="px-5 py-3 text-sm font-body font-medium transition-all hover:opacity-90 flex items-center gap-2"
-          style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}
-        >
-          <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd"
-              d="M9 3.5a5.5 5.5 0 100 11 5.5 5.5 0 000-11zM2 9a7 7 0 1112.452 4.391l3.328 3.329a.75.75 0 11-1.06 1.06l-3.329-3.328A7 7 0 012 9z"
-              clipRule="evenodd" />
-          </svg>
-          Caută
-        </button>
-      </form>
-
-      {/* Categorii rapide */}
-      <div className="flex flex-wrap justify-center gap-3 mb-12">
-        {CATEGORIES.map(cat => (
-          <Link
-            key={cat.key}
-            href={`/cautare?q=${encodeURIComponent(query || cat.label)}&cat=${cat.key}`}
-            className="font-body text-sm px-4 py-1.5 rounded-full border transition-all hover:border-amber-400"
-            style={{ color: '#8A7050', borderColor: '#E8E5E0' }}
-          >
-            {cat.icon} {cat.label}
-          </Link>
-        ))}
-      </div>
-
-      {/* Rezultate */}
       {query ? (
         totalResults === 0 ? (
-          <div className="text-center py-20">
-            <span style={{ color: '#D4C8A0', fontSize: '48px' }} aria-hidden="true">☦</span>
-            <p className="font-body mt-4 text-lg" style={{ color: '#8A7050' }}>
-              Nu s-au găsit rezultate pentru &ldquo;{query}&rdquo;
-            </p>
-            <p className="font-body text-sm mt-2" style={{ color: '#B0A080' }}>
-              Încercați cu Sfânta Scriptură sau navigați prin categorii.
-            </p>
-            <div className="flex justify-center gap-4 mt-6">
-              <Link href={`/biblie?q=${encodeURIComponent(query)}`}
-                className="font-body text-sm px-5 py-2 rounded border transition-all hover:border-amber-400"
-                style={{ color: '#8A7050', borderColor: '#E8E5E0' }}>
-                Caută în Biblie
-              </Link>
-              <Link href="/carti"
-                className="font-body text-sm px-5 py-2 rounded border transition-all hover:border-amber-400"
-                style={{ color: '#8A7050', borderColor: '#E8E5E0' }}>
-                Caută în Bibliotecă
-              </Link>
+          <div className="card text-center">
+            <span className="gold" style={{ fontSize: '44px' }} aria-hidden="true">☦</span>
+            <p className="mt-3 text-[19px]">Nu s-au găsit rezultate pentru &ldquo;{query}&rdquo;</p>
+            <p className="mute text-[16px] mt-2">Încercați cu Sfânta Scriptură sau navigați prin categorii.</p>
+            <div className="flex flex-wrap justify-center gap-3 mt-5">
+              <Link href={`/biblie?q=${encodeURIComponent(query)}`} className="btn">Caută în Biblie</Link>
+              <Link href="/carti" className="btn">Caută în Bibliotecă</Link>
             </div>
           </div>
         ) : (
-          <div>
-            <p className="font-body text-sm mb-8" style={{ color: '#8A7050' }}>
-              {totalResults} rezultate pentru &ldquo;<strong style={{ color: '#3A1A1A' }}>{query}</strong>&rdquo;
+          <>
+            <p className="mute text-[17px]">
+              {totalResults} rezultate pentru &ldquo;<strong className="text-ink">{query}</strong>&rdquo;
             </p>
-
-            {/* Rezultate grupate pe categorii */}
-            <div className="space-y-10">
-              {Object.entries(results).map(([catKey, items]) => {
-                const meta = categoryMeta[catKey] || { label: catKey, color: '#8A7050' }
-                return (
-                  <section key={catKey}>
-                    <div className="flex items-center gap-3 mb-4">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full"
-                        style={{ backgroundColor: meta.color }}
-                        aria-hidden="true"
-                      />
-                      <h2 className="font-heading text-xl" style={{ color: '#1C1B3A' }}>
-                        {meta.label}
-                      </h2>
-                      <span className="font-body text-sm" style={{ color: '#8A7050' }}>
-                        ({items.length})
-                      </span>
-                    </div>
-                    <div className="h-px mb-4" style={{ backgroundColor: '#E8E5E0' }} />
-                    <ul className="space-y-2">
-                      {items.map((item, i) => (
-                        <li key={i}>
-                          <Link
-                            href={item.href}
-                            className="flex items-center justify-between p-3 rounded group transition-colors hover:bg-amber-50"
-                            style={{ border: '1px solid #F0EDE8' }}
-                          >
-                            <div>
-                              <p className="font-body text-sm font-medium group-hover:underline underline-offset-2"
-                                style={{ color: '#3A1A1A', textDecorationColor: '#C9A84C' }}>
-                                {item.title}
-                              </p>
-                              {item.excerpt && (
-                                <p className="font-body text-xs mt-0.5" style={{ color: '#8A7050' }}>
-                                  {item.excerpt}
-                                </p>
-                              )}
-                            </div>
-                            <span className="ml-3 transition-transform group-hover:translate-x-1 shrink-0"
-                              style={{ color: '#C9A84C' }} aria-hidden="true">→</span>
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  </section>
-                )
-              })}
-            </div>
-          </div>
+            {Object.entries(results).map(([catKey, items]) => {
+              const meta = categoryMeta[catKey] || { label: catKey, color: 'var(--mute)' }
+              return (
+                <section key={catKey} className="card" style={{ padding: '22px 24px' }} data-reveal>
+                  <div className="sec-head" style={{ marginBottom: 6 }}>
+                    <h2 className="h-s flex items-center gap-3">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: meta.color }} aria-hidden="true" />
+                      {meta.label}
+                      <span className="mute text-[16px] font-normal">({items.length})</span>
+                    </h2>
+                  </div>
+                  <ul>
+                    {items.map((item, i) => (
+                      <li key={i} style={i < items.length - 1 ? { borderBottom: '1px solid var(--line)' } : undefined}>
+                        <Link href={item.href} className="flex items-center justify-between gap-3 py-3 group">
+                          <span className="min-w-0">
+                            <span className="block group-hover:text-gold transition-colors">{item.title}</span>
+                            {item.excerpt && <span className="block mute text-[16px] mt-0.5">{item.excerpt}</span>}
+                          </span>
+                          <span className="gold shrink-0 transition-transform group-hover:translate-x-1" aria-hidden="true">→</span>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )
+            })}
+          </>
         )
       ) : (
-        <div className="text-center py-16">
-          <span style={{ color: '#D4C8A0', fontSize: '48px' }} aria-hidden="true">☦</span>
-          <p className="font-body mt-4" style={{ color: '#8A7050' }}>
-            Introduceți un termen pentru a căuta în întregul site.
-          </p>
+        <div className="card text-center">
+          <span className="gold" style={{ fontSize: '44px' }} aria-hidden="true">☦</span>
+          <p className="mute mt-3">Introduceți un termen pentru a căuta în întregul site.</p>
         </div>
       )}
-    </div>
+    </PageShell>
   )
 }

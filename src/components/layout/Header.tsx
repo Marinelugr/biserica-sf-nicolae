@@ -217,7 +217,7 @@ export default function Header() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="flex items-center gap-2 px-4 rounded-xl min-h-[44px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+                        className="flex items-center gap-2 px-4 rounded-xl min-h-[44px] transition-colors hover:bg-ink/5 hover:text-gold aria-[current=page]:text-gold"
                         aria-current={isCurrent(link.href) ? 'page' : undefined}
                         onClick={() => setParishOpen(false)}
                       >
@@ -261,7 +261,7 @@ export default function Header() {
               ref={menuBtnRef}
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="lg:hidden flex flex-col items-center justify-center gap-[5px] w-11 h-11 -mr-1.5 rounded-full transition-colors hover:bg-white/5"
+              className="lg:hidden flex flex-col items-center justify-center gap-[5px] w-11 h-11 -mr-1.5 rounded-full transition-colors hover:bg-ink/5"
               aria-label={t.shell.openMenu}
               aria-expanded={menuOpen}
               aria-controls="site-menu-panel"
@@ -323,7 +323,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setMenuOpen(false)}
-            className="flex items-center justify-center w-11 h-11 -mr-2 rounded-full text-gold text-[22px] hover:bg-white/5"
+            className="flex items-center justify-center w-11 h-11 -mr-2 rounded-full text-gold text-[22px] hover:bg-ink/5"
             aria-label={t.shell.closeMenu}
           >
             ✕
@@ -336,7 +336,7 @@ export default function Header() {
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="flex items-center gap-2 px-6 min-h-[48px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+              className="flex items-center gap-2 px-6 min-h-[48px] transition-colors hover:bg-ink/5 hover:text-gold aria-[current=page]:text-gold"
               aria-current={isCurrent(link.href) ? 'page' : undefined}
             >
               {link.label}
@@ -345,7 +345,7 @@ export default function Header() {
 
           <button
             type="button"
-            className="w-full flex items-center justify-between px-6 min-h-[48px] transition-colors hover:bg-white/5 hover:text-gold"
+            className="w-full flex items-center justify-between px-6 min-h-[48px] transition-colors hover:bg-ink/5 hover:text-gold"
             aria-expanded={mobileParishExpanded}
             aria-controls={mobileParishId}
             onClick={() => setMobileParishOpen(!mobileParishExpanded)}
@@ -359,7 +359,7 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
-                className="flex items-center gap-2 px-5 min-h-[44px] text-[17px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+                className="flex items-center gap-2 px-5 min-h-[44px] text-[17px] transition-colors hover:bg-ink/5 hover:text-gold aria-[current=page]:text-gold"
                 aria-current={isCurrent(link.href) ? 'page' : undefined}
               >
                 {link.label}
@@ -371,7 +371,7 @@ export default function Header() {
           <Link
             href={contact.href}
             onClick={() => setMenuOpen(false)}
-            className="flex items-center gap-2 px-6 min-h-[48px] transition-colors hover:bg-white/5 hover:text-gold aria-[current=page]:text-gold"
+            className="flex items-center gap-2 px-6 min-h-[48px] transition-colors hover:bg-ink/5 hover:text-gold aria-[current=page]:text-gold"
             aria-current={isCurrent(contact.href) ? 'page' : undefined}
           >
             {contact.label}

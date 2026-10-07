@@ -6,6 +6,9 @@ import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
+
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -63,181 +66,98 @@ export default async function SfantulNicolaePage() {
     orderBy: { order: 'asc' },
   })
 
-  return (
-    <div>
-      {/* Dark hero */}
-      <div className="py-16 px-4 text-center" style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}>
-        <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
-          {t.saintNicholasPage.badge}
-        </p>
-        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}>
-          {t.saintNicholasPage.pageTitle}
-        </h1>
-        <p className="font-body mb-6" style={{ color: '#6A5030', fontSize: '15px' }}>
-          {t.saintNicholasPage.subtitle}
-        </p>
-        <div className="flex items-center justify-center gap-3">
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-          <span style={{ color: '#C9A84C', fontSize: '20px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
+  const ACATIST = '/carti/acatistul-sfantului-ierarh-nicolae-arhiepiscopul-de-mira-lichia'
+  const feastRow = (day: string, mon: string, title: string, desc: string, gold?: boolean) => (
+    <div className="flex items-start gap-4 py-3">
+      <div
+        className="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 serif font-semibold text-center leading-tight"
+        style={gold ? { background: 'var(--gold)', color: '#0a1330' } : { background: 'var(--red)', color: '#fff' }}
+      >
+        <div>
+          <div style={{ fontSize: 20 }}>{day}</div>
+          <div style={{ fontSize: 11, letterSpacing: '.1em' }}>{mon}</div>
         </div>
       </div>
-
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-        {/* Icoana + Date prăznuire */}
-        <div className="flex flex-col md:flex-row gap-10 mb-16 items-start">
-          {/* Icoana */}
-          <div className="w-full md:w-64 shrink-0 rounded-lg overflow-hidden" style={{ minHeight: '280px', border: '1px solid #E8DFC8' }}>
-            {iconUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={iconUrl} alt={t.saintNicholasPage.iconAlt} style={{ width: '100%', height: '100%', objectFit: 'cover', minHeight: '280px' }} />
-            ) : (
-              <div className="w-full flex flex-col items-center justify-center py-16" style={{ backgroundColor: '#F7F3EC', minHeight: '280px' }}>
-                <span style={{ color: '#D4C8A0', fontSize: '64px' }} aria-hidden="true">☦</span>
-                <p className="font-body text-xs mt-4 text-center px-4" style={{ color: '#B0A080' }}>
-                  {t.saintNicholasPage.iconAlt}
-                  <br />
-                  <span style={{ color: '#C9A84C' }}>{t.saintNicholasPage.iconMissing}</span>
-                </p>
-              </div>
-            )}
-          </div>
-
-          {/* Informații */}
-          <div className="flex-1">
-            <h2 className="font-heading text-2xl mb-6" style={{ color: '#1C1B3A' }}>{t.saintNicholasPage.feastDatesTitle}</h2>
-
-            <div className="space-y-4 mb-8">
-              <div className="flex items-start gap-4 p-4 rounded-lg" style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
-                <div className="w-12 h-12 rounded flex items-center justify-center shrink-0 font-heading font-semibold" style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', fontSize: '16px' }}>
-                  <div className="text-center leading-tight">
-                    <div>19</div>
-                    <div style={{ fontSize: '9px' }}>DEC</div>
-                  </div>
-                </div>
-                <div>
-                  <p className="font-heading text-base" style={{ color: '#1C1B3A' }}>
-                    {feast1}
-                  </p>
-                  <p className="font-body text-sm mt-1" style={{ color: '#8A7050' }}>
-                    {feast1Desc}
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4 p-4 rounded-lg" style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
-                <div className="w-12 h-12 rounded flex items-center justify-center shrink-0 font-heading font-semibold" style={{ backgroundColor: '#C9A84C', color: '#1C1B3A', fontSize: '16px' }}>
-                  <div className="text-center leading-tight">
-                    <div>22</div>
-                    <div style={{ fontSize: '9px' }}>MAI</div>
-                  </div>
-                </div>
-                <div>
-                  <p className="font-heading text-base" style={{ color: '#1C1B3A' }}>
-                    {feast2}
-                  </p>
-                  <p className="font-body text-sm mt-1" style={{ color: '#8A7050' }}>
-                    {feast2Desc}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <Link
-              href="/carti/acatistul-sfantului-ierarh-nicolae-arhiepiscopul-de-mira-lichia"
-              className="font-body text-sm px-5 py-2.5 rounded border inline-flex items-center gap-2 transition-all hover:bg-amber-50"
-              style={{ color: '#8B6014', borderColor: '#C9A84C' }}
-            >
-              <span>☦</span>
-              <span>{t.saintNicholasPage.acatistLink}</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Viața sfântului */}
-        <section className="mb-16">
-          <h2 className="font-heading text-3xl mb-8" style={{ color: '#1C1B3A' }}>
-            {t.saintNicholasPage.lifeTitle}
-          </h2>
-          <div className="h-px mb-8" style={{ backgroundColor: '#E8E5E0' }} />
-
-          {dynLife ? (
-            <div className="tiptap-prose" dangerouslySetInnerHTML={{ __html: dynLife }} />
-          ) : (
-            <div className="space-y-10">
-              {t.saintNicholasPage.fallbackViata.map((sectiune, i) => (
-                <article key={i}>
-                  <h3 className="font-heading text-xl mb-3" style={{ color: '#4A2010' }}>{sectiune.titlu}</h3>
-                  <p className="font-body text-base leading-relaxed" style={{ color: '#3A2010', lineHeight: '1.8' }}>{sectiune.text}</p>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* Tropar */}
-        <section className="mb-10">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-            <h2 className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>{t.saintNicholasPage.troparTitle}</h2>
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-          </div>
-          <blockquote
-            className="font-body text-base leading-relaxed italic text-center mx-auto max-w-2xl p-6 rounded-lg"
-            style={{ color: '#3A1A1A', backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', lineHeight: '1.9' }}
-          >
-            {renderPoem(tropar)}
-          </blockquote>
-          <p className="font-body text-xs text-center mt-2" style={{ color: '#8A7050' }}>{t.saintNicholasPage.troparTone}</p>
-        </section>
-
-        {/* Condac */}
-        <section className="mb-16">
-          <div className="flex items-center gap-3 mb-6">
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-            <h2 className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>{t.saintNicholasPage.condacTitle}</h2>
-            <span className="h-px flex-1" style={{ backgroundColor: '#E8E5E0' }} />
-          </div>
-          <blockquote
-            className="font-body text-base leading-relaxed italic text-center mx-auto max-w-2xl p-6 rounded-lg"
-            style={{ color: '#3A1A1A', backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', lineHeight: '1.9' }}
-          >
-            {renderPoem(condac)}
-          </blockquote>
-          <p className="font-body text-xs text-center mt-2" style={{ color: '#8A7050' }}>{t.saintNicholasPage.condacTone}</p>
-        </section>
-
-        {/* Galerie imagini */}
-        {saintGallery.length > 0 && (
-          <section className="mb-16">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="h-px flex-1 block" style={{ backgroundColor: '#3A2010' }} />
-              <h2 className="font-heading text-xl" style={{ color: '#C9A84C' }}>{t.saintNicholasPage.galleryTitle}</h2>
-              <span className="h-px flex-1 block" style={{ backgroundColor: '#3A2010' }} />
-            </div>
-            <PublicGallery items={saintGallery} />
-          </section>
-        )}
-
-        {/* Link Acatist */}
-        <div className="rounded-lg p-8 text-center" style={{ backgroundColor: '#0D0905', border: '1px solid #1E1208' }}>
-          <span style={{ color: '#C9A84C', fontSize: '28px' }} aria-hidden="true">☦</span>
-          <h3 className="font-heading text-xl mt-3 mb-2" style={{ color: '#C9A84C' }}>
-            {t.saintNicholasPage.acatistCtaTitle}
-          </h3>
-          <p className="font-body text-sm mb-5" style={{ color: '#6A5030' }}>
-            {t.saintNicholasPage.acatistCtaText}
-          </p>
-          <Link
-            href="/carti/acatistul-sfantului-ierarh-nicolae-arhiepiscopul-de-mira-lichia"
-            className="font-body text-sm px-6 py-2.5 rounded border inline-block transition-all hover:bg-white/10"
-            style={{ borderColor: '#C9A84C', color: '#C9A84C' }}
-          >
-            {t.saintNicholasPage.goToLibrary}
-          </Link>
-        </div>
+      <div>
+        <p className="h-s" style={{ fontSize: 21 }}>{title}</p>
+        <p className="mute text-[17px] mt-1">{desc}</p>
       </div>
     </div>
+  )
+  const hymn = (id: string, title: string, text: string, tone: string) => (
+    <section className="card" aria-labelledby={id} data-reveal>
+      <h2 id={id} className="h-m mb-1">{title}</h2>
+      <p className="eyebrow mb-4">{tone}</p>
+      <blockquote className="lead" style={{ fontSize: 22 }}>{renderPoem(text)}</blockquote>
+    </section>
+  )
+
+  return (
+    <PageShell aside="compact">
+      <PageHead eyebrow={t.saintNicholasPage.badge} title={t.saintNicholasPage.pageTitle}>
+        <p className="lead" style={{ fontSize: 22 }}>{t.saintNicholasPage.subtitle}</p>
+      </PageHead>
+
+      <section className="card flex flex-col sm:flex-row gap-6 items-start" aria-labelledby="sn-date">
+        <div className="w-full sm:w-52 shrink-0 overflow-hidden" style={{ borderRadius: 18, border: '1px solid var(--gold-d)', aspectRatio: '4 / 5' }}>
+          {iconUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={iconUrl} alt={t.saintNicholasPage.iconAlt} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          ) : (
+            <div className="ph w-full h-full flex-col text-center px-4">
+              <span style={{ fontSize: 56 }} aria-hidden="true">☦</span>
+              <p className="mute text-[15px] mt-3">
+                {t.saintNicholasPage.iconAlt}
+                <br />
+                <span className="gold">{t.saintNicholasPage.iconMissing}</span>
+              </p>
+            </div>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h2 id="sn-date" className="h-m mb-2">{t.saintNicholasPage.feastDatesTitle}</h2>
+          {feastRow('19', 'DEC', feast1, feast1Desc)}
+          <hr className="sep" />
+          {feastRow('22', 'MAI', feast2, feast2Desc, true)}
+          <Link href={ACATIST} className="btn mt-4">
+            <span aria-hidden="true">☦</span>
+            <span>{t.saintNicholasPage.acatistLink}</span>
+          </Link>
+        </div>
+      </section>
+
+      <article className="card" aria-labelledby="sn-viata">
+        <h2 id="sn-viata" className="h-m mb-5">{t.saintNicholasPage.lifeTitle}</h2>
+        {dynLife ? (
+          <div className="rich reading" dangerouslySetInnerHTML={{ __html: dynLife }} />
+        ) : (
+          <div className="reading flex flex-col gap-8">
+            {t.saintNicholasPage.fallbackViata.map((sectiune, i) => (
+              <section key={i}>
+                <h3 className="h-s mb-2">{sectiune.titlu}</h3>
+                <p>{sectiune.text}</p>
+              </section>
+            ))}
+          </div>
+        )}
+      </article>
+
+      {hymn('sn-tropar', t.saintNicholasPage.troparTitle, tropar, t.saintNicholasPage.troparTone)}
+      {hymn('sn-condac', t.saintNicholasPage.condacTitle, condac, t.saintNicholasPage.condacTone)}
+
+      {saintGallery.length > 0 && (
+        <section className="card" aria-labelledby="sn-galerie" data-reveal>
+          <h2 id="sn-galerie" className="eyebrow mb-5">{t.saintNicholasPage.galleryTitle}</h2>
+          <PublicGallery items={saintGallery} />
+        </section>
+      )}
+
+      <div className="card text-center flex flex-col items-center gap-3" data-reveal>
+        <span className="gold" style={{ fontSize: '28px' }} aria-hidden="true">☦</span>
+        <h2 className="h-s gold">{t.saintNicholasPage.acatistCtaTitle}</h2>
+        <p className="mute">{t.saintNicholasPage.acatistCtaText}</p>
+        <Link href={ACATIST} className="btn gold">{t.saintNicholasPage.goToLibrary}</Link>
+      </div>
+    </PageShell>
   )
 }

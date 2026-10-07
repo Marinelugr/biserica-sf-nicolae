@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getPascalData } from '@/lib/pascal'
 import { getServerT } from '@/lib/i18n/server'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerT()
@@ -23,34 +25,20 @@ export default function CalendarPascalPage() {
   const rows = years.map(getPascalData)
 
   return (
-    <div>
-      {/* Hero dark */}
-      <div className="py-16 px-4 text-center" style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}>
-        <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
-          Parohia Sfântul Ierarh Nicolae
-        </p>
-        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}>
-          Calendarul Pascal Ortodox
-        </h1>
-        <p className="font-body" style={{ color: '#6A5030', fontSize: '16px' }}>
+    <PageShell aside="compact">
+      <PageHead eyebrow="Parohia Sfântul Ierarh Nicolae" title="Calendarul Pascal Ortodox">
+        <p className="mute text-[18px]">
           Sărbătorile pascale calculate după calendarul iulian (stil vechi), {START_YEAR}–{END_YEAR}
         </p>
-        <div className="flex items-center justify-center gap-3 mt-6">
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-          <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-        </div>
-      </div>
+      </PageHead>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="overflow-x-auto rounded-lg" style={{ border: '1px solid #E8E5E0' }}>
-          <table className="w-full font-body text-sm" style={{ borderCollapse: 'collapse', minWidth: '760px' }}>
+      <div className="card flush">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Calendarul Pascal Ortodox">
+          <table className="w-full text-[17px]" style={{ borderCollapse: 'collapse', minWidth: '720px' }}>
             <thead>
-              <tr style={{ backgroundColor: '#1C1B3A' }}>
+              <tr style={{ borderBottom: '1px solid var(--gold-d)' }}>
                 {['An', 'Florii', 'Paști', 'Duminica Tomii', 'Înălțarea', 'Rusaliile', 'Postul Apostolilor'].map(h => (
-                  <th key={h} className="text-left px-4 py-3 font-body text-xs uppercase tracking-wide" style={{ color: '#C9A84C' }}>
-                    {h}
-                  </th>
+                  <th key={h} scope="col" className="text-left px-4 py-3.5 eyebrow" style={{ fontSize: 12 }}>{h}</th>
                 ))}
               </tr>
             </thead>
@@ -58,22 +46,16 @@ export default function CalendarPascalPage() {
               {rows.map(row => {
                 const isCurrent = row.year === currentYear
                 return (
-                  <tr
-                    key={row.year}
-                    style={{
-                      backgroundColor: isCurrent ? 'rgba(201, 168, 76, 0.12)' : 'transparent',
-                      borderBottom: '1px solid #E8E5E0',
-                    }}
-                  >
-                    <td className="px-4 py-3 font-heading" style={{ color: isCurrent ? '#8B1A1A' : '#1C1B3A', fontWeight: isCurrent ? 700 : 400 }}>
+                  <tr key={row.year} style={{ backgroundColor: isCurrent ? 'rgba(224, 184, 74, 0.12)' : 'transparent', borderBottom: '1px solid var(--line)' }}>
+                    <th scope="row" className="text-left px-4 py-3 serif" style={{ color: isCurrent ? 'var(--gold)' : 'var(--ink)', fontWeight: isCurrent ? 700 : 500, fontSize: 20 }}>
                       {row.year}
-                    </td>
-                    <td className="px-4 py-3" style={{ color: '#3A1A1A' }}>{fmt(row.florii)}</td>
-                    <td className="px-4 py-3" style={{ color: '#8B1A1A', fontWeight: 600 }}>{fmt(row.pasti)}</td>
-                    <td className="px-4 py-3" style={{ color: '#3A1A1A' }}>{fmt(row.tomii)}</td>
-                    <td className="px-4 py-3" style={{ color: '#3A1A1A' }}>{fmt(row.inaltarea)}</td>
-                    <td className="px-4 py-3" style={{ color: '#3A1A1A' }}>{fmt(row.rusalii)}</td>
-                    <td className="px-4 py-3" style={{ color: '#3A1A1A' }}>{fmt(row.apostoli)}</td>
+                    </th>
+                    <td className="px-4 py-3">{fmt(row.florii)}</td>
+                    <td className="px-4 py-3" style={{ color: 'var(--rose)', fontWeight: 600 }}>{fmt(row.pasti)}</td>
+                    <td className="px-4 py-3">{fmt(row.tomii)}</td>
+                    <td className="px-4 py-3">{fmt(row.inaltarea)}</td>
+                    <td className="px-4 py-3">{fmt(row.rusalii)}</td>
+                    <td className="px-4 py-3">{fmt(row.apostoli)}</td>
                   </tr>
                 )
               })}
@@ -81,6 +63,6 @@ export default function CalendarPascalPage() {
           </table>
         </div>
       </div>
-    </div>
+    </PageShell>
   )
 }
