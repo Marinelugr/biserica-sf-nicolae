@@ -5,6 +5,10 @@ import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { prisma } from '@/lib/prisma'
 
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
+import VideoTile from '@/components/shell/VideoTile'
+
 export const dynamic = 'force-dynamic'
 
 type Props = { params: Promise<{ catSlug: string }> }
@@ -51,68 +55,27 @@ export default async function VideoCategoryPage({ params }: Props) {
   if (!category) notFound()
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 mb-8 font-body text-sm" style={{ color: '#8A7050' }}>
-        <Link href="/" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>{t.nav.home}</Link>
-        <span aria-hidden="true">›</span>
-        <Link href="/video" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>{t.nav.video}</Link>
-        <span aria-hidden="true">›</span>
-        <span className="truncate max-w-[180px]">{category.name}</span>
-      </nav>
-
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-10">
-        <span className="text-2xl" aria-hidden="true">🎬</span>
-        <h1 className="font-heading text-3xl" style={{ color: '#1C1B3A' }}>{category.name}</h1>
-        <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-      </div>
+    <PageShell aside="compact">
+      <PageHead crumbs={[{ href: '/', label: t.nav.home }, { href: '/video', label: t.nav.video }, { label: category.name }]} title={category.name} />
 
       {category.videos.length === 0 ? (
-        <p className="font-body text-sm" style={{ color: '#8A7050' }}>{t.video.comingSoon}</p>
+        <div className="card"><p className="mute">{t.video.comingSoon}</p></div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {category.videos.map(video => {
-            const thumb = getThumbnail(video.platform, video.videoId)
-            return (
-              <Link
-                key={video.id}
-                href={`/video/${category.slug}/${video.slug}`}
-                className="group rounded-lg overflow-hidden transition-shadow hover:shadow-md block"
-                style={{ border: '1px solid #E8E5E0' }}
-              >
-                <div
-                  className="w-full flex items-center justify-center bg-cover bg-center"
-                  style={{ aspectRatio: '16/9', backgroundColor: '#1C1B3A', backgroundImage: thumb ? `url(${thumb})` : undefined, position: 'relative' }}
-                >
-                  <span
-                    className="flex items-center justify-center rounded-full"
-                    style={{ color: '#C9A84C', fontSize: '22px', width: '48px', height: '48px', backgroundColor: 'rgba(13,9,5,0.55)' }}
-                    aria-hidden="true"
-                  >
-                    ▶
-                  </span>
-                </div>
-                <div className="p-3" style={{ backgroundColor: '#FAFAF8' }}>
-                  <p className="font-body text-sm leading-snug group-hover:underline" style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}>
-                    {video.title}
-                  </p>
-                </div>
-              </Link>
-            )
-          })}
+        <div className="grid grid-cols-1 min-[480px]:grid-cols-2 xl:grid-cols-3 gap-4">
+          {category.videos.map(video => (
+            <VideoTile
+              key={video.id}
+              href={`/video/${category.slug}/${video.slug}`}
+              title={video.title}
+              thumb={getThumbnail(video.platform, video.videoId)}
+            />
+          ))}
         </div>
       )}
 
-      <div className="mt-14 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
-        <Link
-          href="/video"
-          className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
-          style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
-        >
-          ← {t.common.backTo} {t.nav.video}
-        </Link>
+      <div className="card" style={{ padding: '20px 24px' }}>
+        <Link href="/video" className="link-gold text-[17px]">← {t.common.backTo} {t.nav.video}</Link>
       </div>
-    </div>
+    </PageShell>
   )
 }

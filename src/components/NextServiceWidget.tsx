@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 
 interface TimeLeft {
   zile: number
@@ -78,7 +79,11 @@ function getFallbackService(): ServiceInfo | null {
   }
 }
 
-export default function NextServiceWidget() {
+/**
+ * Postarea „Următoarea slujbă" din flux. Nu se randează deloc (nici cardul)
+ * când nu există slujbă de afișat sau numărătoarea e oprită din admin.
+ */
+export default function NextServiceWidget({ author, kicker }: { author: string; kicker: string }) {
   const [service, setService] = useState<ServiceInfo | null>(null)
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null)
   const [paused, setPaused] = useState(false)
@@ -127,32 +132,35 @@ export default function NextServiceWidget() {
   if (paused || !service || !timeLeft) return null
 
   const serviceDate = new Date(service.data)
+  const unit = (value: number, label: string) => (
+    <div className="flex flex-col items-center min-w-[56px]">
+      <span className="serif tabular-nums" style={{ fontSize: 36, fontWeight: 600, color: 'var(--gold)', lineHeight: 1 }}>
+        {String(value).padStart(2, '0')}
+      </span>
+      <span className="mute uppercase" style={{ fontSize: 13, letterSpacing: '.14em', marginTop: 6 }}>{label}</span>
+    </div>
+  )
 
   return (
-    <div className="next-service-widget glass-cobalt max-w-md mx-auto">
-      <div className="widget-label">⛪ Următoarea slujbă</div>
-      <div className="widget-service-name">{service.titlu}</div>
-      <div className="widget-service-time">
+    <article className="card flex flex-col gap-2" style={{ padding: '22px 24px' }} data-kind="parohie">
+      <header className="flex items-center gap-3 mb-2">
+        <Image src="/logo-mark.png" alt="" width={17} height={36} style={{ height: 36, width: 'auto' }} />
+        <div className="flex flex-col leading-tight">
+          <span className="h-s" style={{ fontSize: 20 }}>{author}</span>
+          <span className="kicker">{kicker}</span>
+        </div>
+      </header>
+      <div className="eyebrow">⛪ Următoarea slujbă</div>
+      <div className="serif italic" style={{ fontSize: 26, fontWeight: 500 }}>{service.titlu}</div>
+      <div className="mute" style={{ fontSize: 16 }}>
         {getDayLabel(serviceDate)} · {getFullDate(serviceDate)} · {service.ora}
       </div>
-      <div className="widget-countdown">
-        <div className="countdown-unit">
-          <span className="countdown-number">{String(timeLeft.zile).padStart(2, '0')}</span>
-          <span className="countdown-label">zile</span>
-        </div>
-        <div className="countdown-unit">
-          <span className="countdown-number">{String(timeLeft.ore).padStart(2, '0')}</span>
-          <span className="countdown-label">ore</span>
-        </div>
-        <div className="countdown-unit">
-          <span className="countdown-number">{String(timeLeft.minute).padStart(2, '0')}</span>
-          <span className="countdown-label">min</span>
-        </div>
-        <div className="countdown-unit">
-          <span className="countdown-number">{String(timeLeft.secunde).padStart(2, '0')}</span>
-          <span className="countdown-label">sec</span>
-        </div>
+      <div className="flex flex-wrap gap-4 mt-3">
+        {unit(timeLeft.zile, 'zile')}
+        {unit(timeLeft.ore, 'ore')}
+        {unit(timeLeft.minute, 'min')}
+        {unit(timeLeft.secunde, 'sec')}
       </div>
-    </div>
+    </article>
   )
 }

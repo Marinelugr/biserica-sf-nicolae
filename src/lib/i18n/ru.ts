@@ -353,6 +353,18 @@ const ru: Translations = {
     acceptBtn: 'Понятно',
     policyLink: 'Политика конфиденциальности',
   },
+  shell: {
+    brand: 'Отец Марин', navWord: 'Слово', navParish: 'Приход', navBible: 'Библия', navAbout: 'О приходе', navFather: 'Священник',
+    openMenu: 'Открыть меню', closeMenu: 'Закрыть меню', mainMenu: 'Главное меню',
+    profileRole: 'Настоятель храма Святителя Николая · Хыртопул Мик, Криулень',
+    follow: 'Подписаться', socialTitle: 'Соцсети', scheduleTitle: 'Расписание служб · Приход',
+    feedFilter: 'Фильтр публикаций', feedAll: 'Все', feedWord: 'Слово', feedVideo: 'Видео', feedParish: 'Приход', feedLibrary: 'Библиотека',
+    kindWord: 'Слово священника', kindVideo: 'Видео', kindParish: 'Из жизни прихода', kindLibrary: 'Библиотека',
+    kindChurch: 'Из жизни Церкви', kindAnnouncement: 'Объявление',
+    today: 'Сегодня', oldStyle: 'старый стиль', readFullMessage: 'Читать полностью →', read: 'Читать →', backHome: 'Главная',
+    coverAlt: 'Храм Святителя Николая в Хыртопул Мик, вид сверху',
+    emblemAlt: 'Эмблема храма Святителя Николая', liveBadge: 'LIVE', feedEmpty: 'Сейчас нет публикаций этого типа.', dateLabel: 'Дата',
+  },
 }
 
 export default ru

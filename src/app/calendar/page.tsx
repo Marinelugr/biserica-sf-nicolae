@@ -6,6 +6,9 @@ import { localeToIntl } from '@/lib/i18n/pick'
 import { getFixedFeasts, FIXED_FASTS, isApostlesFast, getSingleDayFast } from '@/lib/constants/oldCalendarFeasts'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
+
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -130,238 +133,154 @@ export default async function CalendarPage({
   const hasGreatFeast = fixedFeasts.some(f => f.type === 'GREAT') || movableFeasts.some(f => f.special)
   const isInFast = activeFasts.length > 0
 
-  let dayBgColor = '#F7F3EC'
-  let dayBorderColor = '#E8DFC8'
-  if (hasGreatFeast) { dayBgColor = '#FDF5F5'; dayBorderColor = '#F0C0C0' }
-  else if (isInFast)  { dayBgColor = '#F5FAF0'; dayBorderColor = '#C8D8B8' }
+  // ── Grila lunii (doar prezentare, din aceleași funcții de calendar) ─────────
+  const intl = localeToIntl(locale)
+  const firstWeekday = (new Date(selYear, selMonth - 1, 1).getDay() + 6) % 7 // luni = 0
+  const monthDays = daysInMonth(selMonth, selYear)
+  const weekdayNames = Array.from({ length: 7 }, (_, i) =>
+    new Date(2024, 0, 1 + i).toLocaleDateString(intl, { weekday: 'short' }).replace('.', ''),
+  )
+  const movableDates = [
+    liturgicalDates.palmSunday, liturgicalDates.easter, liturgicalDates.ascension,
+    liturgicalDates.pentecost, liturgicalDates.thomasSunday, liturgicalDates.allSaintsDay,
+  ].map(d => { const x = new Date(d); return x.getMonth() + 1 === selMonth && x.getFullYear() === selYear ? x.getDate() : -1 })
+  const isToday = (d: number) => d === today.getDate() && selMonth === today.getMonth() + 1 && selYear === today.getFullYear()
+  const isFeastDay = (d: number) => getFixedFeasts(d, selMonth).length > 0 || movableDates.includes(d)
+  const isSunday = (d: number) => new Date(selYear, selMonth - 1, d).getDay() === 0
+  const selectCls = 'field cursor-pointer'
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <PageShell aside="compact">
+      <PageHead eyebrow={t.calendar.subtitle} title={t.calendar.title}>
+        <form method="get" className="flex flex-wrap items-end gap-3 mt-2">
+          <div className="flex flex-col">
+            <label htmlFor="cal-zi" className="label">{t.calendar.day}</label>
+            <select id="cal-zi" name="zi" defaultValue={safeDay} className={selectCls} style={{ minWidth: 80 }}>
+              {Array.from({ length: maxDay }, (_, i) => i + 1).map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="cal-luna" className="label">{t.calendar.month}</label>
+            <select id="cal-luna" name="luna" defaultValue={selMonth} className={selectCls} style={{ minWidth: 160 }}>
+              {t.calendar.months.map((m, i) => <option key={i + 1} value={i + 1}>{m}</option>)}
+            </select>
+          </div>
+          <div className="flex flex-col">
+            <label htmlFor="cal-an" className="label">{t.calendar.year}</label>
+            <select id="cal-an" name="an" defaultValue={selYear} className={selectCls} style={{ minWidth: 100 }}>
+              {yearRange.map(y => <option key={y} value={y}>{y}</option>)}
+            </select>
+          </div>
+          <button type="submit" className="btn red">{t.calendar.show}</button>
+        </form>
+      </PageHead>
 
-      {/* Header */}
-      <div className="text-center mb-12">
-        <p className="font-body text-xs tracking-[0.35em] uppercase mb-3" style={{ color: '#8A7050' }}>
-          {t.calendar.subtitle}
-        </p>
-        <h1 className="font-heading mb-5" style={{ color: '#1C1B3A', fontSize: 'clamp(42px, 6vw, 68px)' }}>
-          {t.calendar.title}
-        </h1>
-        <div className="flex items-center justify-center gap-3">
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
-          <span style={{ color: '#C9A84C', fontSize: '20px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-20 block" style={{ backgroundColor: '#E8E5E0' }} />
+      <section className="card" aria-label={`${t.calendar.months[selMonth - 1]} ${selYear}`}>
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <Link href={`/calendar?zi=${prevDay}&luna=${prevMonth}&an=${prevYear}`} className="chip" aria-label={t.calendar.months[prevMonth - 1]}>
+            ← <span className="hidden sm:inline">{t.calendar.months[prevMonth - 1]}</span>
+          </Link>
+          <h2 className="h-m text-center">{t.calendar.months[selMonth - 1]} {selYear}</h2>
+          <Link href={`/calendar?zi=${nextDay}&luna=${nextMonth}&an=${nextYear}`} className="chip" aria-label={t.calendar.months[nextMonth - 1]}>
+            <span className="hidden sm:inline">{t.calendar.months[nextMonth - 1]}</span> →
+          </Link>
         </div>
-      </div>
-
-      {/* Selector dată */}
-      <form
-        method="get"
-        className="flex flex-wrap items-end gap-3 justify-center mb-10 p-6 rounded-xl"
-        style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}
-      >
-        {/* Ziua */}
-        <div className="flex flex-col gap-1">
-          <label className="font-body text-xs uppercase tracking-widest" style={{ color: '#8A7050' }}>
-            {t.calendar.day}
-          </label>
-          <select
-            name="zi"
-            defaultValue={safeDay}
-            className="font-body px-3 py-2 rounded border outline-none appearance-none cursor-pointer"
-            style={{ borderColor: '#D4C8A0', color: '#3A1A1A', backgroundColor: '#FFFFFF', fontSize: '16px', minWidth: '70px' }}
-          >
-            {Array.from({ length: maxDay }, (_, i) => i + 1).map(d => (
-              <option key={d} value={d}>{d}</option>
-            ))}
-          </select>
+        <div className="cal-grid">
+          {weekdayNames.map(w => <div key={w} className="cal-h" aria-hidden="true">{w}</div>)}
+          {Array.from({ length: firstWeekday }, (_, i) => <span key={`e${i}`} className="cal-d empty" aria-hidden="true" />)}
+          {Array.from({ length: monthDays }, (_, i) => i + 1).map(d => {
+            const cls = ['cal-d', isSunday(d) && 'sun', isFeastDay(d) && 'feast', d === safeDay && 'sel', isToday(d) && 'today'].filter(Boolean).join(' ')
+            return (
+              <Link
+                key={d}
+                href={`/calendar?zi=${d}&luna=${selMonth}&an=${selYear}`}
+                className={cls}
+                aria-current={d === safeDay ? 'date' : undefined}
+                aria-label={new Date(selYear, selMonth - 1, d).toLocaleDateString(intl, { day: 'numeric', month: 'long' })}
+              >
+                {d}
+              </Link>
+            )
+          })}
         </div>
+      </section>
 
-        {/* Luna */}
-        <div className="flex flex-col gap-1">
-          <label className="font-body text-xs uppercase tracking-widest" style={{ color: '#8A7050' }}>
-            {t.calendar.month}
-          </label>
-          <select
-            name="luna"
-            defaultValue={selMonth}
-            className="font-body px-3 py-2 rounded border outline-none appearance-none cursor-pointer"
-            style={{ borderColor: '#D4C8A0', color: '#3A1A1A', backgroundColor: '#FFFFFF', fontSize: '16px', minWidth: '150px' }}
-          >
-            {t.calendar.months.map((m, i) => (
-              <option key={i + 1} value={i + 1}>{m}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Anul */}
-        <div className="flex flex-col gap-1">
-          <label className="font-body text-xs uppercase tracking-widest" style={{ color: '#8A7050' }}>
-            {t.calendar.year}
-          </label>
-          <select
-            name="an"
-            defaultValue={selYear}
-            className="font-body px-3 py-2 rounded border outline-none appearance-none cursor-pointer"
-            style={{ borderColor: '#D4C8A0', color: '#3A1A1A', backgroundColor: '#FFFFFF', fontSize: '16px', minWidth: '90px' }}
-          >
-            {yearRange.map(y => (
-              <option key={y} value={y}>{y}</option>
-            ))}
-          </select>
-        </div>
-
-        <button
-          type="submit"
-          className="font-body px-6 py-2 rounded transition-opacity hover:opacity-90"
-          style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', fontSize: '16px' }}
-        >
-          {t.calendar.show}
-        </button>
-      </form>
-
-      {/* Month navigation */}
-      <div className="flex items-center justify-between mb-8">
-        <Link
-          href={`/calendar?zi=${prevDay}&luna=${prevMonth}&an=${prevYear}`}
-          className="font-body inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-opacity hover:opacity-80"
-          style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', color: '#8A7050', fontSize: '0.9rem' }}
-        >
-          ← {t.calendar.months[prevMonth - 1]}
-        </Link>
-        <span className="font-heading text-lg" style={{ color: '#1C1B3A' }}>
-          {t.calendar.months[selMonth - 1]} {selYear}
-        </span>
-        <Link
-          href={`/calendar?zi=${nextDay}&luna=${nextMonth}&an=${nextYear}`}
-          className="font-body inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-opacity hover:opacity-80"
-          style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8', color: '#8A7050', fontSize: '0.9rem' }}
-        >
-          {t.calendar.months[nextMonth - 1]} →
-        </Link>
-      </div>
-
-      {/* Data selectată + indicatoare */}
-      <div
-        className="text-center mb-8 py-5 px-4 rounded-xl"
-        style={{ backgroundColor: dayBgColor, border: `1px solid ${dayBorderColor}` }}
-      >
-        <p className="font-heading text-2xl capitalize mb-1" style={{ color: '#1C1B3A' }}>
-          {selectedDateStr}
-        </p>
+      <div className={`card ${hasGreatFeast ? 'red-grad' : ''} text-center`}>
+        <p className="h-m capitalize">{selectedDateStr}</p>
         {hasGreatFeast && (
-          <span className="font-body text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}>
+          <span className="inline-block mt-3 text-[15px] px-3.5 py-1 rounded-full" style={{ backgroundColor: 'var(--red)', color: '#fff' }}>
             ☦ {t.calendar.feastTypes.great}
           </span>
         )}
         {!hasGreatFeast && isInFast && (
-          <span className="font-body text-xs px-3 py-1 rounded-full" style={{ backgroundColor: '#4A6A2A', color: '#F2EBD9' }}>
+          <span className="inline-block mt-3 text-[15px] px-3.5 py-1 rounded-full" style={{ border: '1px solid var(--gold-d)', color: 'var(--gold)' }}>
             {t.calendar.feastTypes.fast}
           </span>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-        {/* ── Sfinții zilei ── */}
-        <section>
-          <div className="flex items-center gap-3 mb-5">
-            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: '#8B6014' }} />
-            <h2 className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>{t.calendar.saintsTitle}</h2>
-          </div>
-          <div className="h-px mb-5" style={{ backgroundColor: '#E8E5E0' }} />
-
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <section className="card" aria-labelledby="cal-sfinti">
+          <h2 id="cal-sfinti" className="h-m mb-4">{t.calendar.saintsTitle}</h2>
           {saints.length === 0 ? (
-            <div className="rounded-lg p-6 text-center" style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
-              <span style={{ color: '#D4C8A0', fontSize: '32px' }} aria-hidden="true">☦</span>
-              <p className="font-body text-sm mt-3" style={{ color: '#8A7050' }}>{t.calendar.noSaints}</p>
-              <p className="font-body text-xs mt-1" style={{ color: '#B0A080' }}>{t.calendar.dbInProgress}</p>
+            <div className="text-center py-4">
+              <span className="gold" style={{ fontSize: '32px' }} aria-hidden="true">☦</span>
+              <p className="mute mt-2">{t.calendar.noSaints}</p>
+              <p className="mute text-[15px] mt-1">{t.calendar.dbInProgress}</p>
             </div>
           ) : (
-            <ul className="space-y-2">
+            <ul>
               {saints.map((saint, i) => (
-                <li key={i} className="flex items-start gap-3 p-3 rounded-lg"
-                  style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
-                  <span className="text-lg shrink-0 mt-0.5" aria-hidden="true">☦</span>
-                  <div>
-                    <p className="font-heading text-base" style={{ color: '#3A1A1A' }}>{saint.nameRo}</p>
-                  </div>
+                <li key={i} className="flex items-start gap-3 py-2.5" style={i < saints.length - 1 ? { borderBottom: '1px solid var(--line)' } : undefined}>
+                  <span className="gold shrink-0" aria-hidden="true">☦</span>
+                  <p>{saint.nameRo}</p>
                 </li>
               ))}
             </ul>
           )}
         </section>
 
-        {/* ── Sărbători & Posturi ── */}
-        <section>
-          <div className="flex items-center gap-3 mb-5">
-            <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: '#8B1A1A' }} />
-            <h2 className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>{t.calendar.feastsTitle}</h2>
-          </div>
-          <div className="h-px mb-5" style={{ backgroundColor: '#E8E5E0' }} />
-
+        <section className="card" aria-labelledby="cal-sarbatori">
+          <h2 id="cal-sarbatori" className="h-m mb-4">{t.calendar.feastsTitle}</h2>
           {fixedFeasts.length === 0 && movableFeasts.length === 0 && activeFasts.length === 0 ? (
-            <div className="rounded-lg p-6 text-center" style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
-              <p className="font-body text-sm" style={{ color: '#8A7050' }}>{t.calendar.noFeasts}</p>
-            </div>
+            <p className="mute">{t.calendar.noFeasts}</p>
           ) : (
-            <ul className="space-y-2">
-              {/* Sărbători fixe stil vechi */}
+            <ul className="flex flex-col gap-2.5">
               {fixedFeasts.map((feast, i) => (
-                <li key={`fixed-${i}`}
-                  className="flex items-start gap-3 p-4 rounded-lg"
-                  style={{ backgroundColor: feast.type === 'GREAT' ? feast.color : '#F7F3EC', border: feast.type === 'GREAT' ? 'none' : '1px solid #E8DFC8' }}>
-                  <span className="text-lg shrink-0" style={{ color: feast.type === 'GREAT' ? '#F2EBD9' : feast.color }} aria-hidden="true">☦</span>
+                <li key={`fixed-${i}`} className="flex items-start gap-3 p-3.5 rounded-2xl"
+                  style={feast.type === 'GREAT' ? { background: 'var(--red)' } : { border: '1px solid var(--gold-d)' }}>
+                  <span className="shrink-0" style={{ color: feast.type === 'GREAT' ? '#fff' : 'var(--gold)' }} aria-hidden="true">☦</span>
                   <div>
-                    <p className="font-heading text-base" style={{ color: feast.type === 'GREAT' ? '#F2EBD9' : '#3A1A1A' }}>
-                      {t.calendar.feastNames[feast.nameKey]}
-                    </p>
-                    <p className="font-body text-xs mt-0.5" style={{ color: feast.type === 'GREAT' ? 'rgba(242,235,217,0.6)' : '#9B8050' }}>
+                    <p className="h-s" style={{ fontSize: 20 }}>{t.calendar.feastNames[feast.nameKey]}</p>
+                    <p className="text-[15px] mt-0.5" style={{ color: feast.type === 'GREAT' ? '#f4d6d6' : 'var(--mute)' }}>
                       {t.calendar.julianDate}: {feast.julianDate} {t.calendar.julianSuffix}
                     </p>
                   </div>
                 </li>
               ))}
-
-              {/* Sărbători schimbătoare */}
               {movableFeasts.map((feast, i) => (
-                <li key={`movable-${i}`}
-                  className="flex items-center gap-3 p-4 rounded-lg"
-                  style={{ backgroundColor: feast.special ? feast.color : '#F7F3EC', border: feast.special ? 'none' : '1px solid #E8DFC8' }}>
-                  <span className="text-lg shrink-0" style={{ color: feast.special ? '#F2EBD9' : '#8B1A1A' }} aria-hidden="true">☦</span>
-                  <p className="font-heading text-base" style={{ color: feast.special ? '#F2EBD9' : '#3A1A1A' }}>
-                    {feast.label}
-                  </p>
+                <li key={`movable-${i}`} className="flex items-center gap-3 p-3.5 rounded-2xl"
+                  style={feast.special ? { background: 'var(--red)' } : { border: '1px solid var(--gold-d)' }}>
+                  <span className="shrink-0" style={{ color: feast.special ? '#fff' : 'var(--gold)' }} aria-hidden="true">☦</span>
+                  <p className="h-s" style={{ fontSize: 20 }}>{feast.label}</p>
                 </li>
               ))}
-
-              {/* Posturi active */}
               {activeFasts.map((fast, i) => (
-                <li key={`fast-${i}`}
-                  className="flex items-center gap-3 p-4 rounded-lg"
-                  style={{ backgroundColor: fast.color, border: 'none' }}>
-                  <span className="text-base shrink-0" style={{ color: '#F2EBD9' }} aria-hidden="true">🍃</span>
-                  <p className="font-heading text-base" style={{ color: '#F2EBD9' }}>
-                    {fast.name}
-                  </p>
+                <li key={`fast-${i}`} className="flex items-center gap-3 p-3.5 rounded-2xl" style={{ background: 'rgba(143, 176, 255, 0.12)', border: '1px solid rgba(143,176,255,.35)' }}>
+                  <span className="shrink-0" aria-hidden="true">🍃</span>
+                  <p className="h-s" style={{ fontSize: 20 }}>{fast.name}</p>
                 </li>
               ))}
             </ul>
           )}
 
-          {/* Data Paștelui pentru an selectat */}
-          <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: '#F2EBD9', border: '1px solid #D4C8A0' }}>
-            <p className="font-body text-xs uppercase tracking-widest mb-1" style={{ color: '#8A7050' }}>
-              {t.calendar.easterLabel} {selYear}
-            </p>
-            <p className="font-heading text-lg" style={{ color: '#8B1A1A' }}>
-              {formatDate(liturgicalDates.easter, localeToIntl(locale))}
-            </p>
-            <p className="font-body text-xs mt-0.5" style={{ color: '#9B8050' }}>
-              {t.calendar.gaussFooter}
-            </p>
+          <div className="mt-5 pt-4" style={{ borderTop: '1px solid var(--line)' }}>
+            <p className="eyebrow mb-1">{t.calendar.easterLabel} {selYear}</p>
+            <p className="h-s" style={{ color: 'var(--blue)' }}>{formatDate(liturgicalDates.easter, localeToIntl(locale))}</p>
+            <p className="mute text-[15px] mt-0.5">{t.calendar.gaussFooter}</p>
           </div>
         </section>
       </div>
-    </div>
+    </PageShell>
   )
 }

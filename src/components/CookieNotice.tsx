@@ -23,17 +23,16 @@ export default function CookieNotice() {
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-50 px-4 py-4 sm:px-6"
-      style={{ backgroundColor: '#0D0905', borderTop: '1px solid #2A1A0A' }}
+      style={{ backgroundColor: 'rgba(5, 10, 26, 0.96)', borderTop: '1px solid var(--gold-d)', backdropFilter: 'blur(12px)' }}
       role="region"
       aria-label={t.cookieBanner.policyLink}
     >
       <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-4">
-        <p className="font-body text-sm flex-1 text-center sm:text-left" style={{ color: '#8A7050' }}>
+        <p className="text-[16px] flex-1 text-center sm:text-left mute">
           {t.cookieBanner.message}{' '}
           <Link
             href={localizedHref('/politica-de-confidentialitate', locale)}
-            className="underline hover:opacity-80"
-            style={{ color: '#C9A84C' }}
+            className="underline underline-offset-2 gold hover:opacity-80"
           >
             {t.cookieBanner.policyLink}
           </Link>
@@ -43,8 +42,7 @@ export default function CookieNotice() {
             localStorage.setItem(STORAGE_KEY, '1')
             setVisible(false)
           }}
-          className="font-body text-sm px-6 py-2 rounded transition-all hover:opacity-90 shrink-0"
-          style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}
+          className="btn red sm shrink-0"
         >
           {t.cookieBanner.acceptBtn}
         </button>

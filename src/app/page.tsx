@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import { Fragment, type ReactNode } from 'react'
-import Hero from '@/components/homepage/Hero'
 import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
 import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
@@ -10,7 +9,9 @@ import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
 import NextServiceWidget from '@/components/NextServiceWidget'
 import PascalCard from '@/components/PascalCard'
 import PriestMessageSection from '@/components/homepage/PriestMessageSection'
-import CobaltAurora from '@/components/homepage/CobaltAurora'
+import PageShell from '@/components/shell/PageShell'
+import FeedCard from '@/components/shell/FeedCard'
+import FeedFilter from '@/components/shell/FeedFilter'
 import ChurchLifeSection from '@/components/homepage/ChurchLifeSection'
 import { getChurchLifeCards } from '@/lib/externalFeeds'
 import { getTodayDate } from '@/lib/utils'
@@ -178,35 +179,29 @@ export default async function HomePage() {
   }
   for (const u of UNIT_ORDER_FALLBACK) if (!units.includes(u)) units.push(u)
 
+  const t = await getServerT()
+  const author = t.shell.brand
+  const showHero = enabled['hero'] !== false
+  const prayerHref = dailyData.prayer.slug ? `/carti/${dailyData.prayer.slug}` : '/carti'
+
   const renderUnit = (unit: string): ReactNode => {
     switch (unit) {
       case 'hero':
-        return enabled['hero'] === false ? null : <Hero key="hero" />
+        // Coperta + profilul complet sunt randate de PageShell (vezi mai jos)
+        return null
       case 'astazi_calendar':
-        return enabled['astazi_calendar'] === false ? null : <LiturgicalTodayWidget key="astazi_calendar" />
+        return enabled['astazi_calendar'] === false ? null : (
+          <LiturgicalTodayWidget key="astazi_calendar" saint={dailyData.saints[0] ?? null} prayerHref={prayerHref} />
+        )
       case 'pascal_slujbe':
         return enabled['pascal_slujbe'] === false ? null : (
-          <section key="pascal_slujbe" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Card emblemă — logo complet (cu banderola), stil identic cu celelalte carduri */}
-              <div className="glass-cobalt flex items-center justify-center p-6 sm:p-8">
-                <img
-                  src="/logo-emblema.png"
-                  alt="Emblema Parohiei Sfântul Ierarh Nicolae"
-                  width={560}
-                  height={804}
-                  className="w-auto"
-                  style={{ height: 'clamp(172px, 26vw, 224px)', objectFit: 'contain' }}
-                />
-              </div>
+          <Fragment key="pascal_slujbe">
+            <FeedCard kind="parohie" kicker={t.nav.pascalCalendar} author={author}>
               <PascalCard />
-              {/* Numărătoarea pentru următoarea slujbă — rând propriu sub cele două carduri;
-                  se ascunde complet când componenta nu are ce afișa ([&:empty]:hidden) */}
-              <div className="md:col-span-2 [&:empty]:hidden">
-                <NextServiceWidget />
-              </div>
-            </div>
-          </section>
+            </FeedCard>
+            {/* Numărătoarea pentru următoarea slujbă — nu se randează deloc când nu are ce afișa */}
+            <NextServiceWidget author={author} kicker={t.shell.kindParish} />
+          </Fragment>
         )
       case 'mesajul_parintelui':
         return enabled['mesajul_parintelui'] === false ? null : <PriestMessageSection key="mesajul_parintelui" />
@@ -236,9 +231,20 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="relative" style={{ backgroundColor: '#04080F' }}>
-      <CobaltAurora />
-      <div className="relative" style={{ zIndex: 2 }}>
+    <PageShell aside={showHero ? 'full' : 'compact'} cover={showHero} nameAsH1={showHero}>
+      {!showHero && <h1 className="sr-only">{t.meta.site.title}</h1>}
+      <FeedFilter
+        label={t.shell.feedFilter}
+        emptyLabel={t.shell.feedEmpty}
+        options={[
+          { kind: 'all', label: t.shell.feedAll },
+          { kind: 'cuvant', label: t.shell.feedWord },
+          { kind: 'video', label: t.shell.feedVideo },
+          { kind: 'parohie', label: t.shell.feedParish },
+          { kind: 'biblioteca', label: t.shell.feedLibrary },
+        ]}
+      />
+      <div data-feed className="flex flex-col gap-5">
         {units.map(u => (
           <Fragment key={u}>
             {renderUnit(u)}
@@ -246,6 +252,6 @@ export default async function HomePage() {
           </Fragment>
         ))}
       </div>
-    </div>
+    </PageShell>
   )
 }

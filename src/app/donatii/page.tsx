@@ -5,6 +5,8 @@ import { DONATII_DEFAULTS, type DonationConfigData, type DonationLocalAccount, t
 import PublicGallery from '@/components/PublicGallery'
 import CopyButton from '@/components/CopyButton'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,301 +51,169 @@ export default async function DonationsPage() {
   const contactNameLocalized = config.contactName
   const safetyNoteLocalized = config.safetyNote
 
+  const sub = 'h-s flex items-center gap-2 mb-4'
+  const box = 'rounded-2xl p-4'
+  const boxStyle: React.CSSProperties = { border: '1px solid var(--line)', background: 'rgba(5, 10, 26, 0.45)' }
+
   return (
-    <div>
-      {/* Hero dark */}
-      <div
-        className="relative py-20 px-4 text-center"
-        style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}
-      >
-        <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8B1A1A' }}>
-          {t.donate.badge}
-        </p>
-        <h1
-          className="font-heading italic mb-5 leading-tight"
-          style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}
-        >
-          {t.donate.title}
-        </h1>
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-          <span style={{ color: '#C9A84C', fontSize: '20px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-        </div>
-        <p className="font-body text-base max-w-xl mx-auto" style={{ color: '#8A7050' }}>
+    <PageShell aside="compact">
+      <PageHead eyebrow={t.donate.badge} title={t.donate.title}>
+        <p className="lead" style={{ fontSize: 22 }}>
           {t.donate.verse}
           <br />
-          <span className="text-sm" style={{ color: '#5A4020' }}>{t.donate.verseRef}</span>
+          <span className="mute not-italic text-[16px]" style={{ fontFamily: 'var(--body)' }}>{t.donate.verseRef}</span>
         </p>
-      </div>
+      </PageHead>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-
-        {/* Secțiunea proiecte */}
-        {projects.length > 0 && (
-          <section className="mb-16">
-            <h2 className="font-heading text-3xl mb-2 text-center" style={{ color: '#1C1B3A' }}>
-              {t.donate.projectsTitle}
-            </h2>
-            <p className="font-body text-sm text-center mb-10" style={{ color: '#8A7050' }}>
-              {t.donate.projectsSubtitle}
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((project) => (
-                <div
-                  key={project.id}
-                  className="rounded-lg p-6 flex flex-col"
-                  style={{ backgroundColor: '#FAFAF8', border: '1px solid #E8E5E0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
-                >
-                  <h3 className="font-heading text-lg mb-2" style={{ color: '#1C1B3A' }}>
-                    {project.titleRo}
-                  </h3>
-                  <p className="font-body text-sm leading-relaxed mb-4 flex-1" style={{ color: '#6A5030' }}>
-                    {project.descriptionRo}
-                  </p>
-
-                  {/* Progress bar */}
-                  <div>
-                    <div className="flex justify-between items-center mb-1.5">
-                      <span className="font-body text-xs" style={{ color: '#8A7050' }}>
-                        {t.donate.progress}: <strong style={{ color: '#8B1A1A' }}>{project.progress}%</strong>
-                      </span>
-                      <span className="font-body text-xs" style={{ color: '#8A7050' }}>
-                        {t.donate.target}: {project.target}
-                      </span>
-                    </div>
-                    <div
-                      className="w-full rounded-full overflow-hidden"
-                      style={{ height: '6px', backgroundColor: '#E8E5E0' }}
-                    >
-                      <div
-                        className="h-full rounded-full transition-all"
-                        style={{
-                          width: `${project.progress}%`,
-                          backgroundColor: project.progress === 0 ? '#D4C8A0' : '#8B1A1A',
-                        }}
-                      />
-                    </div>
+      {projects.length > 0 && (
+        <section className="card" aria-labelledby="don-proiecte">
+          <h2 id="don-proiecte" className="h-m mb-1">{t.donate.projectsTitle}</h2>
+          <p className="mute mb-6">{t.donate.projectsSubtitle}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {projects.map(project => (
+              <div key={project.id} className="tile" data-reveal>
+                <h3 className="h-s">{project.titleRo}</h3>
+                <p className="mute text-[17px] leading-relaxed flex-1">{project.descriptionRo}</p>
+                <div className="mt-3">
+                  <div className="flex justify-between items-center mb-1.5 text-[15px] mute">
+                    <span>{t.donate.progress}: <strong className="gold">{project.progress}%</strong></span>
+                    <span>{t.donate.target}: {project.target}</span>
                   </div>
+                  <div className="w-full rounded-full overflow-hidden" style={{ height: 6, backgroundColor: 'rgba(255,255,255,0.12)' }}>
+                    <div className="h-full rounded-full" style={{ width: `${project.progress}%`, backgroundColor: 'var(--gold)' }} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="card red-grad" aria-labelledby="don-metode">
+        <h2 id="don-metode" className="h-m mb-1">{t.donate.methodsTitle}</h2>
+        <p className="mb-6" style={{ color: '#f1dede' }}>{t.donate.methodsSubtitle}</p>
+
+        {config.localAccounts.length > 0 && (
+          <div className="mb-7">
+            <h3 className={sub}>🏦 {t.donate.bankAccountsTitle}</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {config.localAccounts.map((acc, i) => (
+                <div key={i} className={box} style={boxStyle}>
+                  <div className="text-[13px] uppercase tracking-[.14em] mb-1" style={{ color: '#f1c9c9' }}>{acc.bankName} · {acc.accountLabel}</div>
+                  <div className="font-mono text-[16px] tracking-wider mb-1 break-all">{acc.accountNumber}</div>
+                  <div className="text-[15px] mb-3" style={{ color: '#e9d6d6' }}>{acc.holder}</div>
+                  <CopyButton value={acc.accountNumber} copyLabel={t.donate.copyLabel} copiedLabel={t.donate.copiedLabel} />
                 </div>
               ))}
             </div>
-          </section>
+          </div>
         )}
 
-        {/* Modalități de donație */}
-        <section className="mb-16">
-          <h2 className="font-heading text-3xl mb-2 text-center" style={{ color: '#1C1B3A' }}>
-            {t.donate.methodsTitle}
-          </h2>
-          <p className="font-body text-sm text-center mb-10" style={{ color: '#8A7050' }}>
-            {t.donate.methodsSubtitle}
-          </p>
-
-          {/* Conturi locale */}
-          {config.localAccounts.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-heading text-lg mb-4" style={{ color: '#1C1B3A' }}>
-                🏦 {t.donate.bankAccountsTitle}
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {config.localAccounts.map((acc, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg p-4"
-                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8E5E0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
-                  >
-                    <div className="font-body text-xs uppercase tracking-wide mb-1" style={{ color: '#8A7050' }}>{acc.bankName} · {acc.accountLabel}</div>
-                    <div className="font-mono text-sm tracking-wider mb-1" style={{ color: '#3A1A1A' }}>{acc.accountNumber}</div>
-                    <div className="font-body text-xs mb-3" style={{ color: '#8A7050' }}>{acc.holder}</div>
-                    <CopyButton value={acc.accountNumber} copyLabel={t.donate.copyLabel} copiedLabel={t.donate.copiedLabel} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* IBAN diaspora */}
-          {config.ibanAccounts.length > 0 && (
-            <div className="mb-8">
-              <h3 className="font-heading text-lg mb-4" style={{ color: '#1C1B3A' }}>
-                🌐 {t.donate.ibanAccountsTitle}
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {config.ibanAccounts.map((acc, i) => (
-                  <div
-                    key={i}
-                    className="rounded-lg p-4"
-                    style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8E5E0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
-                  >
-                    <div className="font-body text-xs uppercase tracking-wide mb-2" style={{ color: '#8A7050' }}>{acc.bankName}</div>
-                    <dl className="space-y-1 mb-3">
-                      <div className="flex justify-between font-body text-sm">
-                        <dt style={{ color: '#8A7050' }}>IBAN</dt>
-                        <dd className="font-mono tracking-wider" style={{ color: '#3A1A1A' }}>{acc.iban}</dd>
-                      </div>
-                      <div className="flex justify-between font-body text-sm">
-                        <dt style={{ color: '#8A7050' }}>SWIFT</dt>
-                        <dd className="font-mono tracking-wider" style={{ color: '#3A1A1A' }}>{acc.swift}</dd>
-                      </div>
-                      <div className="flex justify-between font-body text-sm">
-                        <dt style={{ color: '#8A7050' }}>{t.donate.beneficiaryLabel}</dt>
-                        <dd style={{ color: '#3A1A1A' }}>{acc.beneficiary}</dd>
-                      </div>
-                    </dl>
-                    <CopyButton value={acc.iban} copyLabel={t.donate.copyLabel} copiedLabel={t.donate.copiedLabel} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* PayPal */}
-          {(config.paypalEmail || config.paypalLink) && (
-            <div className="mb-4">
-              <h3 className="font-heading text-lg mb-4" style={{ color: '#1C1B3A' }}>
-                💳 {t.donate.paypalTitle}
-              </h3>
-              <div
-                className="rounded-lg p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-                style={{ backgroundColor: '#FFFFFF', border: '1px solid #E8E5E0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}
-              >
-                {config.paypalEmail && (
-                  <span className="font-body text-sm" style={{ color: '#6A5030' }}>{config.paypalEmail}</span>
-                )}
-                {config.paypalLink && (
-                  <a
-                    href={config.paypalLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-body text-sm px-5 py-2 rounded-full inline-block text-center"
-                    style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}
-                  >
-                    {t.donate.paypalTitle}
-                  </a>
-                )}
-              </div>
-            </div>
-          )}
-
-          {safetyNoteLocalized && (
-            <p className="font-body text-center text-sm italic mt-6" style={{ color: '#8A7050' }}>
-              {safetyNoteLocalized}
-            </p>
-          )}
-        </section>
-
-        {/* Contact și rețele sociale */}
-        {(config.contactPhone || config.facebookUrl || config.tiktokUrl || config.instagramUrl) && (
-          <section className="mb-16">
-            <h2 className="font-heading text-2xl mb-6 text-center" style={{ color: '#1C1B3A' }}>
-              {t.donate.contactSocialTitle}
-            </h2>
-            <div
-              className="rounded-lg p-6 flex flex-wrap items-center justify-center gap-8"
-              style={{ backgroundColor: '#FBF8F3', border: '1px solid #E8E5E0' }}
-            >
-              {config.contactPhone && (
-                <div className="text-center">
-                  <a href={`tel:${config.contactPhone.replace(/\s+/g, '')}`} className="font-body text-lg block" style={{ color: '#8B1A1A', textDecoration: 'none' }}>
-                    📞 {config.contactPhone}
-                  </a>
-                  <p className="font-body text-xs mt-1" style={{ color: '#8A7050' }}>{t.donate.viberWhatsappTelegram}</p>
-                  {contactNameLocalized && (
-                    <p className="font-body text-xs mt-1" style={{ color: '#6A5030' }}>{contactNameLocalized}</p>
-                  )}
-                </div>
-              )}
-              {(config.facebookUrl || config.tiktokUrl || config.instagramUrl) && (
-                <div className="flex gap-3">
-                  {config.facebookUrl && (
-                    <a href={config.facebookUrl} target="_blank" rel="noopener noreferrer" className="font-body text-sm px-4 py-2 rounded-full border" style={{ borderColor: '#8B1A1A', color: '#8B1A1A', textDecoration: 'none' }}>Facebook</a>
-                  )}
-                  {config.tiktokUrl && (
-                    <a href={config.tiktokUrl} target="_blank" rel="noopener noreferrer" className="font-body text-sm px-4 py-2 rounded-full border" style={{ borderColor: '#8B1A1A', color: '#8B1A1A', textDecoration: 'none' }}>TikTok</a>
-                  )}
-                  {config.instagramUrl && (
-                    <a href={config.instagramUrl} target="_blank" rel="noopener noreferrer" className="font-body text-sm px-4 py-2 rounded-full border" style={{ borderColor: '#8B1A1A', color: '#8B1A1A', textDecoration: 'none' }}>Instagram</a>
-                  )}
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-
-        {/* Video */}
-        <section className="mb-16">
-          <h2 className="font-heading text-2xl mb-6 text-center" style={{ color: '#1C1B3A' }}>
-            {t.donate.videosTitle}
-          </h2>
-          {config.videoLinks.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {config.videoLinks.map((video, i) => (
-                <div key={i}>
-                  <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: '10px', overflow: 'hidden', border: '1px solid #E8E5E0' }}>
-                    <iframe
-                      src={facebookEmbedSrc(video.url)}
-                      title={video.caption || `Video ${i + 1}`}
-                      allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-                      allowFullScreen
-                      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-                    />
-                  </div>
-                  {video.caption && (
-                    <p className="font-body text-sm text-center mt-2" style={{ color: '#8A7050' }}>{video.caption}</p>
-                  )}
+        {config.ibanAccounts.length > 0 && (
+          <div className="mb-7">
+            <h3 className={sub}>🌐 {t.donate.ibanAccountsTitle}</h3>
+            <div className="grid grid-cols-1 gap-3">
+              {config.ibanAccounts.map((acc, i) => (
+                <div key={i} className={box} style={boxStyle}>
+                  <div className="text-[13px] uppercase tracking-[.14em] mb-2" style={{ color: '#f1c9c9' }}>{acc.bankName}</div>
+                  <dl className="space-y-1 mb-3 text-[16px]">
+                    <div className="flex flex-wrap justify-between gap-x-3">
+                      <dt style={{ color: '#e9d6d6' }}>IBAN</dt>
+                      <dd className="font-mono tracking-wider break-all">{acc.iban}</dd>
+                    </div>
+                    <div className="flex flex-wrap justify-between gap-x-3">
+                      <dt style={{ color: '#e9d6d6' }}>SWIFT</dt>
+                      <dd className="font-mono tracking-wider">{acc.swift}</dd>
+                    </div>
+                    <div className="flex flex-wrap justify-between gap-x-3">
+                      <dt style={{ color: '#e9d6d6' }}>{t.donate.beneficiaryLabel}</dt>
+                      <dd>{acc.beneficiary}</dd>
+                    </div>
+                  </dl>
+                  <CopyButton value={acc.iban} copyLabel={t.donate.copyLabel} copiedLabel={t.donate.copiedLabel} />
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="font-body text-center text-sm italic" style={{ color: '#8A7050' }}>{t.donate.videosEmpty}</p>
-          )}
+          </div>
+        )}
+
+        {(config.paypalEmail || config.paypalLink) && (
+          <div className="mb-2">
+            <h3 className={sub}>💳 {t.donate.paypalTitle}</h3>
+            <div className={`${box} flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3`} style={boxStyle}>
+              {config.paypalEmail && <span className="break-all">{config.paypalEmail}</span>}
+              {config.paypalLink && (
+                <a href={config.paypalLink} target="_blank" rel="noopener noreferrer" className="btn red">{t.donate.paypalTitle}</a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {safetyNoteLocalized && (
+          <p className="italic text-[16px] mt-6" style={{ color: '#f1dede' }}>{safetyNoteLocalized}</p>
+        )}
+      </section>
+
+      {(config.contactPhone || config.facebookUrl || config.tiktokUrl || config.instagramUrl) && (
+        <section className="card" aria-labelledby="don-contact" data-reveal>
+          <h2 id="don-contact" className="h-m mb-5">{t.donate.contactSocialTitle}</h2>
+          <div className="flex flex-wrap items-center gap-6">
+            {config.contactPhone && (
+              <div>
+                <a href={`tel:${config.contactPhone.replace(/\s+/g, '')}`} className="link-gold text-[20px] block">📞 {config.contactPhone}</a>
+                <p className="mute text-[15px] mt-1">{t.donate.viberWhatsappTelegram}</p>
+                {contactNameLocalized && <p className="text-[15px] mt-1">{contactNameLocalized}</p>}
+              </div>
+            )}
+            {(config.facebookUrl || config.tiktokUrl || config.instagramUrl) && (
+              <div className="flex flex-wrap gap-2.5">
+                {config.facebookUrl && <a href={config.facebookUrl} target="_blank" rel="noopener noreferrer" className="btn sm">Facebook</a>}
+                {config.tiktokUrl && <a href={config.tiktokUrl} target="_blank" rel="noopener noreferrer" className="btn sm">TikTok</a>}
+                {config.instagramUrl && <a href={config.instagramUrl} target="_blank" rel="noopener noreferrer" className="btn sm">Instagram</a>}
+              </div>
+            )}
+          </div>
         </section>
+      )}
 
-        {/* Galerie foto */}
-        <section className="mb-16">
-          <h2 className="font-heading text-2xl mb-2 text-center" style={{ color: '#1C1B3A' }}>
-            {t.donate.galleryTitle}
-          </h2>
-          <p className="font-body text-sm text-center mb-8" style={{ color: '#8A7050' }}>
-            {t.donate.gallerySubtitle}
-          </p>
-          {gallery.length > 0 ? (
-            <PublicGallery items={gallery} />
-          ) : (
-            <p className="font-body text-center text-sm italic" style={{ color: '#8A7050' }}>{t.donate.galleryEmpty}</p>
-          )}
-        </section>
+      <section className="card" aria-labelledby="don-video" data-reveal>
+        <h2 id="don-video" className="h-m mb-5">{t.donate.videosTitle}</h2>
+        {config.videoLinks.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {config.videoLinks.map((video, i) => (
+              <div key={i}>
+                <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: 18, overflow: 'hidden', border: '1px solid var(--line)' }}>
+                  <iframe
+                    src={facebookEmbedSrc(video.url)}
+                    title={video.caption || `Video ${i + 1}`}
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
+                    allowFullScreen
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+                  />
+                </div>
+                {video.caption && <p className="mute text-[16px] text-center mt-2">{video.caption}</p>}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mute italic">{t.donate.videosEmpty}</p>
+        )}
+      </section>
 
-        {/* Contact */}
-        <div
-          className="rounded-lg p-6 text-center mb-10"
-          style={{ backgroundColor: '#1C1B3A', color: '#F2EBD9' }}
-        >
-          <h3 className="font-heading text-xl mb-2" style={{ color: '#C9A84C' }}>
-            {t.donate.contactTitle}
-          </h3>
-          <p className="font-body text-sm mb-4 opacity-80">
-            {t.donate.anyAmount}
-          </p>
-          <a
-            href="/contact"
-            className="font-body text-sm px-6 py-2.5 rounded border inline-block transition-all hover:bg-white/10"
-            style={{ borderColor: '#C9A84C', color: '#C9A84C' }}
-          >
-            {t.donate.contactBtn}
-          </a>
-        </div>
+      <section className="card" aria-labelledby="don-galerie" data-reveal>
+        <h2 id="don-galerie" className="h-m mb-1">{t.donate.galleryTitle}</h2>
+        <p className="mute mb-5">{t.donate.gallerySubtitle}</p>
+        {gallery.length > 0 ? <PublicGallery items={gallery} /> : <p className="mute italic">{t.donate.galleryEmpty}</p>}
+      </section>
 
-        {/* Footer binecuvântare */}
-        <p className="font-body text-center text-base italic" style={{ color: '#8A7050' }}>
-          {t.donate.blessing} ☦
-        </p>
-        <p className="font-body text-center text-sm mt-2" style={{ color: '#5A4020' }}>
-          {t.donate.thanks}
-        </p>
+      <div className="card text-center flex flex-col items-center gap-3" data-reveal>
+        <h2 className="h-s gold">{t.donate.contactTitle}</h2>
+        <p className="mute">{t.donate.anyAmount}</p>
+        <a href="/contact" className="btn">{t.donate.contactBtn}</a>
+        <hr className="sep w-full my-3" />
+        <p className="lead" style={{ fontSize: 21 }}>{t.donate.blessing} ☦</p>
+        <p className="mute text-[16px]">{t.donate.thanks}</p>
       </div>
-    </div>
+    </PageShell>
   )
 }

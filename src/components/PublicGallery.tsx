@@ -65,11 +65,13 @@ export default function PublicGallery({ items }: Props) {
     <>
       <div className="pg-grid">
         {items.map((item, i) => (
-          <div
+          <button
+            type="button"
             key={item.id}
             className="pg-item"
             onClick={() => open(i)}
-            style={{ cursor: 'pointer', borderRadius: '6px', overflow: 'hidden', border: '1px solid #2A1A0A', backgroundColor: '#1A1008' }}
+            aria-label={item.caption || `Fotografia ${i + 1}`}
+            style={{ cursor: 'pointer', borderRadius: '14px', overflow: 'hidden', border: '1px solid var(--line)', backgroundColor: 'rgba(10, 18, 44, 0.7)', display: 'block', width: '100%', padding: 0, textAlign: 'left' }}
           >
             <img
               src={item.thumbnailUrl || item.url}
@@ -81,24 +83,24 @@ export default function PublicGallery({ items }: Props) {
               onError={e => { const el = e.target as HTMLImageElement; if (item.thumbnailUrl && el.src !== item.url) el.src = item.url }}
             />
             {item.caption && (
-              <div style={{ padding: '0.5rem 0.75rem', color: '#9B8050', fontFamily: 'Georgia, serif', fontSize: '0.78rem', lineHeight: 1.4 }}>
+              <span style={{ display: 'block', padding: '0.55rem 0.8rem', color: 'var(--mute)', fontSize: '15px', lineHeight: 1.4 }}>
                 {item.caption}
-              </div>
+              </span>
             )}
-          </div>
+          </button>
         ))}
       </div>
       <style>{`
-        .pg-grid { columns: 4; column-gap: 0.875rem; }
+        .pg-grid { columns: 3; column-gap: 0.875rem; }
         .pg-item { break-inside: avoid; margin-bottom: 0.875rem; }
-        @media (max-width: 1024px) { .pg-grid { columns: 3; } }
-        @media (max-width: 768px)  { .pg-grid { columns: 2; } }
-        @media (max-width: 480px)  { .pg-grid { columns: 1; } }
+        .pg-item:hover { border-color: var(--gold-d) !important; }
+        @media (max-width: 640px)  { .pg-grid { columns: 2; } }
+        @media (max-width: 420px)  { .pg-grid { columns: 1; } }
       `}</style>
 
       {lightbox !== null && (
         <div
-          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.95)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(3, 6, 16, 0.96)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
           onClick={close}
           // Touch swipe handlers
           onTouchStart={e => {
@@ -116,7 +118,7 @@ export default function PublicGallery({ items }: Props) {
           {/* Prev button */}
           <button
             onClick={e => { e.stopPropagation(); go(-1) }}
-            style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.55)', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', borderRadius: '50%', width: '48px', height: '48px', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s', zIndex: 10 }}
+            style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(5,10,26,0.7)', border: '1px solid var(--gold-d)', color: 'var(--gold)', borderRadius: '50%', width: '48px', height: '48px', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s', zIndex: 10 }}
             aria-label="Fotografie anterioară"
           >‹</button>
 
@@ -128,15 +130,15 @@ export default function PublicGallery({ items }: Props) {
             <img
               src={items[lightbox].url}
               alt={items[lightbox].caption || ''}
-              style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', borderRadius: '4px', display: 'block' }}
+              style={{ maxWidth: '100%', maxHeight: '80vh', objectFit: 'contain', borderRadius: '14px', display: 'block' }}
             />
             {items[lightbox].caption && (
-              <p style={{ color: '#D4C4A0', fontFamily: 'Georgia, serif', fontSize: '0.9rem', textAlign: 'center', maxWidth: '600px', lineHeight: 1.5 }}>
+              <p style={{ color: 'var(--ink)', fontSize: '17px', textAlign: 'center', maxWidth: '600px', lineHeight: 1.5 }}>
                 {items[lightbox].caption}
               </p>
             )}
             {/* Counter */}
-            <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>
+            <span style={{ color: 'var(--mute)', fontSize: '15px' }}>
               {lightbox + 1} / {items.length}
             </span>
           </div>
@@ -144,20 +146,20 @@ export default function PublicGallery({ items }: Props) {
           {/* Next button */}
           <button
             onClick={e => { e.stopPropagation(); go(1) }}
-            style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.55)', border: '1px solid rgba(201,168,76,0.3)', color: '#C9A84C', borderRadius: '50%', width: '48px', height: '48px', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s', zIndex: 10 }}
+            style={{ position: 'absolute', right: '0.75rem', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(5,10,26,0.7)', border: '1px solid var(--gold-d)', color: 'var(--gold)', borderRadius: '50%', width: '48px', height: '48px', cursor: 'pointer', fontSize: '1.4rem', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s', zIndex: 10 }}
             aria-label="Fotografie următoare"
           >›</button>
 
           {/* Close button */}
           <button
             onClick={close}
-            style={{ position: 'absolute', top: '0.875rem', right: '0.875rem', backgroundColor: 'rgba(0,0,0,0.6)', border: '1px solid rgba(255,255,255,0.1)', color: '#F2EBD9', borderRadius: '4px', padding: '0.4rem 0.75rem', cursor: 'pointer', fontFamily: 'Georgia, serif', fontSize: '0.875rem', zIndex: 10 }}
+            style={{ position: 'absolute', top: '0.875rem', right: '0.875rem', backgroundColor: 'rgba(0,0,0,0.6)', border: '1px solid var(--gold-d)', color: 'var(--ink)', borderRadius: '50%', width: '48px', height: '48px', cursor: 'pointer', fontSize: '1.1rem', zIndex: 10 }}
             aria-label="Închide"
           >✕</button>
 
           {/* Keyboard hint (desktop, first open only) */}
           {showHint && (
-            <div style={{ position: 'absolute', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(0,0,0,0.7)', border: '1px solid #2A1A0A', color: '#8A7050', borderRadius: '6px', padding: '0.45rem 1rem', fontFamily: 'Georgia, serif', fontSize: '0.78rem', whiteSpace: 'nowrap', pointerEvents: 'none', animation: 'fadein 0.3s ease' }}>
+            <div style={{ position: 'absolute', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', backgroundColor: 'rgba(0,0,0,0.7)', border: '1px solid var(--line)', color: 'var(--mute)', borderRadius: '999px', padding: '0.45rem 1rem', fontSize: '15px', whiteSpace: 'nowrap', pointerEvents: 'none', animation: 'fadein 0.3s ease' }}>
               ← → taste · swipe pe mobil · ESC pentru închidere
               <style>{`@keyframes fadein { from { opacity: 0; transform: translateX(-50%) translateY(6px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }`}</style>
             </div>

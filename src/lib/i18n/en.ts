@@ -353,6 +353,18 @@ const en: Translations = {
     acceptBtn: 'Got it',
     policyLink: 'Privacy Policy',
   },
+  shell: {
+    brand: 'Father Marin', navWord: 'The Word', navParish: 'Parish', navBible: 'Bible', navAbout: 'About the parish', navFather: 'The Priest',
+    openMenu: 'Open menu', closeMenu: 'Close menu', mainMenu: 'Main menu',
+    profileRole: 'Parish priest of St. Nicholas Church · Hîrtopul Mic, Criuleni',
+    follow: 'Follow', socialTitle: 'Social media', scheduleTitle: 'Service schedule · Parish',
+    feedFilter: 'Filter posts', feedAll: 'All', feedWord: 'Word', feedVideo: 'Video', feedParish: 'Parish', feedLibrary: 'Library',
+    kindWord: 'Word of the priest', kindVideo: 'Video', kindParish: 'Parish life', kindLibrary: 'Library',
+    kindChurch: 'Church life', kindAnnouncement: 'Announcement',
+    today: 'Today', oldStyle: 'old style', readFullMessage: 'Read the full message →', read: 'Read →', backHome: 'Home',
+    coverAlt: 'St. Nicholas Church in Hîrtopul Mic, seen from above',
+    emblemAlt: 'Emblem of St. Nicholas Church', liveBadge: 'LIVE', feedEmpty: 'No posts of this kind right now.', dateLabel: 'Date',
+  },
 }
 
 export default en

@@ -3,8 +3,11 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ShareButtons from '@/components/shared/ShareButtons'
-import { FALLBACK_MESAJ, FALLBACK_SEMNATURA, FALLBACK_PHOTO_URL } from '@/lib/priestMessage'
+import { FALLBACK_MESAJ, FALLBACK_SEMNATURA } from '@/lib/priestMessage'
 import { SITE_URL } from '@/lib/site'
+
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,64 +38,28 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MesajulParinteluiPage() {
   const mesaj = await prisma.priestMessage.findFirst({ where: { active: true } })
 
-  const photoUrl = mesaj?.photoUrl ?? FALLBACK_PHOTO_URL
   const mesajText = mesaj?.mesajRo || FALLBACK_MESAJ
   const semnatura = mesaj?.semnaturaRo || FALLBACK_SEMNATURA
   const updatedAt = mesaj ? mesaj.updatedAt.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }) : null
 
   return (
-    <div>
-      {/* Hero dark */}
-      <div className="py-16 px-4 text-center" style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}>
-        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(36px, 6vw, 56px)', fontWeight: 400 }}>
-          Mesajul Părintelui
-        </h1>
-        <div className="flex items-center justify-center gap-3">
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-          <span style={{ color: '#C9A84C', fontSize: '20px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-        </div>
+    <PageShell aside="compact">
+      <PageHead crumbs={[{ href: '/', label: 'Acasă' }, { label: 'Mesajul Părintelui' }]} title="Mesajul Părintelui" />
+      <article className="card">
+        <figure className="flex flex-col gap-5">
+          <blockquote className="lead reading" style={{ fontSize: 'clamp(23px, 2.4vw, 27px)', maxWidth: '62ch', whiteSpace: 'pre-line' }}>
+            {mesajText}
+          </blockquote>
+          <figcaption>
+            <p className="gold text-[19px]">— {semnatura}</p>
+            {updatedAt && <p className="mute text-[16px] mt-1">Actualizat la {updatedAt}</p>}
+          </figcaption>
+        </figure>
+      </article>
+      <div className="card flex flex-wrap items-center justify-between gap-4" style={{ padding: '20px 24px' }}>
+        <Link href="/" className="link-gold text-[17px]">← Înapoi</Link>
+        <ShareButtons url={SHARE_URL} title={SHARE_TEXT} />
       </div>
-
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>
-          <Link href="/" style={{ color: '#8A7050', textDecoration: 'none' }}>Acasă</Link>
-          <span style={{ color: '#C9A96E' }}>›</span>
-          <span style={{ color: '#6A5030' }}>Mesajul Părintelui</span>
-        </div>
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        <div className="flex flex-col sm:flex-row gap-8 items-start">
-          {photoUrl && (
-            <img
-              src={photoUrl}
-              alt={semnatura}
-              style={{ width: '250px', aspectRatio: '3/4', borderRadius: '8px', objectFit: 'cover', flexShrink: 0, border: '1px solid #C9A96E' }}
-            />
-          )}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#3A2A10', fontSize: '1.05rem', lineHeight: 1.9, whiteSpace: 'pre-line' }}>
-              {mesajText}
-            </p>
-            <p style={{ fontFamily: 'Georgia, serif', color: '#C9A96E', fontSize: '0.95rem', marginTop: '1.5rem' }}>
-              — {semnatura}
-            </p>
-            {updatedAt && (
-              <p style={{ fontFamily: 'Georgia, serif', color: '#9B8050', fontSize: '0.8rem', marginTop: '0.25rem' }}>
-                Actualizat la {updatedAt}
-              </p>
-            )}
-          </div>
-        </div>
-
-        <div style={{ marginTop: '2.5rem', paddingTop: '1.5rem', borderTop: '1px solid #E8DFC8', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Link href="/" style={{ fontFamily: 'Georgia, serif', fontSize: '0.875rem', color: '#8A7050', textDecoration: 'none' }}>
-            ← Înapoi
-          </Link>
-          <ShareButtons url={SHARE_URL} title={SHARE_TEXT} />
-        </div>
-      </div>
-    </div>
+    </PageShell>
   )
 }

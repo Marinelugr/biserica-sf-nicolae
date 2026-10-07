@@ -43,29 +43,20 @@ export default function ContactForm() {
     }
   }
 
-  const inputClass = (hasError: boolean) =>
-    `w-full px-4 py-3 rounded-md font-body text-sm outline-none transition-all ${
-      hasError
-        ? 'border-2 border-red-400'
-        : 'border focus:border-amber-600'
-    }`
-
-  const inputStyle = {
-    backgroundColor: '#FAFAF8',
-    borderColor: '#E8E5E0',
-    color: '#3A1A1A',
-  }
+  const inputClass = (hasError: boolean) => `field ${hasError ? '!border-[#ff8a8a] border-2' : ''}`
+  const inputStyle = {}
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
-      <h2 className="font-heading text-2xl mb-6" style={{ color: '#1C1B3A' }}>
+      <h2 className="h-m mb-2">
         {t.contactPage.formTitle}
       </h2>
 
       {status === 'success' && (
         <div
-          className="rounded-md p-4 font-body text-sm"
-          style={{ backgroundColor: '#F0FDF4', border: '1px solid #86EFAC', color: '#166534' }}
+          className="rounded-2xl p-4 text-[17px]"
+          role="status"
+          style={{ backgroundColor: 'rgba(80, 180, 110, 0.14)', border: '1px solid rgba(120, 220, 150, 0.5)', color: '#bdf0cb' }}
         >
           {t.contactPage.successMsg}
         </div>
@@ -73,15 +64,16 @@ export default function ContactForm() {
 
       {status === 'error' && (
         <div
-          className="rounded-md p-4 font-body text-sm"
-          style={{ backgroundColor: '#FEF2F2', border: '1px solid #FCA5A5', color: '#991B1B' }}
+          className="rounded-2xl p-4 text-[17px]"
+          role="alert"
+          style={{ backgroundColor: 'rgba(155, 28, 28, 0.25)', border: '1px solid rgba(229, 138, 138, 0.55)', color: '#ffd4d4' }}
         >
           {t.contactPage.errorMsg}
         </div>
       )}
 
       <div>
-        <label htmlFor="name" className="font-body text-xs uppercase tracking-wide block mb-1.5" style={{ color: '#8A7050' }}>
+        <label htmlFor="name" className="label">
           {t.contactPage.nameLabel} *
         </label>
         <input
@@ -94,14 +86,14 @@ export default function ContactForm() {
           placeholder={t.contactPage.namePlaceholder}
         />
         {errors.name && (
-          <p className="font-body text-xs mt-1" style={{ color: '#991B1B' }}>
+          <p className="text-[15px] mt-1.5" style={{ color: '#ff9c9c' }}>
             {errors.name.message}
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="email" className="font-body text-xs uppercase tracking-wide block mb-1.5" style={{ color: '#8A7050' }}>
+        <label htmlFor="email" className="label">
           {t.contactPage.emailLabel2} *
         </label>
         <input
@@ -114,14 +106,14 @@ export default function ContactForm() {
           placeholder={t.contactPage.emailPlaceholder}
         />
         {errors.email && (
-          <p className="font-body text-xs mt-1" style={{ color: '#991B1B' }}>
+          <p className="text-[15px] mt-1.5" style={{ color: '#ff9c9c' }}>
             {errors.email.message}
           </p>
         )}
       </div>
 
       <div>
-        <label htmlFor="message" className="font-body text-xs uppercase tracking-wide block mb-1.5" style={{ color: '#8A7050' }}>
+        <label htmlFor="message" className="label">
           {t.contactPage.messageLabel} *
         </label>
         <textarea
@@ -133,7 +125,7 @@ export default function ContactForm() {
           placeholder={t.contactPage.messagePlaceholder}
         />
         {errors.message && (
-          <p className="font-body text-xs mt-1" style={{ color: '#991B1B' }}>
+          <p className="text-[15px] mt-1.5" style={{ color: '#ff9c9c' }}>
             {errors.message.message}
           </p>
         )}
@@ -142,8 +134,7 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === 'sending'}
-        className="font-body text-sm px-8 py-3 rounded transition-all hover:opacity-90 disabled:opacity-60"
-        style={{ backgroundColor: '#1C1B3A', color: '#F2EBD9' }}
+        className="btn gold"
       >
         {status === 'sending' ? t.contactPage.sendingBtn : t.contactPage.submitBtn}
       </button>

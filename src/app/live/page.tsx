@@ -3,6 +3,8 @@ import { getCombinedLiveStatus, getLastArchivedLive } from '@/lib/live-stream'
 import LiveView from '@/components/live/LiveView'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { SITE_URL } from '@/lib/site'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,31 +51,9 @@ export default async function LivePage() {
     : 'https://www.youtube.com'
 
   return (
-    <div style={{ backgroundColor: '#0D0905', minHeight: '100vh' }}>
-      {/* Header */}
-      <div
-        className="py-16 px-4 text-center"
-        style={{ borderBottom: '1px solid #1E1208' }}
-      >
-        <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
-          Parohia Sfântul Ierarh Nicolae
-        </p>
-        <h1
-          className="font-heading italic leading-tight mb-5"
-          style={{ color: '#C9A84C', fontSize: 'clamp(28px, 5vw, 48px)', fontWeight: 400 }}
-        >
-          Transmisiune în direct
-        </h1>
-        <div className="flex items-center justify-center gap-3 mt-6">
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-          <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-        </div>
-      </div>
-
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <LiveView initialStatus={status} lastArchived={lastArchived} subscribeUrl={subscribeUrl} />
-      </div>
-    </div>
+    <PageShell aside="none">
+      <PageHead eyebrow="Parohia Sfântul Ierarh Nicolae" title="Transmisiune în direct" />
+      <LiveView initialStatus={status} lastArchived={lastArchived} subscribeUrl={subscribeUrl} />
+    </PageShell>
   )
 }

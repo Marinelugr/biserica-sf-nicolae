@@ -179,6 +179,15 @@ export interface Translations {
     sections: { title: string; text: string }[]
   }
   cookieBanner: { message: string; acceptBtn: string; policyLink: string }
+  shell: {
+    brand: string; navWord: string; navParish: string; navBible: string; navAbout: string; navFather: string
+    openMenu: string; closeMenu: string; mainMenu: string
+    profileRole: string; follow: string; socialTitle: string; scheduleTitle: string
+    feedFilter: string; feedAll: string; feedWord: string; feedVideo: string; feedParish: string; feedLibrary: string
+    kindWord: string; kindVideo: string; kindParish: string; kindLibrary: string; kindChurch: string; kindAnnouncement: string
+    today: string; oldStyle: string; readFullMessage: string; read: string; backHome: string
+    coverAlt: string; emblemAlt: string; liveBadge: string; feedEmpty: string; dateLabel: string
+  }
 }
 
 const ro: Translations = {
@@ -534,6 +543,18 @@ const ro: Translations = {
     message: 'Acest site folosește un cookie tehnic pentru a reține limba aleasă. Nu folosim cookie-uri de urmărire sau publicitate.',
     acceptBtn: 'Am înțeles',
     policyLink: 'Politica de confidențialitate',
+  },
+  shell: {
+    brand: 'Părintele Marin', navWord: 'Cuvântul', navParish: 'Parohia', navBible: 'Biblia', navAbout: 'Despre parohie', navFather: 'Părintele',
+    openMenu: 'Deschide meniul', closeMenu: 'Închide meniul', mainMenu: 'Meniu principal',
+    profileRole: 'Parohul Bisericii Sfântul Ierarh Nicolae · Hîrtopul Mic, Criuleni',
+    follow: 'Urmărește', socialTitle: 'Rețele sociale', scheduleTitle: 'Program slujbe · Parohia',
+    feedFilter: 'Filtrează postările', feedAll: 'Tot', feedWord: 'Cuvânt', feedVideo: 'Video', feedParish: 'Parohie', feedLibrary: 'Bibliotecă',
+    kindWord: 'Cuvântul părintelui', kindVideo: 'Video', kindParish: 'Din viața parohiei', kindLibrary: 'Bibliotecă',
+    kindChurch: 'Din viața Bisericii', kindAnnouncement: 'Anunț',
+    today: 'Astăzi', oldStyle: 'stil vechi', readFullMessage: 'Citește mesajul complet →', read: 'Citește →', backHome: 'Acasă',
+    coverAlt: 'Biserica Sfântul Ierarh Nicolae din Hîrtopul Mic, văzută de sus',
+    emblemAlt: 'Emblema Bisericii Sfântul Ierarh Nicolae', liveBadge: 'LIVE', feedEmpty: 'Nu sunt postări de acest tip acum.', dateLabel: 'Data',
   },
 }
 

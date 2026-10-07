@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
+import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
+
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,154 +46,82 @@ export default async function IstoriaBisericiiPage() {
   })
 
   return (
-    <div>
-      {/* Banda panoramică 21:9 */}
-      <div className="w-full overflow-hidden" style={{ aspectRatio: '21/9', position: 'relative', maxHeight: '420px' }}>
-        <Image
-          src="/images/12.jpg"
-          alt={t.home.heroImageAlt}
-          fill
-          className="object-cover object-center"
-          priority
-          quality={90}
-        />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, rgba(7,4,1,0.1) 0%, rgba(7,4,1,0.45) 100%)' }} />
-      </div>
-
-      {/* Dark header */}
-      <div className="py-14 px-4 text-center" style={{ backgroundColor: '#0D0905', borderBottom: '1px solid #1E1208' }}>
-        <p className="font-body text-xs tracking-[0.3em] uppercase mb-4" style={{ color: '#8A7050' }}>
-          {t.priest.badge}
-        </p>
-        <h1 className="font-heading italic leading-tight mb-5" style={{ color: '#C9A84C', fontSize: 'clamp(44px, 7vw, 70px)', fontWeight: 400 }}>
-          {t.historyPage.pageTitle}
-        </h1>
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-          <span style={{ color: '#C9A84C', fontSize: '18px' }} aria-hidden="true">☦</span>
-          <span className="h-px w-16 block" style={{ backgroundColor: '#3A2010' }} />
-        </div>
-        <p className="font-body text-sm" style={{ color: '#6A5030' }}>
+    <PageShell aside="compact">
+      <PageHead eyebrow={t.priest.badge} title={t.historyPage.pageTitle}>
+        <p className="mute text-[17px]">
           {t.home.heroSubtitle}
           <br />
           {t.home.heroMitropolia}
         </p>
-      </div>
+      </PageHead>
 
-      {/* Conținut articol */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <article className="card">
         {dynContent ? (
-          <div
-            className="tiptap-prose"
-            dangerouslySetInnerHTML={{ __html: dynContent }}
-          />
+          <div className="rich reading" dangerouslySetInnerHTML={{ __html: dynContent }} />
         ) : (
-          <>
-            <p className="font-body text-lg leading-relaxed mb-12 text-center italic" style={{ color: '#4A3020' }}>
-              {t.historyPage.fallbackIntro}
-            </p>
-            <div className="h-px mb-12" style={{ backgroundColor: '#E8E5E0' }} />
-            <div className="space-y-12">
-              {t.historyPage.sections.map((section, i) => (
-                <article key={i}>
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: '#C9A84C' }} aria-hidden="true" />
-                    <h2 className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>{section.title}</h2>
-                  </div>
-                  <p className="font-body text-base leading-relaxed pl-5" style={{ color: '#3A2010', lineHeight: '1.8' }}>
-                    {section.text}
-                  </p>
-                </article>
-              ))}
-            </div>
-          </>
+          <div className="reading flex flex-col gap-8">
+            <p className="lead" style={{ fontSize: 23 }}>{t.historyPage.fallbackIntro}</p>
+            <hr className="sep" />
+            {t.historyPage.sections.map((section, i) => (
+              <section key={i}>
+                <h2 className="h-m mb-3 flex items-center gap-3">
+                  <span className="w-2 h-2 rounded-full shrink-0 bg-gold" aria-hidden="true" />
+                  {section.title}
+                </h2>
+                <p>{section.text}</p>
+              </section>
+            ))}
+          </div>
         )}
-      </div>
+      </article>
 
-      {/* ══ GALERIE FOTO ══ */}
-      <section style={{ backgroundColor: '#F7F3EC', borderTop: '1px solid #E8DFC8', borderBottom: '1px solid #E8DFC8' }}>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="flex items-center gap-4 mb-8">
-            <span className="flex-1 h-px" style={{ backgroundColor: '#D4C8A0' }} />
-            <h2 className="font-body text-xs uppercase tracking-[0.35em]" style={{ color: '#8A7050' }}>{t.common.gallery}</h2>
-            <span className="flex-1 h-px" style={{ backgroundColor: '#D4C8A0' }} />
-          </div>
-
-          {gallery.length === 0 ? (
-            <div className="text-center py-10">
-              <span style={{ color: '#D4C8A0', fontSize: '40px' }} aria-hidden="true">📷</span>
-              <p className="font-body text-sm mt-3" style={{ color: '#8A7050' }}>
-                {t.historyPage.galleryEmpty}
-              </p>
-            </div>
-          ) : (
-            <PublicGallery items={gallery} />
-          )}
-        </div>
+      <section className="card" aria-labelledby="istoria-galerie" data-reveal>
+        <h2 id="istoria-galerie" className="eyebrow mb-5">{t.common.gallery}</h2>
+        {gallery.length === 0 ? (
+          <p className="mute text-center py-6"><span aria-hidden="true" className="block text-[36px] mb-2">📷</span>{t.historyPage.galleryEmpty}</p>
+        ) : (
+          <PublicGallery items={gallery} />
+        )}
       </section>
 
-      {/* ══ SECȚIUNEA VIDEO ══ */}
-      <section>
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-          <div className="flex items-center gap-4 mb-8">
-            <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-            <h2 className="font-body text-xs uppercase tracking-[0.35em]" style={{ color: '#8A7050' }}>{t.nav.video}</h2>
-            <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
-          </div>
-
-          {videos.length === 0 ? (
-            <div className="rounded-lg p-8 text-center" style={{ backgroundColor: '#F7F3EC', border: '2px dashed #D4C8A0' }}>
-              <span style={{ color: '#D4C8A0', fontSize: '40px' }} aria-hidden="true">▶</span>
-              <p className="font-body text-sm mt-3" style={{ color: '#8A7050' }}>
-                {t.historyPage.videosEmpty}
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {videos.map((v, i) => {
-                const ytId = extractYouTubeId(v.url)
-                return (
-                  <div key={i} className="rounded-lg overflow-hidden" style={{ border: '1px solid #E8E5E0' }}>
-                    <div style={{ aspectRatio: '16/9' }}>
-                      {ytId ? (
-                        <iframe
-                          src={`https://www.youtube.com/embed/${ytId}`}
-                          title={v.title}
-                          className="w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <a href={v.url} target="_blank" rel="noopener noreferrer" className="w-full h-full flex items-center justify-center" style={{ backgroundColor: '#F7F3EC' }}>
-                          <span style={{ color: '#8A7050', fontSize: '2rem' }}>▶</span>
-                        </a>
-                      )}
-                    </div>
-                    <p className="font-body text-sm p-3" style={{ color: '#3A1A1A' }}>{v.title}</p>
+      <section className="card" aria-labelledby="istoria-video" data-reveal>
+        <h2 id="istoria-video" className="eyebrow mb-5">{t.nav.video}</h2>
+        {videos.length === 0 ? (
+          <p className="mute text-center py-6"><span aria-hidden="true" className="block text-[32px] mb-2 gold">▶</span>{t.historyPage.videosEmpty}</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {videos.map((v, i) => {
+              const ytId = extractYouTubeId(v.url)
+              return (
+                <div key={i} className="news">
+                  <div style={{ aspectRatio: '16/9' }}>
+                    {ytId ? (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${ytId}`}
+                        title={v.title}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
+                    ) : (
+                      <a href={v.url} target="_blank" rel="noopener noreferrer" className="ph w-full h-full" aria-label={v.title}>
+                        <span className="play sm"><span aria-hidden="true">▶</span></span>
+                      </a>
+                    )}
                   </div>
-                )
-              })}
-            </div>
-          )}
-        </div>
+                  <p className="body text-[17px]">{v.title}</p>
+                </div>
+              )
+            })}
+          </div>
+        )}
       </section>
 
-      {/* CTA Donații */}
-      <div className="max-w-3xl mx-auto px-4 pb-16">
-        <div className="rounded-lg p-8 text-center" style={{ backgroundColor: '#F7F3EC', border: '1px solid #E8DFC8' }}>
-          <span style={{ color: '#C9A84C', fontSize: '32px' }} aria-hidden="true">☦</span>
-          <p className="font-body text-base mt-4 mb-6" style={{ color: '#4A3020' }}>
-            {t.historyPage.ctaText}
-          </p>
-          <a
-            href="/donatii"
-            className="font-body text-sm px-6 py-2.5 rounded inline-block transition-all hover:opacity-90"
-            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9' }}
-          >
-            {t.historyPage.ctaBtn}
-          </a>
-        </div>
+      <div className="card red-grad text-center flex flex-col items-center gap-4" data-reveal>
+        <span className="gold" style={{ fontSize: '32px' }} aria-hidden="true">☦</span>
+        <p className="reading">{t.historyPage.ctaText}</p>
+        <Link href="/donatii" className="btn red">{t.historyPage.ctaBtn}</Link>
       </div>
-    </div>
+    </PageShell>
   )
 }

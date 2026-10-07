@@ -24,11 +24,12 @@ export default function CopyButton({ value, copyLabel, copiedLabel }: Props) {
   return (
     <button
       onClick={handleCopy}
-      className="font-body text-xs px-3 py-1 rounded-full border transition-all"
+      type="button"
+      className="chip"
       style={{
-        borderColor: copied ? '#2F6B3A' : '#8B1A1A',
-        color: copied ? '#2F6B3A' : '#8B1A1A',
-        backgroundColor: 'transparent',
+        minHeight: 36, padding: '4px 14px', fontSize: 15,
+        borderColor: copied ? '#6fbf86' : 'var(--gold-d)',
+        color: copied ? '#8fe0a5' : 'var(--gold)',
       }}
     >
       {copied ? copiedLabel : copyLabel}

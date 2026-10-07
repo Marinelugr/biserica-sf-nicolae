@@ -10,6 +10,9 @@ import ShareButtons from '@/components/shared/ShareButtons'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
 import { SITE_URL } from '@/lib/site'
+import PageShell from '@/components/shell/PageShell'
+import PageHead from '@/components/shell/PageHead'
+import VideoTile from '@/components/shell/VideoTile'
 
 export const dynamic = 'force-dynamic'
 
@@ -89,119 +92,64 @@ export default async function VideoDetailPage({ params }: Props) {
   const shareUrl = `${SITE_URL}/video/${catSlug}/${videoSlug}`
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <PageShell aside="compact">
       <ViewTracker type="video" id={video.id} />
-      {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 mb-8 font-body text-sm flex-wrap" style={{ color: '#8A7050' }}>
-        <Link href="/" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>{t.nav.home}</Link>
-        <span aria-hidden="true">›</span>
-        <Link href="/video" className="hover:underline underline-offset-2" style={{ textDecorationColor: '#C9A84C' }}>{t.nav.video}</Link>
-        <span aria-hidden="true">›</span>
-        <Link href={`/video/${category.slug}`} className="hover:underline underline-offset-2 truncate max-w-[160px]" style={{ textDecorationColor: '#C9A84C' }}>{category.name}</Link>
-        <span aria-hidden="true">›</span>
-        <span className="truncate max-w-[180px]">{video.title}</span>
-      </nav>
-
-      {/* Titlu */}
-      <h1 className="font-heading leading-tight mb-4" style={{ color: '#1C1B3A', fontSize: 'clamp(24px, 4vw, 38px)' }}>
-        {video.title}
-      </h1>
-
-      {/* Dată · vizualizări */}
-      <p className="font-body text-sm mb-8" style={{ color: '#8A7050' }}>
-        <time dateTime={video.createdAt.toISOString()}>
-          {formatDate(video.createdAt, localeToIntl(locale))}
-        </time>
-        {' · '}
-        <ViewBadge value={video.views} locale={locale} />
-      </p>
-
-      {/* Embed responsive */}
-      {embedUrl ? (
-        <div style={{ position: 'relative', width: '100%', paddingTop: '56.25%', borderRadius: '10px', overflow: 'hidden', border: '1px solid #E8E5E0', backgroundColor: '#1C1B3A' }}>
-          <iframe
-            src={embedUrl}
-            title={video.title}
-            allow="accelerometer; fullscreen; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-            style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
-          />
-        </div>
-      ) : (
-        <a
-          href={video.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block rounded-lg text-center py-16 font-body"
-          style={{ backgroundColor: '#1C1B3A', color: '#C9A84C', border: '1px solid #E8E5E0' }}
+      <article className="flex flex-col gap-5">
+        <PageHead
+          size="m"
+          crumbs={[{ href: '/', label: t.nav.home }, { href: '/video', label: t.nav.video }, { href: `/video/${category.slug}`, label: category.name }, { label: video.title }]}
+          title={video.title}
         >
-          ▶ Vizionează pe {video.platform === 'youtube' ? 'YouTube' : 'Vimeo'}
-        </a>
-      )}
+          <p className="date">
+            <time dateTime={video.createdAt.toISOString()}>{formatDate(video.createdAt, localeToIntl(locale))}</time>
+            {' · '}
+            <span className="mute"><ViewBadge value={video.views} locale={locale} /></span>
+          </p>
+        </PageHead>
 
-      {/* Descriere */}
-      {video.description && (
-        <p className="font-body mt-8 leading-relaxed" style={{ color: '#2A1A0A' }}>
-          {video.description}
-        </p>
-      )}
+        {embedUrl ? (
+          <div className="card flush" style={{ borderRadius: 22 }}>
+            <div style={{ position: 'relative', width: '100%', aspectRatio: '16 / 9' }}>
+              <iframe
+                src={embedUrl}
+                title={video.title}
+                allow="accelerometer; fullscreen; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+                style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 'none' }}
+              />
+            </div>
+          </div>
+        ) : (
+          <a href={video.url} target="_blank" rel="noopener noreferrer" className="card ph flex-col gap-4 py-16 text-center" style={{ borderRadius: 22 }}>
+            <span className="play" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style={{ marginLeft: 3 }}><path d="M8 5v14l11-7z" /></svg>
+            </span>
+            <span className="gold">▶ Vizionează pe {video.platform === 'youtube' ? 'YouTube' : 'Vimeo'}</span>
+          </a>
+        )}
 
-      {/* Share */}
-      <div className="mt-8 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
-        <ShareButtons url={shareUrl} title={video.title} />
-      </div>
+        {video.description && (
+          <div className="card"><p className="reading" style={{ whiteSpace: 'pre-line' }}>{video.description}</p></div>
+        )}
 
-      {/* Video-uri similare */}
+        <div className="card flex flex-wrap items-center justify-between gap-4" style={{ padding: '20px 24px' }}>
+          <Link href={`/video/${category.slug}`} className="link-gold text-[17px]">← {t.common.backTo} {category.name}</Link>
+          <ShareButtons url={shareUrl} title={video.title} />
+        </div>
+      </article>
+
       {similar.length > 0 && (
-        <div className="mt-14">
-          <div className="flex items-center gap-3 mb-6">
-            <h2 className="font-heading text-2xl" style={{ color: '#1C1B3A' }}>Video-uri similare</h2>
-            <span className="flex-1 h-px" style={{ backgroundColor: '#E8E5E0' }} />
+        <section className="flex flex-col gap-4" aria-labelledby="video-similare">
+          <div className="sec-head" style={{ marginBottom: 0 }}>
+            <h2 id="video-similare" className="h-m">Video-uri similare</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {similar.map(v => {
-              const thumb = getThumbnail(v.platform, v.videoId)
-              return (
-                <Link
-                  key={v.id}
-                  href={`/video/${category.slug}/${v.slug}`}
-                  className="group rounded-lg overflow-hidden transition-shadow hover:shadow-md block"
-                  style={{ border: '1px solid #E8E5E0' }}
-                >
-                  <div
-                    className="w-full flex items-center justify-center bg-cover bg-center"
-                    style={{ aspectRatio: '16/9', backgroundColor: '#1C1B3A', backgroundImage: thumb ? `url(${thumb})` : undefined, position: 'relative' }}
-                  >
-                    <span
-                      className="flex items-center justify-center rounded-full"
-                      style={{ color: '#C9A84C', fontSize: '20px', width: '40px', height: '40px', backgroundColor: 'rgba(13,9,5,0.55)' }}
-                      aria-hidden="true"
-                    >
-                      ▶
-                    </span>
-                  </div>
-                  <div className="p-3" style={{ backgroundColor: '#FAFAF8' }}>
-                    <p className="font-body text-sm leading-snug group-hover:underline" style={{ color: '#1C1B3A', textDecorationColor: '#C9A84C' }}>
-                      {v.title}
-                    </p>
-                  </div>
-                </Link>
-              )
-            })}
+          <div className="grid grid-cols-1 min-[480px]:grid-cols-2 xl:grid-cols-3 gap-4">
+            {similar.map(v => (
+              <VideoTile key={v.id} href={`/video/${category.slug}/${v.slug}`} title={v.title} thumb={getThumbnail(v.platform, v.videoId)} />
+            ))}
           </div>
-        </div>
+        </section>
       )}
-
-      {/* Back */}
-      <div className="mt-14 pt-8" style={{ borderTop: '1px solid #E8E5E0' }}>
-        <Link
-          href={`/video/${category.slug}`}
-          className="font-body text-sm inline-flex items-center gap-1 hover:underline underline-offset-2"
-          style={{ color: '#8A7050', textDecorationColor: '#C9A84C' }}
-        >
-          ← {t.common.backTo} {category.name}
-        </Link>
-      </div>
-    </div>
+    </PageShell>
   )
 }

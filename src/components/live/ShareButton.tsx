@@ -31,16 +31,16 @@ export default function ShareButton({ isLive, liveTitle }: { isLive: boolean; li
   return (
     <div className="relative inline-block">
       <button
+        type="button"
         onClick={handleShare}
-        className="font-body text-sm px-4 py-2 rounded border transition-colors duration-200 hover:bg-stone-900"
-        style={{ color: '#9B8050', borderColor: '#3A2010', borderWidth: '1.5px' }}
+        className="btn sm"
       >
         ↗ Distribuie
       </button>
       {copied && (
         <span
-          className="absolute left-1/2 -translate-x-1/2 -top-9 font-body text-xs px-3 py-1.5 rounded whitespace-nowrap"
-          style={{ backgroundColor: '#1C1B0A', color: '#C9A84C', border: '1px solid #3A2010' }}
+          className="absolute left-1/2 -translate-x-1/2 -top-9 text-[14px] px-3 py-1.5 rounded-full whitespace-nowrap"
+          style={{ backgroundColor: 'rgba(8, 14, 36, 0.98)', color: 'var(--gold)', border: '1px solid var(--gold-d)' }}
           role="status"
         >
           Link copiat!

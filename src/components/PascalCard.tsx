@@ -10,10 +10,10 @@ const YEARS_BACK = 2
 const YEARS_FORWARD = 3
 
 const arrowStyle: React.CSSProperties = {
-  background: 'none', border: 'none', color: '#C9A96E', fontSize: '15px', cursor: 'pointer', padding: '4px 6px', lineHeight: 1,
+  background: 'none', border: 'none', color: 'var(--gold)', fontSize: '17px', cursor: 'pointer', padding: '6px 8px', lineHeight: 1, minHeight: 40,
 }
 const yearBtnStyle: React.CSSProperties = {
-  border: 'none', borderRadius: '6px', fontSize: '12px', padding: '5px 8px', cursor: 'pointer', fontFamily: 'inherit',
+  border: '1px solid transparent', borderRadius: '999px', fontSize: '15px', padding: '6px 10px', cursor: 'pointer', fontFamily: 'inherit', minHeight: 40,
 }
 
 export default function PascalCard() {
@@ -29,41 +29,41 @@ export default function PascalCard() {
   const years = Array.from({ length: YEARS_BACK + YEARS_FORWARD + 1 }, (_, i) => baseYear - YEARS_BACK + i)
 
   return (
-    <div className="glass-cobalt" style={{ padding: '24px 28px', textAlign: 'center' }}>
-      <div style={{ fontSize: '13px', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#C9A84C', marginBottom: '10px' }}>
-        ☦ Calendarul Pascal
-      </div>
-      <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontStyle: 'italic', fontSize: '28px', color: '#E9EFFA', marginBottom: '2px' }}>
+    <div className="flex flex-col gap-1.5">
+      <div className="eyebrow">☦ Calendarul Pascal</div>
+      <div className="serif italic" style={{ fontSize: '28px', fontWeight: 500 }}>
         Sfintele Paști
       </div>
-      <div style={{ fontFamily: "'Cormorant Garamond', Georgia, serif", fontSize: '22px', color: '#5A8FE8', marginBottom: '6px' }}>
+      <div className="serif" style={{ fontSize: '24px', color: 'var(--blue)', fontWeight: 600 }}>
         {fmt(data.pasti)} {data.year}
       </div>
-      <div style={{ fontSize: '14px', color: '#828EA8', marginBottom: '18px' }}>
+      <div className="mute" style={{ fontSize: '16px', marginBottom: '10px' }}>
         Floriile: {fmt(data.florii)}
       </div>
 
       {/* Selector an */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px', marginBottom: '18px', flexWrap: 'wrap' }}>
-        <button onClick={() => setBaseYear(y => y - 1)} aria-label="Anul anterior" style={arrowStyle}>←</button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '2px', marginBottom: '12px', flexWrap: 'wrap' }}>
+        <button type="button" onClick={() => setBaseYear(y => y - 1)} aria-label="Anul anterior" style={arrowStyle}>←</button>
         {years.map(y => (
           <button
             key={y}
+            type="button"
             onClick={() => setSelectedYear(y)}
+            aria-pressed={y === selectedYear}
             style={{
               ...yearBtnStyle,
-              backgroundColor: y === selectedYear ? '#C9A84C' : 'transparent',
-              color: y === selectedYear ? '#04080F' : '#828EA8',
-              fontWeight: y === selectedYear ? 700 : 400,
+              backgroundColor: y === selectedYear ? 'var(--gold)' : 'transparent',
+              color: y === selectedYear ? '#0a1330' : 'var(--mute)',
+              fontWeight: y === selectedYear ? 600 : 400,
             }}
           >
             {y}
           </button>
         ))}
-        <button onClick={() => setBaseYear(y => y + 1)} aria-label="Anul următor" style={arrowStyle}>→</button>
+        <button type="button" onClick={() => setBaseYear(y => y + 1)} aria-label="Anul următor" style={arrowStyle}>→</button>
       </div>
 
-      <Link href="/calendar-pascal" style={{ fontSize: '13px', color: '#C9A96E', textDecoration: 'none' }}>
+      <Link href="/calendar-pascal" className="link-gold" style={{ fontSize: '17px' }}>
         Vezi calendarul pascal complet →
       </Link>
     </div>
