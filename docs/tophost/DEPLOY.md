@@ -117,20 +117,13 @@ trebuie să fie dinamică (ƒ în tabelul de rute din `next build`), nu statică
 
 - Serverul nu are `rsync`; upload-ul se face cu `tar` prin SSH într-un director gol.
 - Procesul apare în `ps` ca `next-server (v16.2.9)`, nu `node`: `ssh tophost-parintel 'ps -eo pid,rss,etime,args | grep [n]ext-server'`.
-- Măsurat cu mediul real: RSS ~240–365 MB (după `sharp`), pornire la rece `/` ~2,2 s, `/` cald TTFB p50 ~0,2 s.
-- **LiteSpeed Cache** păstrează `/_next/image` ignorând `Vary: Accept`: primul format generat (AVIF)
-  e servit tuturor. Browserele fără AVIF ar primi imagini pe care nu le pot afișa. HTML-ul și API-ul
-  nu sunt cache-uite (`no-store`). Remediere propusă, de aplicat manual (bloc separat, la finalul
-  `~/public_html/.htaccess`, după blocurile selectorului):
-
-  ```apache
-  # BEGIN parohie-lscache
-  <IfModule LiteSpeed>
-  RewriteEngine On
-  RewriteRule ^_next/image - [E=Cache-Control:no-cache]
-  </IfModule>
-  # END parohie-lscache
-  ```
+- Măsurat cu mediul real: RSS ~240–480 MB per proces (după `sharp`; Passenger poate porni 2 procese
+  sub sarcină), limita LVE a contului 3 GB / 40 Entry Processes; pornire la rece `/` ~2,2 s,
+  `/` cald TTFB p50 ~0,2 s.
+- **LiteSpeed Cache** păstrează `/_next/image` ignorând `Vary: Accept`, deci primul format generat
+  e servit tuturor. De aceea `images.formats` e doar `['image/webp']` în `next.config.ts`: nu
+  reintroduce AVIF fără o regulă LSCache. HTML-ul și API-ul nu sunt cache-uite (`no-store`).
+  Intrările vechi rămase în cache se golesc din cPanel → LiteSpeed Web Cache Manager → Flush All.
 - Static prin LiteSpeed (copiere în `public_html/_next/static`) a fost testat și abandonat: LiteSpeed
   dă `max-age=604800` fără `immutable` și fără compresie. Ar cere reguli în `.htaccess` și
   sincronizare în deploy; Next servește deja `/_next/static` cu cache de 1 an.
