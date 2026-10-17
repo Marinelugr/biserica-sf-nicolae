@@ -1,0 +1,67 @@
+name: build-standalone
+
+# Construiește bundle-ul Next.js standalone pentru TopHost (Passenger/cPanel).
+# Fără secrete: doar valori publice + un DATABASE_URL fictiv (nefuncțional),
+# necesar doar ca PrismaClient să se poată construi la build.
+on:
+  push:
+    branches: [main, infra/tophost]
+  workflow_dispatch:
+
+concurrency:
+  group: build-standalone-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_PUBLIC_SITE_URL: https://parintelemarin.com
+      # Placeholder intenționat nefuncțional (portul 1): build-ul nu are acces la DB.
+      DATABASE_URL: postgresql://build:build@127.0.0.1:1/build
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Build
+        run: npm run build
+
+      - name: Assemble bundle
+        run: |
+          set -euo pipefail
+          rm -rf bundle
+          mkdir -p bundle/public bundle/.next/static
+          cp -R .next/standalone/. bundle/
+          cp -R public/. bundle/public/
+          cp -R .next/static/. bundle/.next/static/
+          echo "${GITHUB_SHA}" > bundle/REVISION
+          tar -czf parohie-standalone.tar.gz -C bundle .
+          ls -lh parohie-standalone.tar.gz
+
+      - name: Verify no .env files in archive
+        run: |
+          set -euo pipefail
+          if tar -tzf parohie-standalone.tar.gz | grep -E '(^|/)\.env'; then
+            echo "::error::Arhiva conține fișiere .env*"
+            exit 1
+          fi
+          echo "OK: niciun fișier .env* în arhivă"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parohie-standalone
+          path: parohie-standalone.tar.gz
+          retention-days: 7
+          if-no-files-found: error
