@@ -4,6 +4,9 @@ import { translatePath } from '@/lib/i18n/slugs'
 import { publicArticleWhere } from '@/lib/articleVisibility'
 import { SITE_URL } from '@/lib/site'
 
+// Generat la cerere: build-ul CI nu are acces la DB, iar un sitemap static ar conține doar rutele fixe.
+export const dynamic = 'force-dynamic'
+
 const BASE = SITE_URL
 
 function langAlternates(path: string) {
