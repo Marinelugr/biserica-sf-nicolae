@@ -20,12 +20,12 @@ restart_app() {
   remote "mkdir -p $REMOTE_BASE/tmp && touch $REMOTE_BASE/tmp/restart.txt"
 }
 
-# Smoke test pe IP cu antetul Host; reîncearcă până la $1 secunde (implicit 60).
+# Smoke test prin HTTPS, fixat pe IP-ul serverului (--resolve, independent de DNS); reîncearcă până la $1 secunde (implicit 60).
 smoke_test() {
   local timeout="${1:-60}" start now body
   start=$(date +%s)
   while :; do
-    if body=$(curl -fsS --max-time 10 -H "Host: $SITE_HOST" "http://$SERVER_IP/api/health" 2>/dev/null) \
+    if body=$(curl -fsS --max-time 10 --resolve "$SITE_HOST:443:$SERVER_IP" "https://$SITE_HOST/api/health" 2>/dev/null) \
        && [ "$body" = '{"ok":true}' ]; then
       now=$(date +%s); log "health OK după $((now - start)) s"
       return 0
