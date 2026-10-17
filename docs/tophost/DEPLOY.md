@@ -50,9 +50,23 @@ Cerințe locale: `gh` autentificat, `ssh`, `curl`, `tar`.
 Nu sunt în repo, în CI sau în artefact. Build-ul CI folosește doar `NEXT_PUBLIC_SITE_URL` și un
 `DATABASE_URL` fictiv (`127.0.0.1:1`), necesar doar pentru ca `PrismaClient` să poată fi construit.
 
-Variabilele de runtime vor sta în `~/.config/parohie/env` (director 700, fișier 600), format
+Variabilele de runtime stau în `~/.config/parohie/env` (director 700, fișier 600), format
 `KEY=VALUE` (ghilimele opționale, comentarii cu `#`). Wrapper-ul nu suprascrie variabile deja
 setate și nu loghează valori. Fișierul se completează în pasul următor.
+
+**Important:** `DATABASE_URL` trebuie să existe mereu. `src/proxy.ts` importă `@/auth`, care importă
+`@/lib/prisma`; fără `DATABASE_URL`, `new PrismaClient()` aruncă eroare la încărcarea modulului și
+**orice** cerere (inclusiv `/api/health`) dă 500. Până la pasul cu secrete, fișierul conține doar un
+placeholder nefuncțional (`127.0.0.1:1`).
+
+## Observații
+
+- Serverul nu are `rsync`; upload-ul se face cu `tar` prin SSH într-un director gol.
+- Procesul apare în `ps` ca `next-server (v16.2.9)`, nu `node`: `ssh tophost-parintel 'ps -eo pid,rss,etime,args | grep [n]ext-server'`.
+- Măsurat: RSS ~125–140 MB, pornire la rece ~1,2 s.
+- Static prin LiteSpeed (copiere în `public_html/_next/static`) a fost testat și abandonat: LiteSpeed
+  dă `max-age=604800` fără `immutable` și fără compresie. Ar cere reguli în `.htaccess` și
+  sincronizare în deploy; Next servește deja `/_next/static` cu cache de 1 an.
 
 ## Ce NU e încă făcut
 
