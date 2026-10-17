@@ -14,7 +14,7 @@ scripts/deploy-tophost.sh (pe Mac)
   └─ gh run watch → gh run download
   └─ upload prin SSH (tar; serverul nu are rsync) în ~/parohie/app.new (director gol = echivalent --delete)
   └─ swap: app → app.prev, app.new → app; touch ~/parohie/tmp/restart.txt
-  └─ smoke test: GET http://195.178.106.95/api/health cu `Host: parintelemarin.com` (60 s)
+  └─ smoke test: GET https://parintelemarin.com/api/health, fixat pe 195.178.106.95 cu --resolve (60 s)
        eșec → rollback automat la app.prev, cod de ieșire ≠ 0
 ```
 
@@ -102,8 +102,9 @@ La rotirea `CRON_SECRET` nu e nimic altceva de schimbat: `parohie-cron.sh` îl c
 | 04:00 | `/api/cron/feeds` (mitropolia.md, protopopiatul-criuleni-dubasari.md) |
 
 `~/bin/parohie-cron.sh <cale>` citește `CRON_SECRET` din `~/.config/parohie/env` și îl dă lui `curl`
-prin stdin (`-K -`). Cererea merge la `http://195.178.106.95` cu `Host: parintelemarin.com`
-(`127.0.0.1` ajunge la vhost-ul implicit, 404), deci nu depinde de DNS. Rulare manuală:
+prin stdin (`-K -`). Cererea merge la `https://parintelemarin.com` fixat pe `195.178.106.95` cu
+`--resolve` (`127.0.0.1` ajunge la vhost-ul implicit, 404), deci nu depinde de DNS și nu trece prin
+redirectul `http` → `https`. Rulare manuală:
 `ssh tophost-parintel '~/bin/parohie-cron.sh /api/cron/feeds; tail -3 ~/logs/parohie-cron.log'`.
 
 ## Sitemap
@@ -116,29 +117,63 @@ trebuie să fie dinamică (ƒ în tabelul de rute din `next build`), nu statică
 
 - Serverul nu are `rsync`; upload-ul se face cu `tar` prin SSH într-un director gol.
 - Procesul apare în `ps` ca `next-server (v16.2.9)`, nu `node`: `ssh tophost-parintel 'ps -eo pid,rss,etime,args | grep [n]ext-server'`.
-- Măsurat cu mediul real: RSS ~240–365 MB (după `sharp`), pornire la rece `/` ~2,2 s, `/` cald TTFB p50 ~0,2 s.
-- **LiteSpeed Cache** păstrează `/_next/image` ignorând `Vary: Accept`: primul format generat (AVIF)
-  e servit tuturor. Browserele fără AVIF ar primi imagini pe care nu le pot afișa. HTML-ul și API-ul
-  nu sunt cache-uite (`no-store`). Remediere propusă, de aplicat manual (bloc separat, la finalul
-  `~/public_html/.htaccess`, după blocurile selectorului):
-
-  ```apache
-  # BEGIN parohie-lscache
-  <IfModule LiteSpeed>
-  RewriteEngine On
-  RewriteRule ^_next/image - [E=Cache-Control:no-cache]
-  </IfModule>
-  # END parohie-lscache
-  ```
+- Măsurat cu mediul real: RSS ~240–480 MB per proces (după `sharp`; Passenger poate porni 2 procese
+  sub sarcină), limita LVE a contului 3 GB / 40 Entry Processes; pornire la rece `/` ~2,2 s,
+  `/` cald TTFB p50 ~0,2 s.
+- **LiteSpeed Cache** păstrează `/_next/image` ignorând `Vary: Accept`, deci primul format generat
+  e servit tuturor. De aceea `images.formats` e doar `['image/webp']` în `next.config.ts`: nu
+  reintroduce AVIF fără o regulă LSCache. HTML-ul și API-ul nu sunt cache-uite (`no-store`).
+  Intrările vechi rămase în cache se golesc din cPanel → LiteSpeed Web Cache Manager → Flush All.
 - Static prin LiteSpeed (copiere în `public_html/_next/static`) a fost testat și abandonat: LiteSpeed
   dă `max-age=604800` fără `immutable` și fără compresie. Ar cere reguli în `.htaccess` și
   sincronizare în deploy; Next servește deja `/_next/static` cu cache de 1 an.
 
+## DNS și HTTPS
+
+| Domeniu | Nameservere | Înregistrări |
+| --- | --- | --- |
+| `parintelemarin.com` | Spaceship (`launch1/2.spaceship.net`) | `A @` → `195.178.106.95`; `www` CNAME → apex; TXT `google-site-verification` |
+| `biserica-sf-nicolae.org` | Spaceship (mutate de pe Vercel pe 2026-10-17, DNSSEC activ, DS key id 45193) | `A @`, `A www` → `195.178.106.95`; TXT `google-site-verification`; CAA (letsencrypt, sectigo, pki.goog) |
+
+Certificate: AutoSSL (Let's Encrypt), separat pentru `parintelemarin.com` + `www` și pentru
+`biserica-sf-nicolae.org` + `www`, reînnoite automat de cPanel. Avertismentele AutoSSL pentru
+`mail.*`, `cpanel.*`, `webmail.*`, `biserica-sf-nicolae.parintelemarin.com` etc. sunt normale: acele
+nume nu au DNS.
+
+### Redirecturi (`.htaccess`, în afara blocurilor cPanel/selector)
+
+- `~/public_html/.htaccess`, la început, blocul `parohie-redirects`: `http` → `https` și
+  `www.parintelemarin.com` → `https://parintelemarin.com/<cale>`, 301, query păstrat.
+- `~/public_html/biserica-sf-nicolae.org/.htaccess` (document root-ul domeniului adițional), blocul
+  `parohie-redirect-org`: orice host ≠ `parintelemarin.com` → `https://parintelemarin.com/<cale>`, 301.
+- Ambele exceptează `/.well-known/` (validarea AutoSSL). HSTS nu e activat.
+- Redirectul `.org` trebuie păstrat **minimum 12 luni** (Search Console → Change of address).
+- Next mai are în `next.config.ts` redirecturi (308) pentru aceleași host-uri; nu se ajunge la ele,
+  `.htaccess` răspunde primul.
+
+### Depanare AutoSSL
+
+```bash
+ssh tophost-parintel 'uapi SSL start_autossl_check'              # pornește o verificare
+ssh tophost-parintel 'uapi SSL is_autossl_check_in_progress'     # data: 1 = în curs
+ssh tophost-parintel 'uapi SSL get_autossl_problems'             # cauze (DNS, CAA, DCV)
+echo | openssl s_client -connect parintelemarin.com:443 -servername parintelemarin.com | openssl x509 -noout -issuer -enddate
+```
+
+Cauze tipice: DNS-ul nu arată spre `195.178.106.95`, `CAA` care nu permite `letsencrypt.org`/`sectigo.com`,
+o regulă de redirect care prinde `/.well-known/`. Emiterea poate întârzia câteva minute după o
+verificare reușită.
+
+### Rollback
+
+- Redirecturi: `cp -p ~/public_html/.htaccess.bak-20261017-220228 ~/public_html/.htaccess` (și
+  `~/public_html/biserica-sf-nicolae.org/.htaccess.bak-20261017-220359` pentru `.org`), apoi health.
+- DNS `.org` înapoi la Vercel: Spaceship → domeniu → Nameservers → `ns1/ns2.vercel-dns.com`
+  (proiectul Vercel e oprit, deci ar da 402).
+
 ## Ce NU e încă făcut
 
-- DNS și certificatul SSL (AutoSSL) pentru `parintelemarin.com`;
-- redirect-ul `biserica-sf-nicolae.org` → `parintelemarin.com` (domeniul nu e încă pe cont);
-- Google Search Console (proprietate nouă + sitemap) după mutarea DNS;
 - formularul de contact (vezi „Secrete”);
-- remedierea LiteSpeed Cache pentru `/_next/image` (vezi „Observații”);
-- de verificat manual: autentificarea admin, încărcarea de fișiere, formularul de contact.
+- domeniul vechi în footer/contact (4 fișiere);
+- Search Console: sitemap pentru `parintelemarin.com`, Change of address pentru `biserica-sf-nicolae.org`;
+- de verificat manual: autentificarea admin, încărcarea de fișiere.
