@@ -9,7 +9,7 @@ import type { ContactInfo } from '@/lib/contact-info'
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
 const EMPTY: ContactInfo = {
-  phone: '', email: '', address: '', facebook: '', schedule: '', message: '', mapEmbed: '',
+  phone: '', email: '', address: '', facebook: '', message: '', mapEmbed: '',
 }
 
 function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
@@ -96,14 +96,6 @@ export default function AdminContactPage() {
               <div>
                 <label style={lbl}>Facebook URL</label>
                 <input type="text" value={form.facebook} onChange={e => set('facebook', e.target.value)} placeholder="https://www.facebook.com/..." style={inp} />
-              </div>
-
-              <div>
-                <label style={lbl}>Program slujbe (rezumat)</label>
-                <textarea value={form.schedule} onChange={e => set('schedule', e.target.value)} rows={4} placeholder={'Duminică - 09:00 - Sfânta Liturghie'} style={{ ...inp, resize: 'vertical' }} />
-                <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', display: 'block', marginTop: '0.35rem' }}>
-                  O linie pe fiecare intrare: Zi - Oră - Denumire slujbă.
-                </span>
               </div>
 
               <div>

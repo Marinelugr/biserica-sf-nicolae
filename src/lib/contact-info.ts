@@ -5,7 +5,6 @@ export const SETTING_KEYS = {
   email: 'contact_email',
   address: 'contact_address',
   facebook: 'contact_facebook',
-  schedule: 'contact_schedule',
   message: 'contact_message',
   mapEmbed: 'contact_map_embed',
 } as const
@@ -18,7 +17,6 @@ export const DEFAULT_CONTACT: ContactInfo = {
   email: 'parinte.marin@biserica-sf-nicolae.org',
   address: 'Hîrtopul Mic\nRaionul Criuleni\nRepublica Moldova',
   facebook: 'https://www.facebook.com/PreotMarin',
-  schedule: 'Duminică - 09:00 - Sfânta Liturghie\nSâmbătă - 17:00 - Vecernia și Utrenia\nVineri - 08:00 - Utrenia\nSărbători - 09:00 - Sfânta Liturghie',
   message: '',
   mapEmbed: 'https://www.google.com/maps?q=47.2469,28.9283&z=15&output=embed',
 }

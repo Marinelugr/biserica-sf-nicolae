@@ -2,7 +2,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localizedHref } from '@/lib/i18n/href'
-import { getScheduleItems } from '@/lib/schedule'
 import { socialLinks } from '@/lib/social'
 import { getProfileData } from '@/lib/profile'
 import SocialIcon from '@/components/shell/SocialIcon'
@@ -28,7 +27,6 @@ export default async function Footer() {
     { href: '/stiri',              label: t.footer.pages.news },
   ].map(link => ({ ...link, href: localizedHref(link.href, locale) }))
 
-  const scheduleItems = getScheduleItems(t)
   const socials = socialLinks(profile.facebook)
   const headCls = 'eyebrow mb-4'
   const linkCls = 'inline-flex items-center min-h-[32px] transition-colors hover:text-gold'
@@ -40,7 +38,7 @@ export default async function Footer() {
         <Image src="/logo-mark.png" alt="" width={17} height={36} style={{ height: 32, width: 'auto' }} />
       </span>
       <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 pb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
 
           {/* Coloana 1 — Emblemă & adresă */}
           <div>
@@ -82,21 +80,7 @@ export default async function Footer() {
             </ul>
           </div>
 
-          {/* Coloana 3 — Program slujbe */}
-          <div>
-            <h2 className={headCls}>{t.footer.scheduleTitle}</h2>
-            <ul className="space-y-2">
-              {scheduleItems.map(item => (
-                <li key={item.zi} className="flex items-baseline gap-2 text-[17px]">
-                  <span className="w-24 shrink-0 mute text-[16px]">{item.zi}</span>
-                  <span className="gold">{item.ora}</span>
-                  <span>{item.slujba}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Coloana 4 — Contact & Social */}
+          {/* Coloana 3 — Contact & Social */}
           <div>
             <h2 className={headCls}>{t.footer.contactTitle}</h2>
             <ul className="space-y-1 mb-5 text-[17px]">

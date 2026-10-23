@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { localizedHref } from '@/lib/i18n/href'
 import { getProfileData } from '@/lib/profile'
-import { getScheduleItems } from '@/lib/schedule'
 import { socialLinks } from '@/lib/social'
 import { SITE_HOST } from '@/lib/site'
 import ProfilePhoto from './ProfilePhoto'
@@ -23,7 +22,6 @@ interface Props {
 export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: Props) {
   const [t, locale, profile] = await Promise.all([getServerT(), getServerLocale(), getProfileData()])
   const socials = socialLinks(profile.facebook)
-  const schedule = getScheduleItems(t)
   const donateHref = localizedHref('/donatii', locale)
   const NameTag = nameAsH1 ? 'h1' : 'p'
 
@@ -47,15 +45,6 @@ export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: 
               <a key={s.key} href={s.href} target="_blank" rel="noopener noreferrer" className="soc" aria-label={s.label}>
                 <SocialIcon name={s.key} size={20} />
               </a>
-            ))}
-          </div>
-          <div className="flex flex-col">
-            <p className="eyebrow" style={{ marginBottom: 6 }}>{t.shell.scheduleTitle}</p>
-            {schedule.slice(0, 3).map((s, i) => (
-              <div key={s.zi} className="flex justify-between gap-3 py-1.5 text-[17px]" style={i < 2 ? { borderBottom: '1px solid var(--line)' } : undefined}>
-                <span>{s.zi}</span>
-                <span className="gold">{s.ora}</span>
-              </div>
             ))}
           </div>
         </div>
@@ -97,20 +86,6 @@ export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: 
             </span>
             <span className="gold" aria-hidden="true">→</span>
           </a>
-        ))}
-      </div>
-
-      <div className="card sec-lite aside-extra flex flex-col gap-1" style={{ padding: '22px 26px' }} data-sec="slujbe">
-        <p className="eyebrow">{t.shell.scheduleTitle}</p>
-        {schedule.map((s, i) => (
-          <div
-            key={s.zi}
-            className="flex justify-between gap-3 py-2"
-            style={i < schedule.length - 1 ? { borderBottom: '1px solid var(--line)' } : undefined}
-          >
-            <span>{s.zi} <span className="mute text-[16px]">· {s.slujba}</span></span>
-            <span className="gold">{s.ora}</span>
-          </div>
         ))}
       </div>
     </>
