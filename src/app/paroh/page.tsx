@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
 import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { htmlToPlainText } from '@/lib/utils'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
@@ -11,7 +12,7 @@ export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const priest = await prisma.priest.findFirst({ select: { nameRo: true, photoUrl: true, bioRo: true, seoKeywords: true } })
-  const plainBio = priest?.bioRo?.replace(/<[^>]*>/g, '').substring(0, 160) || 'Părintele paroh al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova.'
+  const plainBio = htmlToPlainText(priest?.bioRo).substring(0, 160) || 'Părintele paroh al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova.'
   return {
     title: `Parohul Bisericii — ${priest?.nameRo ?? 'Preot Paroh'} | Sf. Nicolae Hîrtopul Mic`,
     description: plainBio,

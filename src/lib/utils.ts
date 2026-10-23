@@ -1,3 +1,15 @@
+import { decode } from 'he'
+
+// Text simplu din HTML-ul editorului (fragmente, descrieri meta, numărare de cuvinte):
+// fără <script>/<style>, etichetele devin spațiu, entitățile (&nbsp; &amp; &#8211; &icirc;) decodate.
+export function htmlToPlainText(html: string | null | undefined): string {
+  if (!html) return ''
+  const withoutTags = html
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1\s*>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+  return decode(withoutTags).replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
 export function slugify(text: string): string {
   const map: Record<string, string> = {
     'ă': 'a', 'â': 'a', 'î': 'i', 'ș': 's', 'ț': 't',
@@ -14,7 +26,7 @@ export function slugify(text: string): string {
 }
 
 export function readingTime(html: string): number {
-  const words = html.replace(/<[^>]*>/g, ' ').trim().split(/\s+/).filter(Boolean).length
+  const words = htmlToPlainText(html).split(' ').filter(Boolean).length
   return Math.max(1, Math.round(words / 200))
 }
 

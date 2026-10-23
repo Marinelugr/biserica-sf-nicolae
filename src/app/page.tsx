@@ -14,7 +14,7 @@ import FeedCard from '@/components/shell/FeedCard'
 import FeedFilter from '@/components/shell/FeedFilter'
 import ChurchLifeSection from '@/components/homepage/ChurchLifeSection'
 import { getChurchLifeCards } from '@/lib/externalFeeds'
-import { getTodayDate } from '@/lib/utils'
+import { getTodayDate, htmlToPlainText } from '@/lib/utils'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { localeToIntl, type Locale } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
@@ -38,10 +38,6 @@ const RUGACIUNI_ZILE: Record<number, string> = {
   4: 'joi',
   5: 'vineri',
   6: 'sambata',
-}
-
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 async function getWidgetConfig() {
@@ -97,7 +93,7 @@ async function getDailyData(locale: Locale) {
       prayer: prayerBook
         ? {
             title: prayerBook.titleRo,
-            text: stripHtml(prayerBook.contentRo).slice(0, 200) + '…',
+            text: htmlToPlainText(prayerBook.contentRo).slice(0, 200) + '…',
             slug: prayerBook.slug,
             day: prayerDay,
           }
@@ -134,7 +130,7 @@ async function getHomeContent(locale: Locale) {
       articles: articles.map(a => ({
         slug: a.slug, title: a.titleRo,
         imageUrl: a.imageUrl, publishedAt: a.publishedAt, category: a.category,
-        excerpt: stripHtml(a.contentRo).slice(0, 220),
+        excerpt: htmlToPlainText(a.contentRo).slice(0, 220),
       })),
       libraryBooks: libraryBooks.map(b => ({
         slug: b.slug, title: b.titleRo, type: b.type,

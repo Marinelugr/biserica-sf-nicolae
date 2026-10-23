@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import PublicGallery from '@/components/PublicGallery'
 import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { htmlToPlainText } from '@/lib/utils'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
 
@@ -26,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!saint) return {}
   const title = saint.nameRo
   const life = saint.lifeRo || ''
-  const plain = life.replace(/<[^>]*>/g, '').substring(0, 160)
+  const plain = htmlToPlainText(life).substring(0, 160)
   return {
     title: `${title} | Sfinți`,
     description: plain || `Viața și prăznuirea ${title}.`,

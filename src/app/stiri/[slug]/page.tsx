@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { formatDate, readingTime } from '@/lib/utils'
+import { formatDate, readingTime, htmlToPlainText } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return {}
   const title = article.titleRo
   const content = article.contentRo
-  const plainText = content.replace(/<[^>]*>/g, '').substring(0, 160)
+  const plainText = htmlToPlainText(content).substring(0, 160)
   return {
     title,
     description: plainText,

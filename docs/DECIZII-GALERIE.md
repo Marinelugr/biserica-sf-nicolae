@@ -165,3 +165,16 @@ ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroa
   4 poze (JPG bun, `.HEIC`, text numit `.jpg`, `.webp` lipsă): 3 chenare cu `.heic · image/heic`,
   `.jpg · image/jpeg`, `.webp`; banner „3 poze…”; după buton: „în așteptare” rămâne 1 poză; editare cu un
   `DELETE` forțat la 500 → „1 din 3 poze nu au putut fi șterse”, banner „1 poză…”; zero erori JS.
+
+## B1. Text curat din HTML
+
+- `htmlToPlainText` în `src/lib/utils.ts`, cu `decode` din `he` (deja dependență, folosit de
+  `externalFeeds.ts` și `sfinti-scraper.ts`). Acceptă și `null`/`undefined` (→ `''`).
+- Înlocuit în: `app/page.tsx` (fragment știre + rugăciune, `stripHtml` șters), `app/magazin/page.tsx`
+  (`stripHtml` șters), descrierile `meta` din `stiri/[slug]`, `paroh`, `carti/[slug]`, `sfintii/[slug]`
+  (înainte lipeau cuvintele: etichetele erau înlocuite cu `''`), `readingTime` din `utils.ts`.
+- Neatins: `src/lib/sfinti-scraper.ts` (decodează deja cu `he`; nu era pe listă).
+- `utils.ts` e importat și de un component client (`admin/video`, doar `slugify`); verificat după build
+  că tabela de entități din `he` nu ajunge în `.next/static`.
+- Teste: `utils.test.ts` (7). Cu vechea metodă în corpul funcției: 4 roșii (`&nbsp;`, entități,
+  `<script>/<style>`, `readingTime`).
