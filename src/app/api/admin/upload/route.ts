@@ -12,7 +12,7 @@ const ALLOWED_TYPES = [
   'image/heic', 'image/heif',
 ]
 
-export async function POST(req: NextRequest) {
+async function handleUpload(req: NextRequest) {
   const session = await auth()
   if (!session) return NextResponse.json({ error: 'Neautorizat' }, { status: 401 })
 
@@ -22,7 +22,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'SUPABASE_SERVICE_ROLE_KEY nu este configurat în .env' }, { status: 500 })
   }
 
-  const formData = await req.formData()
+  let formData: FormData
+  try {
+    formData = await req.formData()
+  } catch {
+    return NextResponse.json({ error: 'Încărcare întreruptă sau coruptă. Încearcă din nou.' }, { status: 400 })
+  }
   const file = formData.get('file') as File | null
   const isThumbnail = formData.get('thumbnail') === 'true'
   if (!file) return NextResponse.json({ error: 'Niciun fișier trimis' }, { status: 400 })
@@ -56,4 +61,14 @@ export async function POST(req: NextRequest) {
 
   const { data: { publicUrl } } = supabase.storage.from(BUCKET).getPublicUrl(data.path)
   return NextResponse.json({ url: publicUrl })
+}
+
+// Orice excepție neprevăzută devine JSON (altfel clientul primește o pagină HTML de eroare).
+export async function POST(req: NextRequest) {
+  try {
+    return await handleUpload(req)
+  } catch (err) {
+    console.error('[upload]', err)
+    return NextResponse.json({ error: 'Eroare la salvarea pozei pe server. Încearcă din nou.' }, { status: 500 })
+  }
 }

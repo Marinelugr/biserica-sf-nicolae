@@ -6,6 +6,8 @@ import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
 import ImageUploadButton from '@/components/admin/ImageUploadButton'
 import MediaGallery from '@/components/admin/MediaGallery'
+import { attachPendingMedia } from '@/lib/mediaUpload'
+import type { PendingMedia } from '@/lib/pendingMedia'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -65,6 +67,8 @@ export default function AdminSfintiPage() {
   const [editSaint, setEditSaint] = useState<Saint | null>(null)
   const [form, setForm] = useState(emptyForm)
   const [saving, setSaving] = useState(false)
+  const [pendingMedia, setPendingMedia] = useState<PendingMedia[]>([])
+  const [galleryUploading, setGalleryUploading] = useState(false)
   const [deleteId, setDeleteId] = useState<string | null>(null)
   const [deleting, setDeleting] = useState(false)
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null)
@@ -82,6 +86,7 @@ export default function AdminSfintiPage() {
   function openNew() {
     setEditSaint(null)
     setForm(emptyForm)
+    setPendingMedia([])
     setShowForm(true)
   }
 
@@ -99,6 +104,18 @@ export default function AdminSfintiPage() {
       const method = editSaint ? 'PATCH' : 'POST'
       const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form) })
       if (!res.ok) { const d = await res.json(); throw new Error(d.error) }
+      if (!editSaint && pendingMedia.length) {
+        const created = await res.json()
+        try {
+          await attachPendingMedia('saint', created.id, pendingMedia)
+          setPendingMedia([])
+        } catch {
+          showToast('Sfântul a fost salvat, dar pozele nu s-au atașat. Le poți adăuga din galeria de la editare.', 'error')
+          setShowForm(false)
+          fetchSaints()
+          return
+        }
+      }
       showToast(editSaint ? 'Sfânt actualizat ✓' : 'Sfânt adăugat ✓', 'success')
       setShowForm(false)
       fetchSaints()
@@ -285,15 +302,21 @@ export default function AdminSfintiPage() {
                 {editSaint ? (
                   <MediaGallery entityType="saint" entityId={editSaint.id} maxPhotos={30} />
                 ) : (
-                  <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem', padding: '1rem', border: '1px dashed #2A1A0A', borderRadius: '6px', textAlign: 'center' }}>
-                    Salvați sfântul mai întâi, apoi puteți adăuga fotografii.
-                  </div>
+                  <MediaGallery
+                    entityType="saint"
+                    entityId={null}
+                    maxPhotos={30}
+                    pending={pendingMedia}
+                    onPendingChange={setPendingMedia}
+                    onUploadingChange={setGalleryUploading}
+                    pendingNote="Ordinea și descrierile se salvează odată cu sfântul."
+                  />
                 )}
               </div>
             </div>
 
             <div style={{ padding: '1.25rem 1.5rem', borderTop: '1px solid #1E1208', display: 'flex', gap: '0.75rem', flexShrink: 0 }}>
-              <button onClick={handleSave} disabled={saving} style={{ ...btnPrimary, opacity: saving ? 0.6 : 1 }}>{saving ? 'Se salvează...' : editSaint ? 'Actualizează' : 'Adaugă sfânt'}</button>
+              <button onClick={handleSave} disabled={saving || galleryUploading} style={{ ...btnPrimary, opacity: saving || galleryUploading ? 0.6 : 1 }}>{saving ? 'Se salvează...' : galleryUploading ? 'Se încarcă pozele...' : editSaint ? 'Actualizează' : 'Adaugă sfânt'}</button>
               <button onClick={() => setShowForm(false)} style={btnGhost}>Anulează</button>
             </div>
           </div>

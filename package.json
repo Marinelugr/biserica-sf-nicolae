@@ -15,7 +15,8 @@
     "db:backfill-video-slugs": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/backfill-video-slugs.ts",
     "db:backfill-saints": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/backfill-saints.ts",
     "db:recompress-images": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/recompress-storage.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test": "vitest run"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -62,6 +63,7 @@
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.2.7"
   }
 }

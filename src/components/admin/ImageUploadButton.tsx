@@ -1,6 +1,25 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import { optimizeImage, blobToFile, formatBytes } from '@/lib/imageOptimizer'
+import { uploadImage } from '@/lib/mediaUpload'
+
+// Vector/animat: compresia prin canvas le-ar strica (SVG rasterizat, GIF fără animație).
+const KEEP_AS_IS = new Set(['image/svg+xml', 'image/gif'])
+
+const fmt = (bytes: number) => formatBytes(bytes).replace('.', ',')
+
+// Poza de telefon (4–10 MB) se micșorează în browser înainte de trimitere.
+// Dacă nu se poate (ex. HEIC în Chrome), se trimite originalul; serverul o comprimă oricum.
+async function compress(file: File): Promise<File> {
+  if (KEEP_AS_IS.has(file.type)) return file
+  try {
+    const { blob } = await optimizeImage(file)
+    return blob.size < file.size ? blobToFile(blob, file.name) : file
+  } catch {
+    return file
+  }
+}
 
 interface Props {
   onUpload: (url: string) => void
@@ -13,6 +32,7 @@ export default function ImageUploadButton({ onUpload, label = 'Încarcă imagine
   const inputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState('')
+  const [sizeNote, setSizeNote] = useState('')
   const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
@@ -24,20 +44,21 @@ export default function ImageUploadButton({ onUpload, label = 'Încarcă imagine
     if (!file) return
     abortRef.current?.abort()
     abortRef.current = new AbortController()
+    const signal = abortRef.current.signal
     setUploading(true)
     setError('')
+    setSizeNote('')
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd, signal: abortRef.current.signal })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Eroare la upload')
-      onUpload(data.url)
+      const toSend = await compress(file)
+      if (signal.aborted) return
+      setSizeNote(toSend === file ? fmt(file.size) : `${fmt(file.size)} → ${fmt(toSend.size)}`)
+      onUpload(await uploadImage(toSend, { signal }))
     } catch (err) {
       if ((err as { name?: string }).name === 'AbortError') return
       setError(err instanceof Error ? err.message : 'Eroare la upload')
     } finally {
       setUploading(false)
+      setSizeNote('')
       if (inputRef.current) inputRef.current.value = ''
     }
   }
@@ -73,7 +94,7 @@ export default function ImageUploadButton({ onUpload, label = 'Încarcă imagine
         }}
       >
         {uploading
-          ? <><Spinner /> Se încarcă...</>
+          ? <><Spinner /> Se încarcă...{sizeNote && <span style={{ color: '#5A4020', fontSize: '0.75rem' }}>({sizeNote})</span>}</>
           : <>📎 {label}</>}
       </button>
       {error && (

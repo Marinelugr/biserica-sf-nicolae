@@ -128,6 +128,31 @@ trebuie să fie dinamică (ƒ în tabelul de rute din `next build`), nu statică
   dă `max-age=604800` fără `immutable` și fără compresie. Ar cere reguli în `.htaccess` și
   sincronizare în deploy; Next servește deja `/_next/static` cu cache de 1 an.
 
+## Limite de încărcare
+
+Măsurat pe 2026-10-23, de pe un Mac (rețea de acasă), cu `POST /api/admin/upload` **fără autentificare**
+(fișier aleator, `multipart/form-data`). Scopul: să vedem dacă LiteSpeed/Passenger taie cererile mari
+înainte de aplicație.
+
+| Mărime | Rezultat |
+| --- | --- |
+| 1 MB | `401` JSON `{"error":"Neautorizat"}`, 0,7 s |
+| 4 MB | `401` JSON, 0,9 s |
+| 5 / 6 / 8 MB | `401` JSON, 1,0–1,4 s |
+| 12 MB | `401` JSON, 2,5–3,0 s |
+| 25 MB | `401` JSON, 4,0 s |
+
+Concluzie: serverul **nu** taie cererile până la 25 MB (fără `413`, `403`, `502` sau HTML); limita
+efectivă e cea din aplicație (`MAX_SIZE_MB = 20` în `src/app/api/admin/upload/route.ts`).
+
+La prima rulare, probele de 12 și 25 MB s-au blocat după 4 MB, respectiv 10 MB trimiși (0 octeți
+primiți, peste 15 minute); la reluare, câteva minute mai târziu, au trecut în câteva secunde. Pare o
+întrerupere de rețea pe partea clientului, nu o limită a serverului, dar arată de ce clientul trebuie
+să comprime pozele înainte de trimitere și să reîncerce o dată (vezi `src/lib/mediaUpload.ts`).
+
+Nemăsurat (cere autentificare): timpul de procesare `sharp` pentru o poză reală de telefon și
+consumul de memorie cu mai multe încărcări simultane.
+
 ## DNS și HTTPS
 
 | Domeniu | Nameservere | Înregistrări |

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { optimizeImage, blobToFile, formatBytes } from '@/lib/imageOptimizer'
+import { uploadImage, attachMedia } from '@/lib/mediaUpload'
+import { movePending, removePending, setPendingCaption, type PendingMedia } from '@/lib/pendingMedia'
 
 interface MediaItem {
   id: string
@@ -13,8 +15,15 @@ interface MediaItem {
 
 interface Props {
   entityType: string
-  entityId: string
+  /** null = formular nou, nesalvat: pozele rămân „în așteptare” la părinte până la salvare. */
+  entityId: string | null
   maxPhotos?: number
+  pending?: PendingMedia[]
+  onPendingChange?: (items: PendingMedia[]) => void
+  /** Textul afișat în modul „în așteptare”, în locul butonului de salvare. */
+  pendingNote?: string
+  /** Anunță părintele cât timp se încarcă poze (ex. ca să nu se salveze formularul între timp). */
+  onUploadingChange?: (uploading: boolean) => void
 }
 
 const inp: React.CSSProperties = { width: '100%', backgroundColor: '#1A1008', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.45rem 0.7rem', color: '#F2EBD9', fontSize: '0.82rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' }
@@ -27,28 +36,47 @@ function Spinner() {
   )
 }
 
-async function uploadFile(file: File, isThumbnail = false): Promise<string> {
-  const fd = new FormData()
-  fd.append('file', file)
-  if (isThumbnail) fd.append('thumbnail', 'true')
-  const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
-  const data = await res.json()
-  if (!res.ok) throw new Error(data.error || 'Eroare upload')
-  return data.url
+interface UploadSummary {
+  ok: number
+  total: number
+  failures: { name: string; reason: string }[]
+  skipped: number
 }
 
-export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: Props) {
+const NO_PENDING: PendingMedia[] = []
+
+function newTempId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
+export default function MediaGallery({ entityType, entityId, maxPhotos = 50, pending = NO_PENDING, onPendingChange, pendingNote = 'Ordinea și descrierile se salvează odată cu știrea.', onUploadingChange }: Props) {
+  const isPending = entityId === null
   const [items, setItems] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!isPending)
   const [uploading, setUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [uploadTotal, setUploadTotal] = useState(0)
   const [error, setError] = useState('')
+  const [summary, setSummary] = useState<UploadSummary | null>(null)
   const [saving, setSaving] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Ultima listă în așteptare, citită în bucla de încărcare (props-ul se schimbă între poze).
+  const pendingRef = useRef(pending)
+  useEffect(() => { pendingRef.current = pending }, [pending])
+
+  const shown: MediaItem[] = isPending
+    ? pending.map(p => ({ id: p.tempId, url: p.url, thumbnailUrl: p.thumbnailUrl, caption: p.caption, order: p.order }))
+    : items
+
+  function setPending(next: PendingMedia[]) {
+    pendingRef.current = next
+    onPendingChange?.(next)
+  }
+
   const load = useCallback(async () => {
+    if (entityId === null) return
     try {
       const res = await fetch(`/api/admin/media?entityType=${entityType}&entityId=${encodeURIComponent(entityId)}`)
       if (res.ok) setItems(await res.json())
@@ -59,65 +87,93 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
 
   useEffect(() => { load() }, [load])
 
+  useEffect(() => {
+    onUploadingChange?.(uploading)
+    // Dacă galeria dispare în timpul încărcării, părintele nu rămâne blocat.
+    return () => { if (uploading) onUploadingChange?.(false) }
+  }, [uploading, onUploadingChange])
+
+  // Avertisment dacă pagina e închisă în timpul încărcării.
+  useEffect(() => {
+    if (!uploading) return
+    const warn = (e: BeforeUnloadEvent) => { e.preventDefault() }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [uploading])
+
+  // Principala, apoi miniatura: una după alta, ca serverul să ruleze un singur
+  // proces sharp odată. Dacă optimizarea în browser eșuează (ex. HEIC în Chrome),
+  // se trimite originalul fără miniatură; serverul îl comprimă oricum.
+  async function uploadOne(file: File): Promise<{ url: string; thumbnailUrl?: string }> {
+    let mainFile = file
+    let thumbFile: File | null = null
+    try {
+      setUploadStatus(`Se optimizează ${file.name}...`)
+      const { blob, thumbnailBlob, originalSize, optimizedSize } = await optimizeImage(file)
+      mainFile = blobToFile(blob, file.name)
+      thumbFile = blobToFile(thumbnailBlob, `thumb_${file.name}`)
+      const reduction = Math.round((1 - optimizedSize / originalSize) * 100)
+      setUploadStatus(`${formatBytes(originalSize)} → ${formatBytes(optimizedSize)} (−${reduction}%) · Se încarcă...`)
+    } catch {
+      setUploadStatus(`${file.name} (${formatBytes(file.size)}) · Se încarcă...`)
+    }
+
+    const url = await uploadImage(mainFile)
+    // Miniatura e opțională: fără ea, galeria afișează poza principală.
+    const thumbnailUrl = thumbFile ? await uploadImage(thumbFile, { thumbnail: true }).catch(() => undefined) : undefined
+    return { url, thumbnailUrl }
+  }
+
   async function handleFiles(files: FileList) {
     if (!files.length) return
-    const remaining = maxPhotos - items.length
-    const toUpload = Array.from(files).slice(0, remaining)
+    const all = Array.from(files)
+    const remaining = maxPhotos - shown.length
+    const toUpload = all.slice(0, Math.max(remaining, 0))
     if (!toUpload.length) { setError(`Limita de ${maxPhotos} poze atinsă.`); return }
 
     setUploading(true)
     setUploadProgress(0)
     setUploadTotal(toUpload.length)
     setError('')
+    setSummary(null)
     setUploadStatus('')
 
-    let done = 0
-    const newItems: MediaItem[] = []
+    const failures: UploadSummary['failures'] = []
+    let ok = 0
+    const baseOrder = shown.length
 
-    for (const file of toUpload) {
+    for (const [i, file] of toUpload.entries()) {
       try {
-        setUploadStatus(`Se optimizează ${file.name}...`)
-
-        // Optimize + thumbnail in parallel
-        const { blob, thumbnailBlob, originalSize, optimizedSize } = await optimizeImage(file)
-        const optimizedFile = blobToFile(blob, file.name)
-        const thumbFile = blobToFile(thumbnailBlob, `thumb_${file.name}`)
-
-        const reduction = Math.round((1 - optimizedSize / originalSize) * 100)
-        setUploadStatus(`${formatBytes(originalSize)} → ${formatBytes(optimizedSize)} (−${reduction}%) · Se încarcă...`)
-
-        // Upload main + thumbnail in parallel
-        const [url, thumbnailUrl] = await Promise.all([
-          uploadFile(optimizedFile),
-          uploadFile(thumbFile, true),
-        ])
-
-        const nextOrder = items.length + newItems.length
-        const res = await fetch('/api/admin/media', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url, thumbnailUrl, entityType, entityId, order: nextOrder }),
-        })
-        if (res.ok) newItems.push(await res.json())
+        const { url, thumbnailUrl } = await uploadOne(file)
+        if (entityId === null) {
+          const current = pendingRef.current
+          setPending([...current, { tempId: newTempId(), url, thumbnailUrl, caption: '', order: current.length }])
+        } else {
+          const item = await attachMedia<MediaItem>({ url, thumbnailUrl, entityType, entityId, order: baseOrder + ok })
+          setItems(prev => [...prev, item])
+        }
+        ok++
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Eroare upload')
+        const reason = err instanceof Error ? err.message.replace(`${file.name}: `, '') : 'Eroare necunoscută'
+        failures.push({ name: file.name, reason })
       }
-      done++
-      setUploadProgress(done)
+      setUploadProgress(i + 1)
     }
 
-    setItems(prev => [...prev, ...newItems])
+    setSummary({ ok, total: toUpload.length, failures, skipped: all.length - toUpload.length })
     setUploading(false)
     setUploadStatus('')
     if (inputRef.current) inputRef.current.value = ''
   }
 
   async function handleDelete(id: string) {
+    if (isPending) { setPending(removePending(pending, id)); return }
     await fetch(`/api/admin/media/${id}`, { method: 'DELETE' })
     setItems(prev => prev.filter(i => i.id !== id))
   }
 
   function move(index: number, dir: -1 | 1) {
+    if (isPending) { setPending(movePending(pending, index, dir)); return }
     const next = [...items]
     const target = index + dir
     if (target < 0 || target >= next.length) return
@@ -127,6 +183,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
   }
 
   function updateCaption(id: string, caption: string) {
+    if (isPending) { setPending(setPendingCaption(pending, id, caption)); return }
     setItems(prev => prev.map(i => i.id === id ? { ...i, caption } : i))
   }
 
@@ -150,11 +207,15 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
       {/* Counter + actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>
-          {items.length} din {maxPhotos} poze
+          {shown.length} din {maxPhotos} poze
         </span>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {items.length > 0 && (
-            <button
+          {isPending ? (
+            <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.78rem', alignSelf: 'center' }}>
+              {pendingNote}
+            </span>
+          ) : shown.length > 0 && (
+            <button type="button"
               onClick={saveOrder}
               disabled={saving}
               style={{ backgroundColor: saving ? '#1A1008' : '#1E1208', color: '#C9A84C', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.4rem 0.875rem', fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: saving ? 'not-allowed' : 'pointer' }}
@@ -162,10 +223,10 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
               {saving ? 'Se salvează...' : '💾 Salvează ordine & captions'}
             </button>
           )}
-          <button
+          <button type="button"
             onClick={() => inputRef.current?.click()}
-            disabled={uploading || items.length >= maxPhotos}
-            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', border: 'none', borderRadius: '4px', padding: '0.4rem 0.875rem', fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: (uploading || items.length >= maxPhotos) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: items.length >= maxPhotos ? 0.5 : 1 }}
+            disabled={uploading || shown.length >= maxPhotos}
+            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', border: 'none', borderRadius: '4px', padding: '0.4rem 0.875rem', fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: (uploading || shown.length >= maxPhotos) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: shown.length >= maxPhotos ? 0.5 : 1 }}
           >
             {uploading ? <><Spinner /> Se optimizează...</> : '📎 Adaugă poze'}
           </button>
@@ -206,7 +267,25 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
         <div style={{ color: '#CA4A4A', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginBottom: '0.75rem' }}>✗ {error}</div>
       )}
 
-      {items.length === 0 ? (
+      {summary && (
+        <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginBottom: '0.75rem', padding: '0.5rem 0.75rem', backgroundColor: '#0A0704', borderRadius: '4px', border: `1px solid ${summary.failures.length ? '#3A1010' : '#1A1008'}` }}>
+          <div style={{ color: summary.failures.length ? '#CA4A4A' : '#7A9A50' }}>
+            {summary.failures.length ? '✗' : '✓'} {summary.ok} din {summary.total} {summary.total === 1 ? 'poză încărcată' : 'poze încărcate'}.
+          </div>
+          {summary.failures.length > 0 && (
+            <ul style={{ margin: '0.35rem 0 0', paddingLeft: '1.1rem', color: '#C06050' }}>
+              {summary.failures.map((f, i) => <li key={i}><strong>{f.name}</strong>: {f.reason}</li>)}
+            </ul>
+          )}
+          {summary.skipped > 0 && (
+            <div style={{ color: '#8B6014', marginTop: '0.35rem' }}>
+              {summary.skipped} {summary.skipped === 1 ? 'poză nu a fost adăugată' : 'poze nu au fost adăugate'}: limita este de {maxPhotos} poze.
+            </div>
+          )}
+        </div>
+      )}
+
+      {shown.length === 0 ? (
         <div
           onClick={() => inputRef.current?.click()}
           style={{ padding: '3rem 1rem', textAlign: 'center', color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.875rem', border: '1px dashed #2A1A0A', borderRadius: '6px', cursor: 'pointer' }}
@@ -215,14 +294,17 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
           <span style={{ fontSize: '0.75rem', color: '#2A1A0A', marginTop: '0.4rem', display: 'block' }}>
             JPG, PNG, WebP, HEIC — compresie automată WebP
           </span>
+          <span style={{ fontSize: '0.75rem', color: '#5A4020', marginTop: '0.25rem', display: 'block' }}>
+            Poți alege mai multe poze deodată.
+          </span>
         </div>
       ) : (
         <div className="mg-grid">
-          {items.map((item, i) => (
+          {shown.map((item, i) => (
             <div key={item.id} className="mg-item" style={{ backgroundColor: '#0A0704', border: '1px solid #2A1A0A', borderRadius: '6px', overflow: 'hidden' }}>
               <div style={{ position: 'relative' }}>
                 <img
-                  src={(item as MediaItem & { thumbnailUrl?: string }).thumbnailUrl || item.url}
+                  src={item.thumbnailUrl || item.url}
                   alt={item.caption || ''}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                   onError={e => {
@@ -230,7 +312,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
                     if (el.src !== item.url) el.src = item.url
                   }}
                 />
-                <button
+                <button type="button"
                   onClick={() => handleDelete(item.id)}
                   style={{ position: 'absolute', top: '0.35rem', right: '0.35rem', backgroundColor: 'rgba(90,10,10,0.9)', border: 'none', borderRadius: '3px', color: '#F2EBD9', cursor: 'pointer', padding: '0.15rem 0.4rem', fontSize: '0.75rem', lineHeight: 1.4 }}
                 >✕</button>
@@ -243,15 +325,15 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
                   style={inp}
                 />
                 <div style={{ display: 'flex', gap: '0.3rem', marginTop: '0.4rem', justifyContent: 'flex-end' }}>
-                  <button
+                  <button type="button"
                     onClick={() => move(i, -1)}
                     disabled={i === 0}
                     style={{ backgroundColor: 'transparent', color: i === 0 ? '#2A1A0A' : '#9B8050', border: '1px solid #2A1A0A', borderRadius: '3px', padding: '0.15rem 0.4rem', fontSize: '0.7rem', cursor: i === 0 ? 'default' : 'pointer' }}
                   >↑ Sus</button>
-                  <button
+                  <button type="button"
                     onClick={() => move(i, 1)}
-                    disabled={i === items.length - 1}
-                    style={{ backgroundColor: 'transparent', color: i === items.length - 1 ? '#2A1A0A' : '#9B8050', border: '1px solid #2A1A0A', borderRadius: '3px', padding: '0.15rem 0.4rem', fontSize: '0.7rem', cursor: i === items.length - 1 ? 'default' : 'pointer' }}
+                    disabled={i === shown.length - 1}
+                    style={{ backgroundColor: 'transparent', color: i === shown.length - 1 ? '#2A1A0A' : '#9B8050', border: '1px solid #2A1A0A', borderRadius: '3px', padding: '0.15rem 0.4rem', fontSize: '0.7rem', cursor: i === shown.length - 1 ? 'default' : 'pointer' }}
                   >↓ Jos</button>
                 </div>
               </div>

@@ -6,6 +6,9 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import ImageUploadButton from '@/components/admin/ImageUploadButton'
+import MediaGallery from '@/components/admin/MediaGallery'
+import { attachPendingMedia } from '@/lib/mediaUpload'
+import type { PendingMedia } from '@/lib/pendingMedia'
 
 const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
@@ -20,11 +23,16 @@ function slugify(text: string) {
     .trim()
 }
 
+const sectionBox: React.CSSProperties = { backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }
+const sectionTitle: React.CSSProperties = { color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid #1E1208' }
+
 export default function NouArticolPage() {
   const router = useRouter()
   const [form, setForm] = useState({ titleRo: '', slug: '', category: '', imageUrl: '', published: false, scheduledFor: '', contentRo: '', seoKeywords: '' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const [pendingMedia, setPendingMedia] = useState<PendingMedia[]>([])
+  const [galleryUploading, setGalleryUploading] = useState(false)
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const title = e.target.value
@@ -47,6 +55,16 @@ export default function NouArticolPage() {
         throw new Error(data.error || 'Eroare la salvare')
       }
       const created = await res.json()
+      if (pendingMedia.length) {
+        try {
+          await attachPendingMedia('article', created.id, pendingMedia)
+        } catch {
+          // Știrea e salvată; pozele (deja în Storage) se pot adăuga din galeria de la editare.
+          setError('Știrea a fost salvată, dar pozele nu s-au atașat. Le poți adăuga din galeria de la editare.')
+          setTimeout(() => router.push(`/admin/stiri/${created.id}`), 3000)
+          return
+        }
+      }
       router.push(`/admin/stiri/${created.id}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Eroare necunoscută')
@@ -131,6 +149,18 @@ export default function NouArticolPage() {
                 />
               </div>
 
+              <div style={{ ...sectionBox, marginBottom: 0 }}>
+                <div style={sectionTitle}>📷 Galerie foto articol</div>
+                <MediaGallery
+                  entityType="article"
+                  entityId={null}
+                  maxPhotos={50}
+                  pending={pendingMedia}
+                  onPendingChange={setPendingMedia}
+                  onUploadingChange={setGalleryUploading}
+                />
+              </div>
+
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <input type="checkbox" id="published" checked={form.published}
                   onChange={e => setForm(f => ({ ...f, published: e.target.checked }))}
@@ -160,13 +190,13 @@ export default function NouArticolPage() {
               )}
 
               <div style={{ display: 'flex', gap: '1rem' }}>
-                <button type="submit" disabled={saving} style={{
-                  backgroundColor: saving ? '#5A1010' : '#8B1A1A',
+                <button type="submit" disabled={saving || galleryUploading} style={{
+                  backgroundColor: saving || galleryUploading ? '#5A1010' : '#8B1A1A',
                   color: '#F2EBD9', border: 'none', borderRadius: '4px',
                   padding: '0.75rem 2rem', fontSize: '1rem', fontFamily: 'Georgia, serif',
-                  cursor: saving ? 'not-allowed' : 'pointer',
+                  cursor: saving || galleryUploading ? 'not-allowed' : 'pointer',
                 }}>
-                  {saving ? 'Se salvează...' : 'Salvează articolul'}
+                  {saving ? 'Se salvează...' : galleryUploading ? 'Se încarcă pozele...' : 'Salvează articolul'}
                 </button>
                 <Link href="/admin/stiri" style={{
                   backgroundColor: 'transparent', color: '#9B8050', border: '1px solid #2A1A0A',
