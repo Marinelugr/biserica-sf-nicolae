@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { optimizeImage, blobToFile, formatBytes } from '@/lib/imageOptimizer'
 import { uploadImage, attachMedia } from '@/lib/mediaUpload'
+import { isHeic, convertHeicToJpeg } from '@/lib/heic'
 import { movePending, removePending, setPendingCaption, type PendingMedia } from '@/lib/pendingMedia'
 
 interface MediaItem {
@@ -102,9 +103,14 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50, pen
   }, [uploading])
 
   // Principala, apoi miniatura: una după alta, ca serverul să ruleze un singur
-  // proces sharp odată. Dacă optimizarea în browser eșuează (ex. HEIC în Chrome),
-  // se trimite originalul fără miniatură; serverul îl comprimă oricum.
-  async function uploadOne(file: File): Promise<{ url: string; thumbnailUrl?: string }> {
+  // proces sharp odată. HEIC se convertește întâi în JPEG (altfel poza e refuzată).
+  // Dacă optimizarea în browser eșuează, se trimite fișierul fără miniatură; serverul îl comprimă oricum.
+  async function uploadOne(original: File): Promise<{ url: string; thumbnailUrl?: string }> {
+    let file = original
+    if (isHeic(original)) {
+      setUploadStatus(`Se convertește ${original.name} din HEIC...`)
+      file = await convertHeicToJpeg(original)
+    }
     let mainFile = file
     let thumbFile: File | null = null
     try {
