@@ -73,7 +73,6 @@ export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: 
           {profile.displayName}
         </NameTag>
         <p className="mute" data-intro-text>{t.shell.profileRole}</p>
-        <p className="lead" style={{ fontSize: 21 }} data-intro-text>{profile.lead}</p>
         <p className="gold" style={{ fontSize: 17 }} data-intro-text>{SITE_HOST}</p>
         <div className="flex flex-wrap gap-2.5" data-intro-text>
           <a className="btn gold" href={`#${SOCIAL_ANCHOR}`}>{t.shell.follow}</a>

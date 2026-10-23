@@ -140,9 +140,3 @@ export function decorateLetter(html: string): string {
     : first.replace(/^<p/i, '<p class="salutare"')
   return html.replace(first, decorated)
 }
-
-/** @deprecated folosit doar până la trecerea pe extrasul formatat (A3). */
-export function firstSentences(text: string, count: number): string {
-  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text]
-  return sentences.slice(0, count).join(' ').trim()
-}

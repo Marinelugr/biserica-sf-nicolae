@@ -3,11 +3,12 @@ import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ShareButtons from '@/components/shared/ShareButtons'
-import { FALLBACK_MESAJ, FALLBACK_SEMNATURA } from '@/lib/priestMessage'
+import { FALLBACK_SEMNATURA, messageDescription, messageToHtml } from '@/lib/priestMessage'
 import { SITE_URL } from '@/lib/site'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import PriestMessageLetter from '@/components/homepage/PriestMessageLetter'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,8 +17,7 @@ const SHARE_TEXT = 'Mesajul Părintelui Marin Grigoriță, Parohul Bisericii Sf�
 
 export async function generateMetadata(): Promise<Metadata> {
   const mesaj = await prisma.priestMessage.findFirst({ where: { active: true } })
-  const mesajRo = mesaj?.mesajRo || FALLBACK_MESAJ
-  const description = mesajRo.slice(0, 160)
+  const description = messageDescription(mesaj?.mesajRo, 160)
 
   return {
     title: 'Mesajul Părintelui | Sf. Nicolae Hîrtopul Mic',
@@ -38,24 +38,14 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function MesajulParinteluiPage() {
   const mesaj = await prisma.priestMessage.findFirst({ where: { active: true } })
 
-  const mesajText = mesaj?.mesajRo || FALLBACK_MESAJ
+  const html = messageToHtml(mesaj?.mesajRo)
   const semnatura = mesaj?.semnaturaRo || FALLBACK_SEMNATURA
   const updatedAt = mesaj ? mesaj.updatedAt.toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' }) : null
 
   return (
     <PageShell aside="compact">
       <PageHead crumbs={[{ href: '/', label: 'Acasă' }, { label: 'Mesajul Părintelui' }]} title="Mesajul Părintelui" />
-      <article className="card">
-        <figure className="flex flex-col gap-5">
-          <blockquote className="lead reading" style={{ fontSize: 'clamp(23px, 2.4vw, 27px)', maxWidth: '62ch', whiteSpace: 'pre-line' }}>
-            {mesajText}
-          </blockquote>
-          <figcaption>
-            <p className="gold text-[19px]">— {semnatura}</p>
-            {updatedAt && <p className="mute text-[16px] mt-1">Actualizat la {updatedAt}</p>}
-          </figcaption>
-        </figure>
-      </article>
+      <PriestMessageLetter html={html} signature={semnatura} updatedLabel={updatedAt ? `Actualizat la ${updatedAt}` : null} />
       <div className="card flex flex-wrap items-center justify-between gap-4" style={{ padding: '20px 24px' }}>
         <Link href="/" className="link-gold text-[17px]">← Înapoi</Link>
         <ShareButtons url={SHARE_URL} title={SHARE_TEXT} />
