@@ -128,3 +128,23 @@ ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroa
 - `db:recompress-images` nu e afectat (sare peste tot ce are `wasOptimized: false`).
 - Teste: `upload-decode.test.ts` (5; `processImageBuffer` real, `sharp` simulat să arunce, Supabase simulat).
   Cu vechiul `catch` readus: 3 roșii (HEIC, HEIF, text redenumit .jpg).
+
+## A2. HEIC → JPEG în browser
+
+- `heic-to` **1.6.6** (fixată exact; libheif 1.23.6 compilat în WASM), licență **LGPL-3.0**, notată în
+  `docs/LICENTE-TERTE.md`. Încărcată doar prin `await import('heic-to')` din `convertHeicToJpeg`.
+- `src/lib/heic.ts`: `isHeic` (tip `image/heic|heif[-sequence]` sau extensie `.heic/.heif`, orice
+  majuscule; tipul poate fi gol), `convertHeicToJpeg` (JPEG 0,9, nume `.jpg`), `heicErrorMessage`.
+- `MediaGallery.uploadOne` și `ImageUploadButton.compress`: conversia **înainte** de `optimizeImage`.
+  Conversie eșuată → poza e **refuzată** (apare în rezumat cu mesajul „Poza X este în format HEIC…”),
+  originalul nu mai pleacă spre server. Dacă doar `optimizeImage` eșuează după conversie, se trimite
+  JPEG-ul (serverul îl poate procesa).
+- Am folosit importul implicit (`heic-to`), care cere `unsafe-eval`. Site-ul nu are CSP; dacă se adaugă
+  una, se trece la `heic-to/csp` (același API).
+- Pachet: chunk separat de **3,0 MB** (necomprimat), cerut doar la primul HEIC; nu e referit de niciun
+  manifest de pagină (`.next/server`). Restul chunk-urilor: +~8 KB în total față de `main`
+  (2 122 879 → 2 131 135 octeți fără chunk-ul `heic-to`).
+- Verificat în Chromium headless (HeadlessChrome 153, script necomis, esbuild + playwright-core):
+  `/tmp/test.heic` (141 KB, 940×664) → `test.jpg`, `image/jpeg`, **168 217 octeți**, 940×664, 265 ms.
+  Un fișier text numit `proba.heic` → mesajul de refuz în română.
+- `accept` și textul „JPG, PNG, WebP, HEIC” rămân neschimbate (acum sunt adevărate).
