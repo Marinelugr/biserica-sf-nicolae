@@ -45,6 +45,10 @@ interface UploadSummary {
 
 const NO_PENDING: PendingMedia[] = []
 
+function newTempId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
 export default function MediaGallery({ entityType, entityId, maxPhotos = 50, pending = NO_PENDING, onPendingChange, pendingNote = 'Ordinea și descrierile se salvează odată cu știrea.', onUploadingChange }: Props) {
   const isPending = entityId === null
   const [items, setItems] = useState<MediaItem[]>([])
@@ -143,8 +147,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50, pen
         const { url, thumbnailUrl } = await uploadOne(file)
         if (entityId === null) {
           const current = pendingRef.current
-          const tempId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
-          setPending([...current, { tempId, url, thumbnailUrl, caption: '', order: current.length }])
+          setPending([...current, { tempId: newTempId(), url, thumbnailUrl, caption: '', order: current.length }])
         } else {
           const item = await attachMedia<MediaItem>({ url, thumbnailUrl, entityType, entityId, order: baseOrder + ok })
           setItems(prev => [...prev, item])
