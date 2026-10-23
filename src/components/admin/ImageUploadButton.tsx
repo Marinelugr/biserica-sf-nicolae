@@ -3,6 +3,7 @@
 import { useRef, useState, useEffect } from 'react'
 import { optimizeImage, blobToFile, formatBytes } from '@/lib/imageOptimizer'
 import { uploadImage } from '@/lib/mediaUpload'
+import { isHeic, convertHeicToJpeg } from '@/lib/heic'
 
 // Vector/animat: compresia prin canvas le-ar strica (SVG rasterizat, GIF fără animație).
 const KEEP_AS_IS = new Set(['image/svg+xml', 'image/gif'])
@@ -10,9 +11,11 @@ const KEEP_AS_IS = new Set(['image/svg+xml', 'image/gif'])
 const fmt = (bytes: number) => formatBytes(bytes).replace('.', ',')
 
 // Poza de telefon (4–10 MB) se micșorează în browser înainte de trimitere.
-// Dacă nu se poate (ex. HEIC în Chrome), se trimite originalul; serverul o comprimă oricum.
-async function compress(file: File): Promise<File> {
-  if (KEEP_AS_IS.has(file.type)) return file
+// HEIC se convertește întâi în JPEG; dacă nu se poate, poza e refuzată (serverul n-o poate procesa).
+// Dacă doar micșorarea nu reușește, se trimite fișierul; serverul îl comprimă oricum.
+async function compress(original: File): Promise<File> {
+  if (KEEP_AS_IS.has(original.type)) return original
+  const file = isHeic(original) ? await convertHeicToJpeg(original) : original
   try {
     const { blob } = await optimizeImage(file)
     return blob.size < file.size ? blobToFile(blob, file.name) : file

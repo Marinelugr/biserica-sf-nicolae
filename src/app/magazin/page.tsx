@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { localizedHref } from '@/lib/i18n/href'
+import { htmlToPlainText } from '@/lib/utils'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
 
@@ -16,10 +17,6 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t.meta.magazin.description,
     alternates: buildAlternates('/magazin'),
   }
-}
-
-function stripHtml(html: string): string {
-  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
 }
 
 async function getProducts() {
@@ -52,7 +49,7 @@ export default async function MagazinPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
           {products.map(product => {
             const inStock = product.stock > 0
-            const description = product.descriptionRo ? stripHtml(product.descriptionRo) : null
+            const description = product.descriptionRo ? htmlToPlainText(product.descriptionRo) : null
             const price = Number(product.price).toLocaleString('ro-MD')
             return (
               <article key={product.id} className="news" data-reveal>

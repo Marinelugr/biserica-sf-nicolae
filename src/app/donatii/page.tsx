@@ -7,6 +7,7 @@ import CopyButton from '@/components/CopyButton'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import { onlyDisplayable } from '@/lib/imageLoad'
 
 export const dynamic = 'force-dynamic'
 
@@ -26,11 +27,12 @@ function facebookEmbedSrc(url: string) {
 export default async function DonationsPage() {
   const t = await getServerT()
 
-  const [projects, configRow, gallery] = await Promise.all([
+  const [projects, configRow, galleryRows] = await Promise.all([
     prisma.donationProject.findMany({ where: { active: true }, orderBy: { order: 'asc' } }),
     prisma.donationConfig.findFirst(),
     prisma.mediaItem.findMany({ where: { entityType: 'donatii', entityId: 'main' }, orderBy: { order: 'asc' } }),
   ])
+  const gallery = onlyDisplayable(galleryRows)
 
   const config: DonationConfigData = configRow
     ? {

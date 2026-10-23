@@ -43,6 +43,9 @@ export interface ProcessedImage {
   originalSize: number
   finalSize: number
   wasOptimized: boolean
+  // true = sharp nu a putut decoda fișierul (ex. HEIC/HEVC, nesuportat de binarele
+  // precompilate; sau un fișier care nu e poză). Ruta de upload îl refuză.
+  failed?: boolean
 }
 
 export async function processImageBuffer(input: Buffer, contentType: string): Promise<ProcessedImage> {
@@ -66,7 +69,8 @@ export async function processImageBuffer(input: Buffer, contentType: string): Pr
 
     return { buffer: optimized, contentType: 'image/webp', ext: 'webp', originalSize, finalSize: optimized.length, wasOptimized: true }
   } catch {
-    // format neprocesabil de build-ul curent de sharp (ex. unele variante HEIC) — păstrăm originalul
-    return { buffer: input, contentType, ext: extFromContentType(contentType), originalSize, finalSize: originalSize, wasOptimized: false }
+    // nedecodabil (HEIC: „Support for this compression format has not been built in”) — nu mai
+    // păstrăm originalul: un .heic salvat nu se poate afișa în Chrome, nici în admin, nici pe site
+    return { buffer: input, contentType, ext: extFromContentType(contentType), originalSize, finalSize: originalSize, wasOptimized: false, failed: true }
   }
 }

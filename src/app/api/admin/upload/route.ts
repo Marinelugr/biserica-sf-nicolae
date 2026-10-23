@@ -43,6 +43,14 @@ async function handleUpload(req: NextRequest) {
   const safeName = file.name.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 60)
   const inputBuffer = Buffer.from(await file.arrayBuffer())
   const processed = await processImageBuffer(inputBuffer, file.type)
+  if (processed.failed) {
+    const isHeic = file.type === 'image/heic' || file.type === 'image/heif'
+    return NextResponse.json({
+      error: isHeic
+        ? 'Formatul HEIC nu poate fi procesat pe server. Exportă poza ca JPG și încearcă din nou.'
+        : 'Fișierul nu pare o poză validă.',
+    }, { status: 415 })
+  }
   const basePath = isThumbnail
     ? `thumbnails/${Date.now()}-${safeName}.${processed.ext}`
     : `admin/${Date.now()}-${safeName}.${processed.ext}`

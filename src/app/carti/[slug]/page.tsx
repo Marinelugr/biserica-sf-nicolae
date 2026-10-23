@@ -7,6 +7,7 @@ import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
+import { htmlToPlainText } from '@/lib/utils'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!book) return {}
   const title = book.titleRo
   const content = book.contentRo
-  const plain = content.replace(/<[^>]*>/g, '').substring(0, 160)
+  const plain = htmlToPlainText(content).substring(0, 160)
   return {
     title: `${title} | Bibliotecă Ortodoxă`,
     description: plain,

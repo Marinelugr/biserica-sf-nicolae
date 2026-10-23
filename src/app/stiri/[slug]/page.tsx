@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { formatDate, readingTime } from '@/lib/utils'
+import { formatDate, readingTime, htmlToPlainText } from '@/lib/utils'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
@@ -14,6 +14,7 @@ import { scheduledGate } from '@/lib/articleVisibility'
 import { SITE_URL } from '@/lib/site'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import { isDisplayableImageUrl, onlyDisplayable } from '@/lib/imageLoad'
 
 export const dynamic = 'force-dynamic'
 
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!article) return {}
   const title = article.titleRo
   const content = article.contentRo
-  const plainText = content.replace(/<[^>]*>/g, '').substring(0, 160)
+  const plainText = htmlToPlainText(content).substring(0, 160)
   return {
     title,
     description: plainText,
@@ -44,13 +45,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
       publishedTime: article.publishedAt?.toISOString(),
-      images: article.imageUrl ? [{ url: article.imageUrl, width: 1200, height: 630, alt: title }] : [],
+      images: isDisplayableImageUrl(article.imageUrl) ? [{ url: article.imageUrl, width: 1200, height: 630, alt: title }] : [],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description: plainText,
-      images: article.imageUrl ? [article.imageUrl] : undefined,
+      images: isDisplayableImageUrl(article.imageUrl) ? [article.imageUrl] : undefined,
     },
   }
 }
@@ -61,10 +62,10 @@ export default async function ArticolPage({ params }: Props) {
   if (!article) notFound()
 
   const { prisma } = await import('@/lib/prisma')
-  const gallery = await prisma.mediaItem.findMany({
+  const gallery = onlyDisplayable(await prisma.mediaItem.findMany({
     where: { entityType: 'article', entityId: article.id },
     orderBy: { order: 'asc' },
-  })
+  }))
 
   const title = article.titleRo
   const content = article.contentRo
@@ -94,7 +95,7 @@ export default async function ArticolPage({ params }: Props) {
           </p>
         </PageHead>
 
-        {article.imageUrl && (
+        {isDisplayableImageUrl(article.imageUrl) && (
           <ContentCoverImage
             src={article.imageUrl}
             alt={title}
