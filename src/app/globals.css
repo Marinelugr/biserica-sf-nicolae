@@ -283,13 +283,6 @@
   .field::placeholder { color: #8d97b0; }
   .field:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold-d); }
   .label { display: block; font-size: 15px; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); margin-bottom: 8px; }
-
-  /* pastila LIVE */
-  .live-pill {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 16px; min-height: 44px; border-radius: 999px;
-    background: var(--red); color: #fff; font-weight: 600; font-size: 15px; letter-spacing: .14em;
-  }
 }
 
 @media (max-width: 760px) {
@@ -339,12 +332,6 @@
 .cover::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(5, 10, 26, 0.05) 0%, rgba(5, 10, 26, 0.35) 55%, var(--bg) 100%); }
 
 /* ─── Animații ─────────────────────────────────────────────────────────────── */
-@keyframes live-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50%      { opacity: 0.55; transform: scale(1.2); }
-}
-.live-dot { display: inline-block; animation: live-pulse 1.4s ease-in-out infinite; }
-
 @keyframes page-in { from { opacity: 0; } to { opacity: 1; } }
 .page-fade { animation: page-in .3s ease-out backwards; }
 
@@ -352,7 +339,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .page-fade, .live-dot { animation: none; }
+  .page-fade { animation: none; }
   .sec-rule { transform: none !important; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   .card, .news, .tile, .btn, .chip, .soc, .play { transition: none; }

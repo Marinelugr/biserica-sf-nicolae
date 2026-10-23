@@ -5,7 +5,6 @@ import { messageExcerptHtml } from '@/lib/priestMessage'
 import { MESAJ_VECHI } from '@/lib/fixtures/mesajVechi'
 import PageShell from '@/components/shell/PageShell'
 import FeedFilter from '@/components/shell/FeedFilter'
-import LiveStreamView from '@/components/homepage/LiveStreamView'
 import LiturgicalTodayView from '@/components/homepage/LiturgicalTodayView'
 import AnnouncementCard from '@/components/homepage/AnnouncementCard'
 import ServicesCard from '@/components/homepage/ServicesCard'
@@ -73,13 +72,11 @@ export default async function SectiuniGalleryPage() {
         options={[
           { kind: 'all', label: t.shell.feedAll },
           { kind: 'cuvant', label: t.shell.feedWord },
-          { kind: 'video', label: t.shell.feedVideo },
           { kind: 'parohie', label: t.shell.feedParish },
           { kind: 'biblioteca', label: t.shell.feedLibrary },
         ]}
       />
       <div data-feed className="flex flex-col gap-5">
-        <LiveStreamView videoId="M7lc1UVf-VE" t={t} />
         <LiturgicalTodayView
           t={t}
           data={{

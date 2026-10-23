@@ -1,7 +1,7 @@
 export interface Translations {
   nav: {
     home: string; bible: string; calendar: string; pascalCalendar: string; books: string
-    churchHistory: string; saintNicholas: string; priest: string; video: string; news: string; live: string; shop: string; donate: string
+    churchHistory: string; saintNicholas: string; priest: string; video: string; news: string; shop: string; donate: string
     contact: string
   }
   home: {
@@ -10,8 +10,6 @@ export interface Translations {
     liturgicalLife: string; saintsToday: string; gospelToday: string
     prayerToday: string; latestNews: string; allNews: string
     orthodoxLibrary: string; allBooks: string; noSaints: string
-    liveNow: string; watchLiveService: string; openOnYoutube: string
-    liveStreamTitle: string; liveFooterNote: string
     allSaintsLink: string; readFullGospel: string; allPrayersLink: string; readFullPrayer: string; fullCalendarLink: string
     ourParish: string; noNews: string; sacredTexts: string; libraryLabel: string
     libraryInProgress: string; viewAllLink: string
@@ -178,11 +176,11 @@ export interface Translations {
     brand: string; navWord: string; navParish: string; navBible: string; navAbout: string; navFather: string
     openMenu: string; closeMenu: string; mainMenu: string
     profileRole: string; follow: string; socialTitle: string
-    feedFilter: string; feedAll: string; feedWord: string; feedVideo: string; feedParish: string; feedLibrary: string
-    kindWord: string; kindVideo: string; kindParish: string; kindLibrary: string; kindChurch: string; kindAnnouncement: string
+    feedFilter: string; feedAll: string; feedWord: string; feedParish: string; feedLibrary: string
+    kindWord: string; kindParish: string; kindLibrary: string; kindChurch: string; kindAnnouncement: string
     kindServices: string; readAnnouncement: string
     today: string; oldStyle: string; readFullMessage: string; read: string; backHome: string
-    coverAlt: string; emblemAlt: string; liveBadge: string; feedEmpty: string; dateLabel: string
+    coverAlt: string; emblemAlt: string; feedEmpty: string; dateLabel: string
   }
 }
 
@@ -190,7 +188,7 @@ const ro: Translations = {
   nav: {
     home: 'Acasă', bible: 'Biblie', calendar: 'Calendar', pascalCalendar: 'Calendar Pascal', books: 'Bibliotecă',
     churchHistory: 'Istoria Bisericii', saintNicholas: 'Sfântul Nicolae', priest: 'Parohul Bisericii',
-    video: 'Video', news: 'Știri', live: 'Live', shop: 'Magazin', donate: 'Donații',
+    video: 'Video', news: 'Știri', shop: 'Magazin', donate: 'Donații',
     contact: 'Contact',
   },
   home: {
@@ -206,10 +204,6 @@ const ro: Translations = {
     latestNews: 'Ultimele știri', allNews: 'Toate știrile →',
     orthodoxLibrary: 'Bibliotecă Ortodoxă', allBooks: 'Toate cărțile →',
     noSaints: 'Nu sunt sfinți înregistrați pentru astăzi.',
-    liveNow: 'Live acum', watchLiveService: 'Urmărește slujba în direct',
-    openOnYoutube: 'Deschide pe YouTube ↗',
-    liveStreamTitle: 'Transmisiune live — Parohia Sfântul Ierarh Nicolae',
-    liveFooterNote: '☦ Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic — transmisiune în direct',
     allSaintsLink: 'Toți sfinții zilei →', readFullGospel: 'Citește integral →',
     allPrayersLink: 'Toate rugăciunile →', readFullPrayer: 'Citește integral →',
     fullCalendarLink: 'Calendar complet →',
@@ -434,7 +428,7 @@ const ro: Translations = {
   meta: {
     site: {
       title: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Criuleni',
-      description: 'Website oficial al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova. Biblie ortodoxă, calendar liturgic, transmisiuni live.',
+      description: 'Website oficial al Parohiei Sfântul Ierarh Nicolae din Hîrtopul Mic, Raionul Criuleni, Republica Moldova. Biblie ortodoxă, calendar liturgic, cărți și video ortodox.',
       ogTitle: 'Biserica Sfântul Ierarh Nicolae — Hîrtopul Mic, Moldova',
       ogDescription: 'Parohia Ortodoxă din Hîrtopul Mic, Criuleni, Republica Moldova.',
       twitterTitle: 'Biserica Sfântul Ierarh Nicolae',
@@ -540,13 +534,13 @@ const ro: Translations = {
     openMenu: 'Deschide meniul', closeMenu: 'Închide meniul', mainMenu: 'Meniu principal',
     profileRole: 'Parohul Bisericii Sfântul Ierarh Nicolae · Hîrtopul Mic, Criuleni',
     follow: 'Urmărește', socialTitle: 'Rețele sociale',
-    feedFilter: 'Filtrează postările', feedAll: 'Tot', feedWord: 'Cuvânt', feedVideo: 'Video', feedParish: 'Parohie', feedLibrary: 'Bibliotecă',
-    kindWord: 'Cuvântul părintelui', kindVideo: 'Video', kindParish: 'Din viața parohiei', kindLibrary: 'Bibliotecă',
+    feedFilter: 'Filtrează postările', feedAll: 'Tot', feedWord: 'Cuvânt', feedParish: 'Parohie', feedLibrary: 'Bibliotecă',
+    kindWord: 'Cuvântul părintelui', kindParish: 'Din viața parohiei', kindLibrary: 'Bibliotecă',
     kindChurch: 'Din viața Bisericii', kindAnnouncement: 'Anunț',
     kindServices: 'Slujbe și Calendar Pascal', readAnnouncement: 'Citește anunțul',
     today: 'Astăzi', oldStyle: 'stil vechi', readFullMessage: 'Citește mesajul complet →', read: 'Citește →', backHome: 'Acasă',
     coverAlt: 'Biserica Sfântul Ierarh Nicolae din Hîrtopul Mic, văzută de sus',
-    emblemAlt: 'Emblema Bisericii Sfântul Ierarh Nicolae', liveBadge: 'LIVE', feedEmpty: 'Nu sunt postări de acest tip acum.', dateLabel: 'Data',
+    emblemAlt: 'Emblema Bisericii Sfântul Ierarh Nicolae', feedEmpty: 'Nu sunt postări de acest tip acum.', dateLabel: 'Data',
   },
 }
 

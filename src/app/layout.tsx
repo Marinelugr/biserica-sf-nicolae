@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${m.twitterTitle}`,
     },
     description: m.description,
-    keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online', 'transmisiune live'],
+    keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online'],
     manifest: '/manifest.json',
     appleWebApp: { capable: true, title: 'Sf. Nicolae', statusBarStyle: 'black-translucent' },
     openGraph: {
