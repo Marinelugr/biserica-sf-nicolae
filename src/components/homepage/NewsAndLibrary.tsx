@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { formatDate } from '@/lib/utils'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
+import { isDisplayableImageUrl } from '@/lib/imageLoad'
 
 interface Article {
   slug: string
@@ -50,7 +51,7 @@ export default async function NewsAndLibrary({ articles, libraryBooks, showNews,
             articles.map((article, i) => (
               <Link key={article.slug} href={`/stiri/${article.slug}`} className="card news-row" data-kind="parohie" data-reveal>
                 <div className="thumb">
-                  {article.imageUrl ? (
+                  {isDisplayableImageUrl(article.imageUrl) ? (
                     <Image
                       src={article.imageUrl}
                       alt={article.title}

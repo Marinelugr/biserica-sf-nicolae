@@ -20,6 +20,7 @@ import { localeToIntl, type Locale } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { publicArticleWhere } from '@/lib/articleVisibility'
 import { mergeHomepageWidgets, DEFAULT_HOMEPAGE_WIDGETS } from '@/lib/homepageWidgets'
+import { isDisplayableImageUrl } from '@/lib/imageLoad'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerT()
@@ -129,7 +130,7 @@ async function getHomeContent(locale: Locale) {
     return {
       articles: articles.map(a => ({
         slug: a.slug, title: a.titleRo,
-        imageUrl: a.imageUrl, publishedAt: a.publishedAt, category: a.category,
+        imageUrl: isDisplayableImageUrl(a.imageUrl) ? a.imageUrl : null, publishedAt: a.publishedAt, category: a.category,
         excerpt: htmlToPlainText(a.contentRo).slice(0, 220),
       })),
       libraryBooks: libraryBooks.map(b => ({

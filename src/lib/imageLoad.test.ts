@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { describeLoadFailure, isDisplayableImageUrl, extensionOf } from './imageLoad'
+import { describeLoadFailure, isDisplayableImageUrl, extensionOf, onlyDisplayable } from './imageLoad'
 
 const base = 'https://x.supabase.co/storage/v1/object/public/images/admin'
 
@@ -39,5 +39,20 @@ describe('isDisplayableImageUrl', () => {
     expect(isDisplayableImageUrl(`${base}/a.jpg?x=b.heic`)).toBe(true)
     expect(isDisplayableImageUrl('/images/12.jpg')).toBe(true)
     expect(isDisplayableImageUrl(`${base}/heic`)).toBe(true)
+  })
+})
+
+describe('onlyDisplayable', () => {
+  it('scoate pozele HEIC și miniaturile HEIC', () => {
+    const items = [
+      { id: '1', url: `${base}/a.webp`, thumbnailUrl: `${base}/t.webp` },
+      { id: '2', url: `${base}/b.heic`, thumbnailUrl: null },
+      { id: '3', url: `${base}/c.jpg`, thumbnailUrl: `${base}/t.HEIC` },
+    ]
+    expect(onlyDisplayable(items)).toEqual([
+      { id: '1', url: `${base}/a.webp`, thumbnailUrl: `${base}/t.webp` },
+      { id: '3', url: `${base}/c.jpg`, thumbnailUrl: null },
+    ])
+    expect(onlyDisplayable([items[1]])).toEqual([])
   })
 })

@@ -8,6 +8,7 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 import { publicArticleWhere } from '@/lib/articleVisibility'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import { isDisplayableImageUrl } from '@/lib/imageLoad'
 
 export const dynamic = 'force-dynamic'
 
@@ -50,7 +51,7 @@ export default async function StiriPage() {
           {articles.map(article => (
             <article key={article.slug} className="news group relative" data-reveal>
               <div className="media">
-                {article.imageUrl ? (
+                {isDisplayableImageUrl(article.imageUrl) ? (
                   <Image
                     src={article.imageUrl}
                     alt={article.titleRo}

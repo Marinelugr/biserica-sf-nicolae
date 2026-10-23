@@ -178,3 +178,26 @@ ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroa
   că tabela de entități din `he` nu ajunge în `.next/static`.
 - Teste: `utils.test.ts` (7). Cu vechea metodă în corpul funcției: 4 roșii (`&nbsp;`, entități,
   `<script>/<style>`, `readingTime`).
+
+## B2. HEIC salvate deja: omise pe paginile publice
+
+- `src/lib/imageLoad.ts`: `isDisplayableImageUrl` (fals pentru `.heic`/`.heif` după ce se scot `?…`/`#…`,
+  orice majuscule, și pentru `null`/gol) și `onlyDisplayable` (filtrează galeriile; o miniatură HEIC la o
+  poză bună devine `null`). Teste în `imageLoad.test.ts`.
+- `grep -rn "imageUrl\|mediaItem\|PublicGallery" src` (fără admin/api), locurile modificate:
+
+| Fișier | Ce |
+| --- | --- |
+| `components/homepage/NewsAndLibrary.tsx` | cardul știrii: aspectul fără imagine (☦) dacă adresa nu e afișabilă |
+| `app/page.tsx` | `imageUrl` trimis la `NewsAndLibrary` → `null` dacă e HEIC (dublă protecție) |
+| `app/stiri/page.tsx` | lista de știri: aspectul fără imagine |
+| `app/stiri/[slug]/page.tsx` | imaginea mare (omisă), `og:image`/`twitter:image` (omise), galeria (`onlyDisplayable`; secțiunea dispare dacă rămâne goală) |
+| `app/sfintii/[slug]/page.tsx` | galeria |
+| `app/istoria-bisericii/page.tsx` | galeria (mesajul „galerie goală” existent dacă nu rămâne nimic) |
+| `app/paroh/page.tsx` | galeria |
+| `app/donatii/page.tsx` | galeria |
+| `app/sfantul-nicolae/page.tsx` | galeria |
+
+- Neatinse (alt model decât `Article`/`MediaItem`): `magazin` (`Product.imageUrl`), `carti/[slug]`
+  (`LibraryBook.imageUrl` + `galleryUrls`). Pot primi HEIC doar prin `ImageUploadButton`, care acum
+  convertește sau refuză.

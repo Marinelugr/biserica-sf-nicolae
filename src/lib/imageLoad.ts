@@ -30,3 +30,10 @@ export function isDisplayableImageUrl(url: string | null | undefined): url is st
   const ext = extensionOf(url)
   return ext !== '.heic' && ext !== '.heif'
 }
+
+// Galeriile publice: scoate pozele HEIC; o miniatură HEIC la o poză bună se ignoră (se afișează poza).
+export function onlyDisplayable<T extends { url: string; thumbnailUrl?: string | null }>(items: T[]): T[] {
+  return items
+    .filter(item => isDisplayableImageUrl(item.url))
+    .map(item => (item.thumbnailUrl && !isDisplayableImageUrl(item.thumbnailUrl) ? { ...item, thumbnailUrl: null } : item))
+}

@@ -7,6 +7,7 @@ import { htmlToPlainText } from '@/lib/utils'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import { onlyDisplayable } from '@/lib/imageLoad'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,10 +34,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ParohPage() {
   const t = await getServerT()
   const priest = await prisma.priest.findFirst()
-  const gallery = await prisma.mediaItem.findMany({
+  const gallery = onlyDisplayable(await prisma.mediaItem.findMany({
     where: { entityType: 'priest', entityId: priest?.id ?? '' },
     orderBy: { order: 'asc' },
-  })
+  }))
 
   if (!priest) {
     return (

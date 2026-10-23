@@ -8,6 +8,7 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import { onlyDisplayable } from '@/lib/imageLoad'
 
 export const dynamic = 'force-dynamic'
 
@@ -40,10 +41,10 @@ export default async function IstoriaBisericiiPage() {
     }
   } catch { /* use fallback */ }
 
-  const gallery = await prisma.mediaItem.findMany({
+  const gallery = onlyDisplayable(await prisma.mediaItem.findMany({
     where: { entityType: 'history', entityId: 'church-history' },
     orderBy: { order: 'asc' },
-  })
+  }))
 
   return (
     <PageShell aside="compact">

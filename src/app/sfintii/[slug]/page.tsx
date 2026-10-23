@@ -8,6 +8,7 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 import { htmlToPlainText } from '@/lib/utils'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import { onlyDisplayable } from '@/lib/imageLoad'
 
 export const dynamic = 'force-dynamic'
 
@@ -49,10 +50,10 @@ export default async function SaintPage({ params }: Props) {
   if (!saint) notFound()
 
   const { prisma } = await import('@/lib/prisma')
-  const gallery = await prisma.mediaItem.findMany({
+  const gallery = onlyDisplayable(await prisma.mediaItem.findMany({
     where: { entityType: 'saint', entityId: saint.id },
     orderBy: { order: 'asc' },
-  })
+  }))
 
   const title = saint.nameRo
   const life = saint.lifeRo || ''

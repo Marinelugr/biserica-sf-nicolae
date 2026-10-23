@@ -8,6 +8,7 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
+import { onlyDisplayable } from '@/lib/imageLoad'
 
 export const dynamic = 'force-dynamic'
 
@@ -61,10 +62,10 @@ export default async function SfantulNicolaePage() {
   const tropar = dynTropar || t.saintNicholasPage.fallbackTropar
   const condac = dynCondac || t.saintNicholasPage.fallbackCondac
 
-  const saintGallery = await prisma.mediaItem.findMany({
+  const saintGallery = onlyDisplayable(await prisma.mediaItem.findMany({
     where: { entityType: 'saint', entityId: 'sfantul-nicolae' },
     orderBy: { order: 'asc' },
-  })
+  }))
 
   const ACATIST = '/carti/acatistul-sfantului-ierarh-nicolae-arhiepiscopul-de-mira-lichia'
   const feastRow = (day: string, mon: string, title: string, desc: string, gold?: boolean) => (
