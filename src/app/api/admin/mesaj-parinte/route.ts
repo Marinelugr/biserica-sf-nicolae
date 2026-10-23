@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/auth'
 import { prisma } from '@/lib/prisma'
+import { MAX_MESSAGE_HTML } from '@/lib/priestMessage'
+import { htmlToPlainText } from '@/lib/utils'
 
 export async function GET() {
   const session = await auth()
@@ -17,8 +19,12 @@ export async function POST(req: NextRequest) {
   const data = await req.json()
   const { photoUrl, mesajRo, semnaturaRo, active } = data
 
-  if (!mesajRo) {
+  // HTML din editor: `<p></p>` nu e un mesaj
+  if (typeof mesajRo !== 'string' || !htmlToPlainText(mesajRo).trim()) {
     return NextResponse.json({ error: 'Mesajul (Română) este obligatoriu' }, { status: 400 })
+  }
+  if (mesajRo.length > MAX_MESSAGE_HTML) {
+    return NextResponse.json({ error: 'Mesajul este prea lung (cel mult 30.000 de caractere cu formatare)' }, { status: 400 })
   }
 
   const payload = {

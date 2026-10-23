@@ -1,10 +1,17 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
+import dynamic from 'next/dynamic'
 import AdminSidebar from '@/components/admin/AdminSidebar'
 import AdminSignOutButton from '@/components/admin/AdminSignOutButton'
 import ImageUploadButton from '@/components/admin/ImageUploadButton'
-import { firstSentences, FALLBACK_SEMNATURA } from '@/lib/priestMessage'
+import PriestMessageCard from '@/components/homepage/PriestMessageCard'
+import PriestMessageLetter from '@/components/homepage/PriestMessageLetter'
+import { FALLBACK_SEMNATURA, MAX_MESSAGE_HTML, messageExcerptHtml, messageToHtml } from '@/lib/priestMessage'
+import { htmlToPlainText } from '@/lib/utils'
+import ro from '@/lib/i18n/ro'
+
+const TipTapEditor = dynamic(() => import('@/components/admin/TipTapEditor'), { ssr: false })
 
 const inp: React.CSSProperties = { width: '100%', backgroundColor: '#1A1008', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.6rem 0.875rem', color: '#F2EBD9', fontSize: '0.95rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' }
 const lbl: React.CSSProperties = { display: 'block', color: '#9B8050', fontSize: '0.8rem', marginBottom: '0.35rem', fontFamily: 'Georgia, serif' }
@@ -12,7 +19,14 @@ const btnGold: React.CSSProperties = { backgroundColor: '#C9A84C', color: '#0D09
 const btnGhost: React.CSSProperties = { backgroundColor: 'transparent', color: '#9B8050', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.45rem 0.875rem', fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: 'pointer', textDecoration: 'none', display: 'inline-block' }
 const sectionBox: React.CSSProperties = { backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }
 const sectionTitle: React.CSSProperties = { color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1rem', marginBottom: '1.25rem', paddingBottom: '0.75rem', borderBottom: '1px solid #1E1208' }
-const textarea: React.CSSProperties = { ...inp, resize: 'vertical', minHeight: '140px', lineHeight: 1.6 }
+const hint: React.CSSProperties = { color: '#8A7050', fontFamily: 'Georgia, serif', fontSize: '0.8rem', marginTop: '0.6rem' }
+const previewLabel: React.CSSProperties = { color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }
+const previewStage: React.CSSProperties = { backgroundColor: 'var(--bg)', color: 'var(--ink)', borderRadius: '8px', padding: '1.25rem', marginBottom: '1.75rem' }
+
+/** Mesajul are text, nu doar etichete goale (`<p></p>`)? */
+function hasText(html: string): boolean {
+  return htmlToPlainText(html).trim().length > 0
+}
 
 interface MesajForm {
   id: string | null
@@ -33,11 +47,11 @@ function Toast({ message, type, onClose }: { message: string; type: 'success' | 
 
 function PreviewModal({ form, onClose }: { form: MesajForm; onClose: () => void }) {
   const semnatura = form.semnaturaRo.trim() || FALLBACK_SEMNATURA
-  const excerpt = firstSentences(form.mesajRo, 2) + '…'
+  const excerpt = messageExcerptHtml(form.mesajRo)
 
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', zIndex: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', overflowY: 'auto' }} onClick={onClose}>
-      <div style={{ backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px', maxWidth: '720px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
+      <div style={{ backgroundColor: '#110C07', border: '1px solid #2A1A0A', borderRadius: '8px', maxWidth: '820px', width: '100%', maxHeight: '90vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}>
         <div style={{ padding: '1.25rem 1.5rem', borderBottom: '1px solid #1E1208', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <span style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1rem' }}>👁️ Previzualizare</span>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#9B8050', cursor: 'pointer', fontSize: '1.25rem' }}>✕</button>
@@ -50,35 +64,22 @@ function PreviewModal({ form, onClose }: { form: MesajForm; onClose: () => void 
             </div>
           )}
 
-          {/* ── Homepage ── */}
-          <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pe homepage</div>
-          <div style={{ backgroundColor: '#f0ebe2', borderRadius: '6px', padding: '1.75rem 1.5rem', marginBottom: '1.75rem' }}>
-            <div style={{ display: 'flex', flexDirection: form.photoUrl ? 'row' : 'column', gap: '1.25rem', alignItems: 'flex-start' }}>
-              {form.photoUrl && (
-                <img src={form.photoUrl} alt="" style={{ width: '100px', height: '130px', borderRadius: '8px', border: '1px solid #C9A96E', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#3A2A10', fontSize: '0.95rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>{excerpt}</p>
-                <p style={{ fontFamily: 'Georgia, serif', color: '#C9A96E', fontSize: '0.85rem' }}>— {semnatura}</p>
-                <div style={{ textAlign: 'right', marginTop: '0.75rem' }}>
-                  <span style={{ fontFamily: 'Georgia, serif', fontSize: '0.75rem', color: '#8A7050' }}>Citește mesajul complet →</span>
-                </div>
-              </div>
-            </div>
+          {/* Aceleași componente ca pe site; `inert` — linkurile din previzualizare nu se apasă */}
+          <div style={previewLabel}>Pe prima pagină</div>
+          <div style={previewStage} inert>
+            <PriestMessageCard
+              html={excerpt.html}
+              truncated={excerpt.truncated}
+              signature={semnatura}
+              kicker={ro.shell.kindWord}
+              author={ro.shell.brand}
+              readMoreLabel={ro.shell.readFullMessage}
+            />
           </div>
 
-          {/* ── Pagina proprie ── */}
-          <div style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.75rem', marginBottom: '0.5rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pe pagina /mesajul-parintelui</div>
-          <div style={{ backgroundColor: '#FFFFFF', borderRadius: '6px', padding: '1.75rem 1.5rem' }}>
-            <div style={{ display: 'flex', flexDirection: form.photoUrl ? 'row' : 'column', gap: '1.5rem', alignItems: 'flex-start' }}>
-              {form.photoUrl && (
-                <img src={form.photoUrl} alt="" style={{ width: '140px', aspectRatio: '3/4', borderRadius: '8px', border: '1px solid #C9A96E', objectFit: 'cover', flexShrink: 0 }} onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-              )}
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic', color: '#3A2A10', fontSize: '0.95rem', lineHeight: 1.8, whiteSpace: 'pre-line' }}>{form.mesajRo}</p>
-                <p style={{ fontFamily: 'Georgia, serif', color: '#C9A96E', fontSize: '0.9rem', marginTop: '1.25rem' }}>— {semnatura}</p>
-              </div>
-            </div>
+          <div style={previewLabel}>Pe pagina /mesajul-parintelui</div>
+          <div style={previewStage} inert>
+            <PriestMessageLetter html={messageToHtml(form.mesajRo)} signature={semnatura} />
           </div>
         </div>
 
@@ -111,7 +112,8 @@ export default function AdminMesajParintePage() {
           setForm({
             id: data.id || null,
             photoUrl: data.photoUrl || '',
-            mesajRo: data.mesajRo || '',
+            // mesajele vechi (text cu **) apar deja formatate în editor
+            mesajRo: data.mesajRo ? messageToHtml(data.mesajRo) : '',
             semnaturaRo: data.semnaturaRo || 'Pr. Marin Grigoriță, Parohul Bisericii',
             active: data.active ?? true,
           })
@@ -122,8 +124,12 @@ export default function AdminMesajParintePage() {
   }, [])
 
   async function handleSave() {
-    if (!form.mesajRo.trim()) {
+    if (!hasText(form.mesajRo)) {
       showToast('Mesajul (Română) este obligatoriu', 'error')
+      return
+    }
+    if (form.mesajRo.length > MAX_MESSAGE_HTML) {
+      showToast('Mesajul este prea lung (cel mult 30.000 de caractere cu formatare)', 'error')
       return
     }
     setSaving(true)
@@ -133,7 +139,11 @@ export default function AdminMesajParintePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       })
-      if (!res.ok) throw new Error('Eroare la salvare')
+      if (!res.ok) {
+        const err = await res.json().catch(() => null)
+        showToast(err?.error || 'Eroare la salvare', 'error')
+        return
+      }
       const data = await res.json()
       setForm(f => ({ ...f, id: data.id }))
       showToast('Date salvate cu succes ✓', 'success')
@@ -168,7 +178,7 @@ export default function AdminMesajParintePage() {
             <h1 style={{ color: '#C9A84C', fontFamily: 'Georgia, serif', fontSize: '1.5rem', margin: 0 }}>✉️ Mesajul Părintelui</h1>
             <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
               <a href="/mesajul-parintelui" target="_blank" style={{ ...btnGhost }}>↗ Vizualizează pagina</a>
-              <button onClick={() => setShowPreview(true)} disabled={!form.mesajRo.trim()} style={{ ...btnGhost, opacity: form.mesajRo.trim() ? 1 : 0.5 }}>👁️ Previzualizare</button>
+              <button onClick={() => setShowPreview(true)} disabled={!hasText(form.mesajRo)} style={{ ...btnGhost, opacity: hasText(form.mesajRo) ? 1 : 0.5 }}>👁️ Previzualizare</button>
               <button onClick={handleSave} disabled={saving || loading} style={{ ...btnGold, opacity: saving ? 0.7 : 1 }}>
                 {saving ? 'Se salvează...' : '💾 Salvează'}
               </button>
@@ -201,7 +211,8 @@ export default function AdminMesajParintePage() {
               {/* ─── Mesaj ─── */}
               <div style={sectionBox}>
                 <div style={sectionTitle}>✉️ Mesajul *</div>
-                <textarea value={form.mesajRo} onChange={e => set('mesajRo', e.target.value)} placeholder="Bine ați venit la pagina oficială a bisericii..." style={textarea} />
+                <TipTapEditor value={form.mesajRo} onChange={v => set('mesajRo', v)} placeholder="Scrieți aici mesajul pentru credincioși..." />
+                <p style={hint}>Formatează textul ca la Știri: B = îngroșat, I = cursiv, H2 = titlu.</p>
               </div>
 
               {/* ─── Semnătură + Activ ─── */}
