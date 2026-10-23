@@ -95,7 +95,7 @@ export default async function VideoDetailPage({ params }: Props) {
     <PageShell aside="compact">
       <ViewTracker type="video" id={video.id} />
       <article className="flex flex-col gap-5">
-        <PageHead
+        <PageHead sec="video"
           size="m"
           crumbs={[{ href: '/', label: t.nav.home }, { href: '/video', label: t.nav.video }, { href: `/video/${category.slug}`, label: category.name }, { label: video.title }]}
           title={video.title}

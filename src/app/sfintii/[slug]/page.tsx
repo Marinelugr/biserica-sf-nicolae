@@ -61,7 +61,7 @@ export default async function SaintPage({ params }: Props) {
   return (
     <PageShell aside="compact">
       <article className="flex flex-col gap-5">
-        <PageHead
+        <PageHead sec="sfinti"
           size="m"
           crumbs={[{ href: '/', label: t.nav.home }, { href: '/sfintii', label: t.saints.title }, { label: title }]}
           eyebrow={`${saint.day} ${MONTHS_FULL[saint.month - 1]}`}

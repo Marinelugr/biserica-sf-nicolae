@@ -64,7 +64,7 @@ export default async function CategoriePage({ params }: Props) {
 
   return (
     <PageShell aside="compact">
-      <PageHead
+      <PageHead sec="biblioteca"
         crumbs={[{ href: '/', label: t.nav.home }, { href: '/carti', label: t.books.title }, { label }]}
         eyebrow={<><span aria-hidden="true">{cat.icon}</span> {t.books.title}</>}
         title={label}

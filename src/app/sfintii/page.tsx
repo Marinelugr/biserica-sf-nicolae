@@ -55,7 +55,7 @@ export default async function SfintiiPage({ searchParams }: Props) {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.saints.subtitle} title={t.saints.title}>
+      <PageHead sec="sfinti" eyebrow={t.saints.subtitle} title={t.saints.title}>
         <div className="mt-2">
           <SearchForm action="/sfintii" id="saints-search" placeholder={t.saints.searchPlaceholder} button={t.saints.searchBtn} defaultValue={q || ''} />
         </div>

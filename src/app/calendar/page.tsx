@@ -151,7 +151,7 @@ export default async function CalendarPage({
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.calendar.subtitle} title={t.calendar.title}>
+      <PageHead sec="slujbe" eyebrow={t.calendar.subtitle} title={t.calendar.title}>
         <form method="get" className="flex flex-wrap items-end gap-3 mt-2">
           <div className="flex flex-col">
             <label htmlFor="cal-zi" className="label">{t.calendar.day}</label>

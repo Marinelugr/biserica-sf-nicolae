@@ -74,7 +74,7 @@ export default async function ArticolPage({ params }: Props) {
     <PageShell aside="compact">
       <ViewTracker type="articol" id={article.id} />
       <article className="flex flex-col gap-5">
-        <PageHead
+        <PageHead sec="stiri"
           size="m"
           crumbs={[{ href: '/', label: t.nav.home }, { href: '/stiri', label: t.newsPage.title }, { label: title }]}
           eyebrow={article.category ? <span className="kicker">{article.category}</span> : undefined}

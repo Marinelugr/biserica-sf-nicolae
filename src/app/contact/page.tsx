@@ -33,7 +33,7 @@ export default async function ContactPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.contactPage.subtitle} title={t.contactPage.title}>
+      <PageHead sec="slujbe" eyebrow={t.contactPage.subtitle} title={t.contactPage.title}>
         {contact.message && <div className="rich" style={{ fontSize: 19 }} dangerouslySetInnerHTML={{ __html: contact.message }} />}
       </PageHead>
 

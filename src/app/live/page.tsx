@@ -52,7 +52,7 @@ export default async function LivePage() {
 
   return (
     <PageShell aside="none">
-      <PageHead eyebrow="Parohia Sfântul Ierarh Nicolae" title="Transmisiune în direct" />
+      <PageHead sec="video" eyebrow="Parohia Sfântul Ierarh Nicolae" title="Transmisiune în direct" />
       <LiveView initialStatus={status} lastArchived={lastArchived} subscribeUrl={subscribeUrl} />
     </PageShell>
   )

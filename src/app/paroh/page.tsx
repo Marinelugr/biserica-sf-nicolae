@@ -42,7 +42,7 @@ export default async function ParohPage() {
   if (!priest) {
     return (
       <PageShell aside="full">
-        <PageHead eyebrow={t.priest.badge} title={t.priest.pageTitle} />
+        <PageHead sec="cuvant" eyebrow={t.priest.badge} title={t.priest.pageTitle} />
         <div className="card"><p className="mute text-[19px]">{t.priest.notAvailable}</p></div>
       </PageShell>
     )
@@ -64,7 +64,7 @@ export default async function ParohPage() {
 
   return (
     <PageShell aside="full">
-      <PageHead eyebrow={t.priest.badge} title={t.priest.pageTitle}>
+      <PageHead sec="cuvant" eyebrow={t.priest.badge} title={t.priest.pageTitle}>
         <p className="h-s" style={{ fontSize: 26 }}>{name}</p>
         {title && <p className="gold text-[19px]">{title}</p>}
         {(ordained || parish) && (

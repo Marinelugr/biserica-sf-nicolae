@@ -90,7 +90,7 @@ export default async function CartePage({ params }: Props) {
     <PageShell aside="compact">
       <ViewTracker type="carte" id={book.id} />
       <article className="flex flex-col gap-5">
-        <PageHead
+        <PageHead sec="biblioteca"
           size="m"
           crumbs={[{ href: '/', label: t.nav.home }, { href: '/carti', label: t.books.title }, { href: `/carti/categorie/${cat.slug}`, label: categoryLabel }, { label: title }]}
           eyebrow={<><span aria-hidden="true">{cat.icon}</span> {categoryLabel}</>}

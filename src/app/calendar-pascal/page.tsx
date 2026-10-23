@@ -26,7 +26,7 @@ export default function CalendarPascalPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow="Parohia Sfântul Ierarh Nicolae" title="Calendarul Pascal Ortodox">
+      <PageHead sec="slujbe" eyebrow="Parohia Sfântul Ierarh Nicolae" title="Calendarul Pascal Ortodox">
         <p className="mute text-[18px]">
           Sărbătorile pascale calculate după calendarul iulian (stil vechi), {START_YEAR}–{END_YEAR}
         </p>
