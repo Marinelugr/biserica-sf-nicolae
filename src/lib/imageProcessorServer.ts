@@ -1,5 +1,10 @@
 import sharp from 'sharp'
 
+// Găzduire partajată (TopHost, limită LVE): fără cache intern libvips și un
+// singur fir de lucru per imagine, ca un proces să nu umfle memoria.
+sharp.cache(false)
+sharp.concurrency(1)
+
 // Server-side (Node/sharp) counterpart to imageOptimizer.ts (browser/Canvas).
 // Runs on every upload through /api/admin/upload — the single funnel used by
 // MediaGallery, ImageUploadButton and the retroactive recompress script — so
