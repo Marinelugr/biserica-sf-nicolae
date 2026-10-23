@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { optimizeImage, blobToFile, formatBytes } from '@/lib/imageOptimizer'
 import { uploadImage, attachMedia } from '@/lib/mediaUpload'
+import { movePending, removePending, setPendingCaption, type PendingMedia } from '@/lib/pendingMedia'
 
 interface MediaItem {
   id: string
@@ -14,8 +15,15 @@ interface MediaItem {
 
 interface Props {
   entityType: string
-  entityId: string
+  /** null = formular nou, nesalvat: pozele rămân „în așteptare” la părinte până la salvare. */
+  entityId: string | null
   maxPhotos?: number
+  pending?: PendingMedia[]
+  onPendingChange?: (items: PendingMedia[]) => void
+  /** Textul afișat în modul „în așteptare”, în locul butonului de salvare. */
+  pendingNote?: string
+  /** Anunță părintele cât timp se încarcă poze (ex. ca să nu se salveze formularul între timp). */
+  onUploadingChange?: (uploading: boolean) => void
 }
 
 const inp: React.CSSProperties = { width: '100%', backgroundColor: '#1A1008', border: '1px solid #2A1A0A', borderRadius: '4px', padding: '0.45rem 0.7rem', color: '#F2EBD9', fontSize: '0.82rem', fontFamily: 'Georgia, serif', outline: 'none', boxSizing: 'border-box' }
@@ -35,9 +43,12 @@ interface UploadSummary {
   skipped: number
 }
 
-export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: Props) {
+const NO_PENDING: PendingMedia[] = []
+
+export default function MediaGallery({ entityType, entityId, maxPhotos = 50, pending = NO_PENDING, onPendingChange, pendingNote = 'Ordinea și descrierile se salvează odată cu știrea.', onUploadingChange }: Props) {
+  const isPending = entityId === null
   const [items, setItems] = useState<MediaItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(!isPending)
   const [uploading, setUploading] = useState(false)
   const [uploadStatus, setUploadStatus] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -47,7 +58,21 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
   const [saving, setSaving] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Ultima listă în așteptare, citită în bucla de încărcare (props-ul se schimbă între poze).
+  const pendingRef = useRef(pending)
+  useEffect(() => { pendingRef.current = pending }, [pending])
+
+  const shown: MediaItem[] = isPending
+    ? pending.map(p => ({ id: p.tempId, url: p.url, thumbnailUrl: p.thumbnailUrl, caption: p.caption, order: p.order }))
+    : items
+
+  function setPending(next: PendingMedia[]) {
+    pendingRef.current = next
+    onPendingChange?.(next)
+  }
+
   const load = useCallback(async () => {
+    if (entityId === null) return
     try {
       const res = await fetch(`/api/admin/media?entityType=${entityType}&entityId=${encodeURIComponent(entityId)}`)
       if (res.ok) setItems(await res.json())
@@ -57,6 +82,12 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
   }, [entityType, entityId])
 
   useEffect(() => { load() }, [load])
+
+  useEffect(() => {
+    onUploadingChange?.(uploading)
+    // Dacă galeria dispare în timpul încărcării, părintele nu rămâne blocat.
+    return () => { if (uploading) onUploadingChange?.(false) }
+  }, [uploading, onUploadingChange])
 
   // Avertisment dacă pagina e închisă în timpul încărcării.
   useEffect(() => {
@@ -92,7 +123,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
   async function handleFiles(files: FileList) {
     if (!files.length) return
     const all = Array.from(files)
-    const remaining = maxPhotos - items.length
+    const remaining = maxPhotos - shown.length
     const toUpload = all.slice(0, Math.max(remaining, 0))
     if (!toUpload.length) { setError(`Limita de ${maxPhotos} poze atinsă.`); return }
 
@@ -105,14 +136,20 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
 
     const failures: UploadSummary['failures'] = []
     let ok = 0
-    const baseOrder = items.length
+    const baseOrder = shown.length
 
     for (const [i, file] of toUpload.entries()) {
       try {
         const { url, thumbnailUrl } = await uploadOne(file)
-        const item = await attachMedia<MediaItem>({ url, thumbnailUrl, entityType, entityId, order: baseOrder + ok })
+        if (entityId === null) {
+          const current = pendingRef.current
+          const tempId = `${Date.now()}-${Math.random().toString(36).slice(2)}`
+          setPending([...current, { tempId, url, thumbnailUrl, caption: '', order: current.length }])
+        } else {
+          const item = await attachMedia<MediaItem>({ url, thumbnailUrl, entityType, entityId, order: baseOrder + ok })
+          setItems(prev => [...prev, item])
+        }
         ok++
-        setItems(prev => [...prev, item])
       } catch (err) {
         const reason = err instanceof Error ? err.message.replace(`${file.name}: `, '') : 'Eroare necunoscută'
         failures.push({ name: file.name, reason })
@@ -127,11 +164,13 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
   }
 
   async function handleDelete(id: string) {
+    if (isPending) { setPending(removePending(pending, id)); return }
     await fetch(`/api/admin/media/${id}`, { method: 'DELETE' })
     setItems(prev => prev.filter(i => i.id !== id))
   }
 
   function move(index: number, dir: -1 | 1) {
+    if (isPending) { setPending(movePending(pending, index, dir)); return }
     const next = [...items]
     const target = index + dir
     if (target < 0 || target >= next.length) return
@@ -141,6 +180,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
   }
 
   function updateCaption(id: string, caption: string) {
+    if (isPending) { setPending(setPendingCaption(pending, id, caption)); return }
     setItems(prev => prev.map(i => i.id === id ? { ...i, caption } : i))
   }
 
@@ -164,10 +204,14 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
       {/* Counter + actions */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.8rem' }}>
-          {items.length} din {maxPhotos} poze
+          {shown.length} din {maxPhotos} poze
         </span>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
-          {items.length > 0 && (
+          {isPending ? (
+            <span style={{ color: '#5A4020', fontFamily: 'Georgia, serif', fontSize: '0.78rem', alignSelf: 'center' }}>
+              {pendingNote}
+            </span>
+          ) : shown.length > 0 && (
             <button type="button"
               onClick={saveOrder}
               disabled={saving}
@@ -178,8 +222,8 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
           )}
           <button type="button"
             onClick={() => inputRef.current?.click()}
-            disabled={uploading || items.length >= maxPhotos}
-            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', border: 'none', borderRadius: '4px', padding: '0.4rem 0.875rem', fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: (uploading || items.length >= maxPhotos) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: items.length >= maxPhotos ? 0.5 : 1 }}
+            disabled={uploading || shown.length >= maxPhotos}
+            style={{ backgroundColor: '#8B1A1A', color: '#F2EBD9', border: 'none', borderRadius: '4px', padding: '0.4rem 0.875rem', fontFamily: 'Georgia, serif', fontSize: '0.8rem', cursor: (uploading || shown.length >= maxPhotos) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '0.4rem', opacity: shown.length >= maxPhotos ? 0.5 : 1 }}
           >
             {uploading ? <><Spinner /> Se optimizează...</> : '📎 Adaugă poze'}
           </button>
@@ -238,7 +282,7 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
         </div>
       )}
 
-      {items.length === 0 ? (
+      {shown.length === 0 ? (
         <div
           onClick={() => inputRef.current?.click()}
           style={{ padding: '3rem 1rem', textAlign: 'center', color: '#3A2A0A', fontFamily: 'Georgia, serif', fontSize: '0.875rem', border: '1px dashed #2A1A0A', borderRadius: '6px', cursor: 'pointer' }}
@@ -253,11 +297,11 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
         </div>
       ) : (
         <div className="mg-grid">
-          {items.map((item, i) => (
+          {shown.map((item, i) => (
             <div key={item.id} className="mg-item" style={{ backgroundColor: '#0A0704', border: '1px solid #2A1A0A', borderRadius: '6px', overflow: 'hidden' }}>
               <div style={{ position: 'relative' }}>
                 <img
-                  src={(item as MediaItem & { thumbnailUrl?: string }).thumbnailUrl || item.url}
+                  src={item.thumbnailUrl || item.url}
                   alt={item.caption || ''}
                   style={{ width: '100%', height: 'auto', display: 'block' }}
                   onError={e => {
@@ -285,8 +329,8 @@ export default function MediaGallery({ entityType, entityId, maxPhotos = 50 }: P
                   >↑ Sus</button>
                   <button type="button"
                     onClick={() => move(i, 1)}
-                    disabled={i === items.length - 1}
-                    style={{ backgroundColor: 'transparent', color: i === items.length - 1 ? '#2A1A0A' : '#9B8050', border: '1px solid #2A1A0A', borderRadius: '3px', padding: '0.15rem 0.4rem', fontSize: '0.7rem', cursor: i === items.length - 1 ? 'default' : 'pointer' }}
+                    disabled={i === shown.length - 1}
+                    style={{ backgroundColor: 'transparent', color: i === shown.length - 1 ? '#2A1A0A' : '#9B8050', border: '1px solid #2A1A0A', borderRadius: '3px', padding: '0.15rem 0.4rem', fontSize: '0.7rem', cursor: i === shown.length - 1 ? 'default' : 'pointer' }}
                   >↓ Jos</button>
                 </div>
               </div>
