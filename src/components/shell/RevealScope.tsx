@@ -6,7 +6,8 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/anim/gsap'
 /**
  * Animațiile discrete ale paginii (GSAP):
  *  - intrarea cardului de profil: poza cu un scale fin, textul în cascadă;
- *  - [data-reveal] pe postările din flux: fade + 24px, stagger .08, o singură dată.
+ *  - [data-reveal] pe postările din flux: fade + 24px, stagger .08, o singură dată;
+ *    linia ornamentală din antet (.sec-rule) se „desenează" (scaleX 0→1) odată cu ea.
  * Starea inițială ascunsă e dată de CSS (globals.css) doar când motion e permis;
  * fără JS, <noscript> din layout o anulează. Cu prefers-reduced-motion: zero animații.
  */
@@ -38,17 +39,30 @@ export default function RevealScope({ children, className }: { children: React.R
         const items = gsap.utils.toArray<HTMLElement>('[data-reveal]', root)
         // opacity (nu autoAlpha): elementele rămân focusabile cu tastatura înainte de a apărea
         gsap.set(items, { opacity: 0, y: 24 })
+        // doar transform: fără salt de aspect
+        const rulesOf = (els: Element[]) => els.flatMap(el => Array.from(el.querySelectorAll('.sec-rule')))
+        gsap.set(rulesOf(items), { scaleX: 0 })
+        const drawRules = (els: Element[]) => {
+          const rules = rulesOf(els)
+          if (rules.length) gsap.to(rules, { scaleX: 1, duration: 0.9, delay: 0.2, stagger: 0.08, ease: 'power2.inOut', overwrite: true, clearProps: 'transform' })
+        }
         ScrollTrigger.batch(items, {
           start: 'top 92%',
           once: true,
-          onEnter: batch => gsap.to(batch, { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, overwrite: true, onComplete: () => done(batch) }),
+          onEnter: batch => {
+            gsap.to(batch, { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, overwrite: true, onComplete: () => done(batch) })
+            drawRules(batch)
+          },
         })
         // Elemente ascunse de filtre (display:none) apar fără animație când redevin vizibile
         const refresh = () => ScrollTrigger.refresh()
         // focus cu tastatura pe un element încă neanimat → îl afișăm imediat
         const onFocus = (e: FocusEvent) => {
           const el = (e.target as HTMLElement | null)?.closest<HTMLElement>('[data-reveal]')
-          if (el && !el.hasAttribute('data-revealed')) gsap.to(el, { opacity: 1, y: 0, duration: 0.3, overwrite: true, onComplete: () => done([el]) })
+          if (el && !el.hasAttribute('data-revealed')) {
+            gsap.to(el, { opacity: 1, y: 0, duration: 0.3, overwrite: true, onComplete: () => done([el]) })
+            drawRules([el])
+          }
         }
         window.addEventListener('feed:filter', refresh)
         root.addEventListener('focusin', onFocus)
