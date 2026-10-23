@@ -100,3 +100,31 @@ Dovada că testele pot pica (fiecare mutație aplicată temporar, testele roșii
 `npx tsc --noEmit` și `npm run build` trec. `npm run lint` dă 16 erori și 33 de avertismente, **aceleași
 ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroarea veche din
 `admin/sfinti/page.tsx` (`setState` în `useEffect` la `fetchSaints`), pe care n-am atins-o.
+
+---
+
+# Poze HEIC, erori vizibile, curățare și text curat (ramura `fix/galerie-heic-complet`, 2026-10-23)
+
+## A0. Cauza, reprodusă local (Mac, arm64)
+
+- `sips -s format heic public/images/12.jpg --out /tmp/test.heic` → 141 556 octeți,
+  `ISO Media, HEIF Image HEVC Main or Main Still Picture Profile`.
+- `sharp` **0.34.5** (din `package-lock.json`; libvips 8.17.3, libheif 1.20.2).
+  `sharp.format.heif.input.fileSuffix` = `['.avif']`: binarul precompilat citește doar AVIF.
+- `sharp('/tmp/test.heic').webp().toBuffer()` (și varianta din cod, cu buffer + `failOn: 'none'`) →
+  eroare:
+  `heif: Error while loading plugin: Support for this compression format has not been built in (11.6003)`
+  (precedată de câteva rânduri `bad seek to …`).
+- Eșuează și pe Mac; binarul linux-x64 de pe server e construit la fel (fără HEVC, lovell/sharp#3740),
+  dar nu l-am rulat acolo — concluzia despre server rămâne „foarte probabil la fel”, nu „verificat”.
+
+## A1. Serverul refuză ce nu poate decoda
+
+- `processImageBuffer` întoarce `failed: true` din `catch` (înainte: păstra originalul). „Deja mai mic”
+  rămâne `wasOptimized: false` fără `failed`. GIF/SVG neschimbate.
+- `/api/admin/upload`: `failed` → `415` JSON, **înainte** de Storage. HEIC/HEIF: „Formatul HEIC nu poate fi
+  procesat pe server. Exportă poza ca JPG și încearcă din nou.”; altceva: „Fișierul nu pare o poză validă.”
+  `mediaUpload.messageFor` afișează deja `body.error` pentru 4xx, deci mesajul ajunge la părinte.
+- `db:recompress-images` nu e afectat (sare peste tot ce are `wasOptimized: false`).
+- Teste: `upload-decode.test.ts` (5; `processImageBuffer` real, `sharp` simulat să arunce, Supabase simulat).
+  Cu vechiul `catch` readus: 3 roșii (HEIC, HEIF, text redenumit .jpg).
