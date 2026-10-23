@@ -361,6 +361,7 @@ const ru: Translations = {
     feedFilter: 'Фильтр публикаций', feedAll: 'Все', feedWord: 'Слово', feedVideo: 'Видео', feedParish: 'Приход', feedLibrary: 'Библиотека',
     kindWord: 'Слово священника', kindVideo: 'Видео', kindParish: 'Из жизни прихода', kindLibrary: 'Библиотека',
     kindChurch: 'Из жизни Церкви', kindAnnouncement: 'Объявление',
+    kindServices: 'Богослужения и пасхалия', readAnnouncement: 'Читать объявление',
     today: 'Сегодня', oldStyle: 'старый стиль', readFullMessage: 'Читать полностью →', read: 'Читать →', backHome: 'Главная',
     coverAlt: 'Храм Святителя Николая в Хыртопул Мик, вид сверху',
     emblemAlt: 'Эмблема храма Святителя Николая', liveBadge: 'LIVE', feedEmpty: 'Сейчас нет публикаций этого типа.', dateLabel: 'Дата',

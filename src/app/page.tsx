@@ -6,11 +6,9 @@ import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
 import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
 import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
-import NextServiceWidget from '@/components/NextServiceWidget'
-import PascalCard from '@/components/PascalCard'
+import ServicesCard from '@/components/homepage/ServicesCard'
 import PriestMessageSection from '@/components/homepage/PriestMessageSection'
 import PageShell from '@/components/shell/PageShell'
-import FeedCard from '@/components/shell/FeedCard'
 import FeedFilter from '@/components/shell/FeedFilter'
 import ChurchLifeSection from '@/components/homepage/ChurchLifeSection'
 import { getChurchLifeCards } from '@/lib/externalFeeds'
@@ -177,7 +175,6 @@ export default async function HomePage() {
   for (const u of UNIT_ORDER_FALLBACK) if (!units.includes(u)) units.push(u)
 
   const t = await getServerT()
-  const author = t.shell.brand
   const showHero = enabled['hero'] !== false
   const prayerHref = dailyData.prayer.slug ? `/carti/${dailyData.prayer.slug}` : '/carti'
 
@@ -192,13 +189,7 @@ export default async function HomePage() {
         )
       case 'pascal_slujbe':
         return enabled['pascal_slujbe'] === false ? null : (
-          <Fragment key="pascal_slujbe">
-            <FeedCard kind="parohie" sec="slujbe" kicker={t.nav.pascalCalendar}>
-              <PascalCard />
-            </FeedCard>
-            {/* Numărătoarea pentru următoarea slujbă — nu se randează deloc când nu are ce afișa */}
-            <NextServiceWidget author={author} kicker={t.shell.kindParish} />
-          </Fragment>
+          <ServicesCard key="pascal_slujbe" kicker={t.shell.kindServices} />
         )
       case 'mesajul_parintelui':
         return enabled['mesajul_parintelui'] === false ? null : <PriestMessageSection key="mesajul_parintelui" />

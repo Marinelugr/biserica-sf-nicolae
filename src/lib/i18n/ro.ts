@@ -185,6 +185,7 @@ export interface Translations {
     profileRole: string; follow: string; socialTitle: string; scheduleTitle: string
     feedFilter: string; feedAll: string; feedWord: string; feedVideo: string; feedParish: string; feedLibrary: string
     kindWord: string; kindVideo: string; kindParish: string; kindLibrary: string; kindChurch: string; kindAnnouncement: string
+    kindServices: string; readAnnouncement: string
     today: string; oldStyle: string; readFullMessage: string; read: string; backHome: string
     coverAlt: string; emblemAlt: string; liveBadge: string; feedEmpty: string; dateLabel: string
   }
@@ -552,6 +553,7 @@ const ro: Translations = {
     feedFilter: 'Filtrează postările', feedAll: 'Tot', feedWord: 'Cuvânt', feedVideo: 'Video', feedParish: 'Parohie', feedLibrary: 'Bibliotecă',
     kindWord: 'Cuvântul părintelui', kindVideo: 'Video', kindParish: 'Din viața parohiei', kindLibrary: 'Bibliotecă',
     kindChurch: 'Din viața Bisericii', kindAnnouncement: 'Anunț',
+    kindServices: 'Slujbe și Calendar Pascal', readAnnouncement: 'Citește anunțul',
     today: 'Astăzi', oldStyle: 'stil vechi', readFullMessage: 'Citește mesajul complet →', read: 'Citește →', backHome: 'Acasă',
     coverAlt: 'Biserica Sfântul Ierarh Nicolae din Hîrtopul Mic, văzută de sus',
     emblemAlt: 'Emblema Bisericii Sfântul Ierarh Nicolae', liveBadge: 'LIVE', feedEmpty: 'Nu sunt postări de acest tip acum.', dateLabel: 'Data',

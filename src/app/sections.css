@@ -21,7 +21,9 @@
    (Preflight are aceeași regulă în @layer base; aici e și în afara straturilor, ca să fie sigur). */
 [hidden]:where(:not([hidden="until-found"])) { display: none !important; }
 
-@layer components {
+/* Fără @layer: regulile mobile din globals.css (în afara straturilor) ar suprascrie altfel
+   forma secțiunilor (ex. `.card { border-radius: 20px }` sub 760 px). */
+
   /* ─── Tokeni ─────────────────────────────────────────────────────────── */
   [data-sec="astazi"], [data-head="astazi"] {
     --sec-accent: #e0b84a;
@@ -380,7 +382,7 @@
   .foot-ornament { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold); opacity: 0.7; font-size: 14px; letter-spacing: 0.5em; }
   .foot-ornament::before, .foot-ornament::after { content: ''; height: 1px; width: min(120px, 22vw); background: linear-gradient(90deg, transparent, var(--gold-d)); }
   .foot-ornament::after { transform: scaleX(-1); }
-}
+
 
 @media (max-width: 760px) {
   .panel { padding: 22px 18px; }
@@ -390,6 +392,7 @@
   .slujbe-grid > * + * { border-left: 0; padding-left: 0; border-top: 1px solid var(--sec-edge); padding-top: 18px; }
   .news-lead { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .sec-row .thumb { flex-basis: 108px; height: 76px; }
+  .sec-row .cat-tag { top: 5px; left: 5px; max-width: calc(100% - 10px); padding: 2px 6px; font-size: 10px; letter-spacing: 0.04em; }
   .letter { font-size: 20px; }
   .letter.excerpt { font-size: 21px; }
   .row-no { display: none; }
