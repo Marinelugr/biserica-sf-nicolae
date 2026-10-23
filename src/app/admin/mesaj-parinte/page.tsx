@@ -192,6 +192,7 @@ export default function AdminMesajParintePage() {
               {/* ─── Fotografie ─── */}
               <div style={sectionBox}>
                 <div style={sectionTitle}>📸 Fotografia</div>
+                <p style={{ color: '#8A7050', fontFamily: 'Georgia, serif', fontSize: '0.8rem', margin: '-0.6rem 0 1rem' }}>Aceasta este poza din cardul de profil, de pe toate paginile site-ului.</p>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1 }}>
                     <label style={lbl}>URL fotografie</label>

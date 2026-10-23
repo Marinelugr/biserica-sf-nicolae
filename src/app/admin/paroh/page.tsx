@@ -207,6 +207,7 @@ export default function AdminParohPage() {
               {/* ─── Fotografie ─── */}
               <div style={sectionBox}>
                 <div style={sectionTitle}>📸 Fotografia principală</div>
+                <p style={{ color: '#8A7050', fontFamily: 'Georgia, serif', fontSize: '0.8rem', margin: '-0.6rem 0 1rem' }}>Apare pe pagina Parohul Bisericii.</p>
                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                   <div style={{ flex: 1 }}>
                     <label style={lbl}>URL fotografie</label>
