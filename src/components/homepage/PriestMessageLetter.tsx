@@ -11,7 +11,7 @@ interface Props {
 /** Mesajul complet, ca scrisoare: salut auriu, literă mare, semnătură. Folosit de pagină și de admin. */
 export default function PriestMessageLetter({ html, signature, updatedLabel }: Props) {
   return (
-    <article className="card letter-page">
+    <article className="card letter-page" data-sec="cuvant">
       <div className="rich letter" dangerouslySetInnerHTML={{ __html: decorateLetter(html) }} />
       <footer className="letter-foot">
         <p className="letter-sign">— {signature}</p>

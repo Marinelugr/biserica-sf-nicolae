@@ -44,7 +44,7 @@ export default async function MesajulParinteluiPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead crumbs={[{ href: '/', label: 'Acasă' }, { label: 'Mesajul Părintelui' }]} title="Mesajul Părintelui" />
+      <PageHead sec="cuvant" crumbs={[{ href: '/', label: 'Acasă' }, { label: 'Mesajul Părintelui' }]} title="Mesajul Părintelui" />
       <PriestMessageLetter html={html} signature={semnatura} updatedLabel={updatedAt ? `Actualizat la ${updatedAt}` : null} />
       <div className="card flex flex-wrap items-center justify-between gap-4" style={{ padding: '20px 24px' }}>
         <Link href="/" className="link-gold text-[17px]">← Înapoi</Link>
