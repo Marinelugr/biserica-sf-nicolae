@@ -55,3 +55,48 @@ Limita reală rămâne cea din aplicație (20 MB).
 | `admin/paroh/page.tsx` | `form.id` | da, la primul paroh; deja protejat (`form.id ? … : „Salvați datele mai întâi…”`), iar după salvare `form.id` se setează și galeria apare imediat. Lăsat așa: există un singur paroh. |
 | `admin/sfinti/page.tsx` | `editSaint.id` / `null` la sfânt nou | acum mod „în așteptare” |
 | `admin/stiri/nou/page.tsx` (nou) | `null` | mod „în așteptare” |
+
+## T4. `ImageUploadButton`
+
+- Compresie cu `optimizeImage` (doar poza principală, miniatura nu se folosește aici). Se trimite
+  originalul dacă optimizarea eșuează sau nu micșorează fișierul. SVG și GIF nu se ating (canvas-ul
+  le-ar rasteriza / le-ar opri animația).
+- API-ul (`onUpload`, `label`, `accept`, `style`) e identic; mesajele de eroare au acum numele pozei.
+
+## T5. Server
+
+- `sharp.cache(false)` + `sharp.concurrency(1)` la nivel de modul. Afectează și scriptul
+  `db:recompress-images` (rulează mai încet, dar e unealtă ocazională).
+- `/api/admin/upload`: `formData()` întrerupt → `400` JSON; orice altă excepție → `500` JSON generic,
+  detaliile doar în `~/logs/parohie-passenger.log` (`[upload]`).
+
+## T6. Propuneri (neimplementate)
+
+Galeria e generică (`MediaItem` cu `entityType`/`entityId`), deci niciunul nu cere schimbare de schemă;
+doar o valoare nouă în `ENTITY_TYPES` din `src/app/api/admin/media/route.ts`.
+
+| Formular | Admin | Pagină publică | Estimare |
+| --- | --- | --- | --- |
+| `carti` (LibraryBook) | `MediaGallery` în dialogul de editare + mod „în așteptare” la carte nouă | `PublicGallery` pe `/carti/[slug]` | ~2 h |
+| `mesaj-parinte` (PriestMessage) | o înregistrare, `MediaGallery` cu `id`-ul ei | `PublicGallery` pe `/mesajul-parintelui` | ~1,5 h |
+| `magazin` (Product) | ca la cărți | nu există pagină de produs: trebuie creată `/magazin/[slug]` (sau o fereastră pe listă) | ~4 h |
+| `anunturi` (Anunt) | ușor de adăugat | anunțul e un mesaj scurt, nu are pagină proprie; o galerie are sens doar cu legătura către o știre (deja posibilă) | nerecomandat |
+
+## T7. Teste
+
+`npm test` (vitest, fără rețea și fără bază de date): `mediaUpload` (13), `pendingMedia` (5),
+`media-route` (8), `upload-route` (3).
+
+Dovada că testele pot pica (fiecare mutație aplicată temporar, testele roșii, apoi protecția readusă,
+29/29 verzi):
+
+| Protecție scoasă | Teste roșii |
+| --- | --- |
+| reîncercarea la 502/503/504 și la eroare de rețea | 4 din `mediaUpload` |
+| citirea ca text → `res.json()` direct | 4 din `mediaUpload` (inclusiv 413 HTML și 200 HTML) |
+| validarea prefixului Storage | „adresă din afara Storage-ului nostru → 400” |
+| `try/catch` din ruta de upload | ambele teste 400/500 din `upload-route` |
+
+`npx tsc --noEmit` și `npm run build` trec. `npm run lint` dă 16 erori și 33 de avertismente, **aceleași
+ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroarea veche din
+`admin/sfinti/page.tsx` (`setState` în `useEffect` la `fetchSaints`), pe care n-am atins-o.
