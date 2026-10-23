@@ -213,21 +213,12 @@
   .anunt-title { font-family: var(--serif); font-weight: 600; font-size: clamp(26px, 3vw, 32px); line-height: 1.15; color: var(--sec-ink); }
   .anunt-text { font-size: 20px; line-height: 1.6; color: var(--sec-ink); }
 
-  /* ─── slujbe: chenar dublu, cifre în căsuțe, ani ca pastile ──────────── */
+  /* ─── slujbe: chenar dublu, ani ca pastile ──────────────────────────── */
   .card[data-sec="slujbe"]::after, .panel[data-sec="slujbe"]::after {
     content: ''; position: absolute; inset: 6px; pointer-events: none; z-index: -1;
     border: 1px solid var(--sec-edge); border-radius: calc(var(--sec-radius) - 6px);
   }
   .card[data-sec="slujbe"].sec-lite::after { content: none; }
-  .slujbe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px 28px; }
-  .slujbe-grid > * + * { border-left: 1px solid var(--sec-edge); padding-left: 28px; }
-  .digits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-  .digit {
-    display: flex; flex-direction: column; align-items: center; min-width: 60px; padding: 8px 6px 7px;
-    border-radius: 8px; border: 1px solid var(--sec-edge); background: rgba(5, 10, 26, 0.45);
-  }
-  .digit b { font-family: var(--serif); font-weight: 600; font-size: 32px; line-height: 1; color: var(--sec-accent-text); font-variant-numeric: tabular-nums; }
-  .digit span { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sec-mute); margin-top: 5px; }
   .pill {
     min-height: 40px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
     border: 1px solid var(--sec-edge, var(--line)); background: transparent;
@@ -389,7 +380,6 @@
   .today { gap: 16px; }
   .today-date { min-width: 88px; padding: 8px 10px 10px; }
   .today-day { font-size: 52px; }
-  .slujbe-grid > * + * { border-left: 0; padding-left: 0; border-top: 1px solid var(--sec-edge); padding-top: 18px; }
   .news-lead { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .sec-row .thumb { flex-basis: 108px; height: 76px; }
   .sec-row .cat-tag { top: 5px; left: 5px; max-width: calc(100% - 10px); padding: 2px 6px; font-size: 10px; letter-spacing: 0.04em; }

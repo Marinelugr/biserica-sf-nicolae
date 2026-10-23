@@ -188,7 +188,7 @@ export default async function HomePage() {
         )
       case 'pascal_slujbe':
         return enabled['pascal_slujbe'] === false ? null : (
-          <ServicesCard key="pascal_slujbe" kicker={t.shell.kindServices} />
+          <ServicesCard key="pascal_slujbe" kicker={t.nav.pascalCalendar} />
         )
       case 'mesajul_parintelui':
         return enabled['mesajul_parintelui'] === false ? null : <PriestMessageSection key="mesajul_parintelui" />

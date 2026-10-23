@@ -9,7 +9,7 @@ interface Widget { section: string; enabled: boolean; order: number }
 const LABELS: Record<string, { label: string; icon: string; desc: string }> = {
   hero:                { label: 'Antet principal (Hero)', icon: '⛪', desc: 'Imaginea mare de sus cu titlul parohiei și butoanele' },
   astazi_calendar:     { label: 'Astăzi în calendar',   icon: '📅', desc: 'Banda cu data curentă și postul zilei, link spre calendar' },
-  pascal_slujbe:       { label: 'Paști & următoarea slujbă', icon: '✝', desc: 'Cardul cu numărătoarea până la Paști și cardul următoarei slujbe' },
+  pascal_slujbe:       { label: 'Calendar Pascal', icon: '✝', desc: 'Cardul cu numărătoarea până la Paști' },
   mesajul_parintelui:  { label: 'Mesajul Părintelui',   icon: '✉️', desc: 'Secțiunea cu mesajul și fotografia parohului' },
   sfintii_zilei:       { label: 'Sfinții zilei',        icon: '☦',  desc: 'Calendar ortodox cu sfinții prăznuiți în ziua curentă' },
   evanghelia_zilei:    { label: 'Evanghelia zilei',     icon: '📖', desc: 'Pericopa evanghelică a zilei din calendarul ortodox' },

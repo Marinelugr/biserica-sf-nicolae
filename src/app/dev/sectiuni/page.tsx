@@ -93,7 +93,7 @@ export default async function SectiuniGalleryPage() {
           kicker={t.shell.kindAnnouncement}
           moreLabel={t.shell.readAnnouncement}
         />
-        <ServicesCard kicker={t.shell.kindServices} />
+        <ServicesCard kicker={t.nav.pascalCalendar} />
         <PriestMessageCard
           html={excerpt.html}
           truncated={excerpt.truncated}
