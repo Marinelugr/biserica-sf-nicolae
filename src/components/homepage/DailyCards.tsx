@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getServerT } from '@/lib/i18n/server'
 import FeedCard, { type FeedKind } from '@/components/shell/FeedCard'
+import type { SecId } from '@/lib/sectionTheme'
 
 interface DailyData {
   saints: string[]
@@ -17,10 +18,11 @@ interface DailyCardsProps {
 /** Sfinții / Evanghelia / Rugăciunea zilei — câte o postare, în ordinea și activarea din admin. */
 export default async function DailyCards({ data, enabled, order }: DailyCardsProps) {
   const t = await getServerT()
-  const allCards: { key: string; kind: FeedKind; label: string; content: React.ReactNode; link: string; linkLabel: string }[] = [
+  const allCards: { key: string; kind: FeedKind; sec: SecId; label: string; content: React.ReactNode; link: string; linkLabel: string }[] = [
     {
       key: 'sfintii_zilei',
       kind: 'cuvant',
+      sec: 'sfinti',
       label: t.home.saintsToday,
       content: (
         <div>
@@ -49,6 +51,7 @@ export default async function DailyCards({ data, enabled, order }: DailyCardsPro
     {
       key: 'evanghelia_zilei',
       kind: 'cuvant',
+      sec: 'evanghelie',
       label: t.home.gospelToday,
       content: (
         <div className="flex flex-col gap-2">
@@ -64,6 +67,7 @@ export default async function DailyCards({ data, enabled, order }: DailyCardsPro
     {
       key: 'rugaciunea_zilei',
       kind: 'biblioteca',
+      sec: 'rugaciune',
       label: t.home.prayerToday,
       content: (
         <div className="flex flex-col gap-1.5">
@@ -88,7 +92,7 @@ export default async function DailyCards({ data, enabled, order }: DailyCardsPro
   return (
     <>
       {cards.map(card => (
-        <FeedCard key={card.key} kind={card.kind} kicker={card.label} author={t.shell.brand}>
+        <FeedCard key={card.key} kind={card.kind} sec={card.sec} kicker={card.label}>
           <h2 className="sr-only">{card.label}</h2>
           {card.content}
           {card.linkLabel && (

@@ -193,7 +193,7 @@ export default async function HomePage() {
       case 'pascal_slujbe':
         return enabled['pascal_slujbe'] === false ? null : (
           <Fragment key="pascal_slujbe">
-            <FeedCard kind="parohie" kicker={t.nav.pascalCalendar} author={author}>
+            <FeedCard kind="parohie" sec="slujbe" kicker={t.nav.pascalCalendar}>
               <PascalCard />
             </FeedCard>
             {/* Numărătoarea pentru următoarea slujbă — nu se randează deloc când nu are ce afișa */}

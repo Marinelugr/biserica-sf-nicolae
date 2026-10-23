@@ -54,7 +54,7 @@ export default async function LiturgicalTodayWidget({ saint, prayerHref }: Props
 
   return (
     <>
-      <FeedCard kind="parohie" kicker={t.calendar.todayWidget} author={t.shell.brand}>
+      <FeedCard kind="parohie" sec="astazi" kicker={t.calendar.todayWidget}>
         <div className="flex flex-col gap-2.5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <span className="eyebrow">{t.shell.today} · {shortDate}</span>

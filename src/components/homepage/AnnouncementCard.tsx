@@ -14,7 +14,7 @@ interface AnnouncementCardProps {
  */
 export default function AnnouncementCard({ titlu, mesaj, linkArticol, author, kicker }: AnnouncementCardProps) {
   return (
-    <FeedCard kind="parohie" kicker={kicker} author={author} className="red-grad">
+    <FeedCard kind="parohie" sec="anunt" kicker={kicker} author={author}>
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"

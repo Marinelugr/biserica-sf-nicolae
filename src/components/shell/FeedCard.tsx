@@ -1,43 +1,45 @@
-import Image from 'next/image'
+import type { SecId } from '@/lib/sectionTheme'
+import { SEC_ICON } from '@/lib/sectionTheme'
+import { SectionMedal } from './SectionIcon'
 
 export type FeedKind = 'cuvant' | 'video' | 'parohie' | 'biblioteca'
 
-const KICKER_CLASS: Record<FeedKind, string> = {
-  cuvant: 'kicker blue',
-  video: 'kicker blue',
-  parohie: 'kicker',
-  biblioteca: 'kicker blue',
-}
-
 interface Props {
+  /** Pentru filtrele din flux (`data-kind`). */
   kind: FeedKind
-  /** Eticheta de sub numele autorului (ex. „Video", „Cuvântul părintelui"). */
+  /** Identitatea vizuală (`data-sec`, vezi src/app/sections.css). */
+  sec: SecId
+  /** Titlul secțiunii din antet (ex. „Video", „Cuvântul părintelui"). */
   kicker: string
-  author: string
+  /** Numele autorului — se afișează doar la `cuvant` (sau cu `showAuthor`). */
+  author?: string
+  showAuthor?: boolean
   children: React.ReactNode
-  /** Fără antet (siglă + autor) — pentru rândurile compacte de știri/bibliotecă. */
+  /** Fără antet (medalion + titlu). */
   bare?: boolean
   flush?: boolean
   className?: string
   style?: React.CSSProperties
 }
 
-/** O postare din flux: antet cu sigla + „Părintele Marin" + kicker colorat după tip. */
-export default function FeedCard({ kind, kicker, author, children, bare, flush, className = '', style }: Props) {
+/** O postare din flux: antet cu medalionul secțiunii + titlul ei, în culoarea accentului. */
+export default function FeedCard({ kind, sec, kicker, author, showAuthor = sec === 'cuvant', children, bare, flush, className = '', style }: Props) {
   return (
     <article
       className={`card ${flush ? 'flush' : ''} ${className}`}
       style={flush ? style : { padding: '22px 24px', ...style }}
       data-kind={kind}
+      data-sec={sec}
       data-reveal
     >
       {!bare && (
-        <header className="flex items-center gap-3" style={flush ? { padding: '18px 24px' } : { marginBottom: 14 }}>
-          <Image src="/logo-mark.png" alt="" width={17} height={36} style={{ height: 36, width: 'auto' }} />
-          <div className="flex flex-col leading-tight">
-            <span className="h-s" style={{ fontSize: 20 }}>{author}</span>
-            <span className={KICKER_CLASS[kind]}>{kicker}</span>
+        <header className="sec-top" style={flush ? { padding: '18px 24px 14px', marginBottom: 0 } : undefined}>
+          <SectionMedal name={SEC_ICON[sec]} />
+          <div className="flex flex-col leading-tight min-w-0">
+            <span className="sec-kicker">{kicker}</span>
+            {showAuthor && author && <span className="sec-author">{author}</span>}
           </div>
+          <span className="sec-rule" aria-hidden="true" />
         </header>
       )}
       {children}

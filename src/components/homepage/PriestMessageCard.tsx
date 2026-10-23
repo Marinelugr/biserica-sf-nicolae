@@ -18,7 +18,7 @@ interface Props {
  */
 export default function PriestMessageCard({ html, truncated, signature, kicker, author, readMoreLabel, href = '/mesajul-parintelui' }: Props) {
   return (
-    <FeedCard kind="cuvant" kicker={kicker} author={author}>
+    <FeedCard kind="cuvant" sec="cuvant" kicker={kicker} author={author}>
       <figure className="letter-card">
         <blockquote
           className={`rich letter excerpt${truncated ? ' is-truncated' : ''}`}

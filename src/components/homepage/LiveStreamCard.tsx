@@ -10,7 +10,7 @@ export default async function LiveStreamCard() {
   if (!isLive || !videoId) return null
 
   return (
-    <FeedCard kind="video" kicker={t.shell.kindVideo} author={t.shell.brand} flush>
+    <FeedCard kind="video" sec="video" kicker={t.shell.kindVideo} flush>
       <div className="flex flex-wrap items-center justify-between gap-3" style={{ padding: '0 24px 16px' }}>
         <div className="flex items-center gap-3 flex-wrap">
           <span className="live-pill" style={{ minHeight: 32 }}>
