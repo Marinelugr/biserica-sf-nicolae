@@ -111,16 +111,12 @@ export interface Translations {
   }
   footer: {
     parish: string; address: string; country: string; metropolis: string
-    pagesTitle: string; scheduleTitle: string; contactTitle: string
+    pagesTitle: string; contactTitle: string
     support: string; contact: string; blessing: string; copyright: string
     phone: string; email: string
     pages: {
       about: string; bible: string; books: string; calendar: string
       history: string; saint: string; news: string; video: string
-    }
-    schedule: {
-      sunday: string; saturday: string; friday: string; feasts: string
-      liturgy: string; vespers: string; matins: string
     }
     privacyPolicy: string
   }
@@ -147,7 +143,6 @@ export interface Translations {
     title: string; subtitle: string
     addressLabel: string; hramLabel: string; hramValue: string
     phoneLabel: string; emailLabel: string; facebookLabel: string
-    scheduleTitle: string
     mapTitle: string
     formTitle: string; nameLabel: string; emailLabel2: string; messageLabel: string
     namePlaceholder: string; emailPlaceholder: string; messagePlaceholder: string
@@ -182,7 +177,7 @@ export interface Translations {
   shell: {
     brand: string; navWord: string; navParish: string; navBible: string; navAbout: string; navFather: string
     openMenu: string; closeMenu: string; mainMenu: string
-    profileRole: string; follow: string; socialTitle: string; scheduleTitle: string
+    profileRole: string; follow: string; socialTitle: string
     feedFilter: string; feedAll: string; feedWord: string; feedVideo: string; feedParish: string; feedLibrary: string
     kindWord: string; kindVideo: string; kindParish: string; kindLibrary: string; kindChurch: string; kindAnnouncement: string
     kindServices: string; readAnnouncement: string
@@ -390,7 +385,7 @@ const ro: Translations = {
   footer: {
     parish: 'Parohia Ortodoxă', address: 'Hîrtopul Mic, Raionul Criuleni',
     country: 'Republica Moldova', metropolis: 'Mitropolia Chișinăului și a întregii Moldove',
-    pagesTitle: 'PAGINI', scheduleTitle: 'PROGRAM SLUJBE', contactTitle: 'CONTACT & SOCIAL',
+    pagesTitle: 'PAGINI', contactTitle: 'CONTACT & SOCIAL',
     support: '❤ Susține parohia', contact: 'Formular contact',
     blessing: 'Website realizat de Marin Grigoriță — creator și dezvoltator web',
     copyright: 'Parohia Sfântul Ierarh Nicolae, Hîrtopul Mic',
@@ -399,10 +394,6 @@ const ro: Translations = {
       about: 'Despre Parohie', bible: 'Sfânta Scriptură', books: 'Bibliotecă Ortodoxă',
       calendar: 'Calendar Liturgic', history: 'Istoria Bisericii', saint: 'Sfântul Nicolae',
       news: 'Știri & Articole', video: 'Video Ortodox',
-    },
-    schedule: {
-      sunday: 'Duminică', saturday: 'Sâmbătă', friday: 'Vineri', feasts: 'Sărbători',
-      liturgy: 'Sf. Liturghie', vespers: 'Vecernie', matins: 'Utrenie',
     },
     privacyPolicy: 'Politica de confidențialitate',
   },
@@ -433,7 +424,6 @@ const ro: Translations = {
     title: 'Contactați-ne', subtitle: 'Suntem bucuroși să răspundem întrebărilor dumneavoastră',
     addressLabel: 'Adresă', hramLabel: 'Hram', hramValue: 'Sfântul Ierarh Nicolae (19 decembrie / 22 mai)',
     phoneLabel: 'Telefon', emailLabel: 'Email', facebookLabel: 'Facebook',
-    scheduleTitle: 'Program slujbe',
     mapTitle: 'Cum ajungeți la noi',
     formTitle: 'Trimite un mesaj', nameLabel: 'Nume', emailLabel2: 'Email', messageLabel: 'Mesaj',
     namePlaceholder: 'Numele dumneavoastră', emailPlaceholder: 'email@exemplu.com', messagePlaceholder: 'Scrieți mesajul dumneavoastră...',
@@ -502,7 +492,7 @@ const ro: Translations = {
     },
     contact: {
       title: 'Contact',
-      description: 'Contactează Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Formular de contact, adresă, telefon și program de slujbe.',
+      description: 'Contactează Parohia Sfântul Ierarh Nicolae din Hîrtopul Mic, Criuleni, Moldova. Formular de contact, adresă, și telefon.',
     },
     cautare: {
       title: 'Căutare',
@@ -549,7 +539,7 @@ const ro: Translations = {
     brand: 'Părintele Marin', navWord: 'Cuvântul', navParish: 'Parohia', navBible: 'Biblia', navAbout: 'Despre parohie', navFather: 'Părintele',
     openMenu: 'Deschide meniul', closeMenu: 'Închide meniul', mainMenu: 'Meniu principal',
     profileRole: 'Parohul Bisericii Sfântul Ierarh Nicolae · Hîrtopul Mic, Criuleni',
-    follow: 'Urmărește', socialTitle: 'Rețele sociale', scheduleTitle: 'Program slujbe · Parohia',
+    follow: 'Urmărește', socialTitle: 'Rețele sociale',
     feedFilter: 'Filtrează postările', feedAll: 'Tot', feedWord: 'Cuvânt', feedVideo: 'Video', feedParish: 'Parohie', feedLibrary: 'Bibliotecă',
     kindWord: 'Cuvântul părintelui', kindVideo: 'Video', kindParish: 'Din viața parohiei', kindLibrary: 'Bibliotecă',
     kindChurch: 'Din viața Bisericii', kindAnnouncement: 'Anunț',

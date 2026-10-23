@@ -105,7 +105,6 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 longitude: 28.9283,
               },
               denomination: 'Eastern Orthodox',
-              openingHours: ['Su 09:00-12:00', 'Sa 17:00-19:00'],
             }),
           }}
         />

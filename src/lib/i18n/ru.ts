@@ -198,7 +198,7 @@ const ru: Translations = {
   footer: {
     parish: 'Православный приход', address: 'Хыртопул Мик, Район Криулень',
     country: 'Республика Молдова', metropolis: 'Митрополия Кишинёва и всея Молдовы',
-    pagesTitle: 'СТРАНИЦЫ', scheduleTitle: 'РАСПИСАНИЕ СЛУЖБ', contactTitle: 'КОНТАКТЫ',
+    pagesTitle: 'СТРАНИЦЫ', contactTitle: 'КОНТАКТЫ',
     support: '❤ Поддержать приход', contact: 'Форма контакта',
     blessing: 'Сайт разработан Марином Григорицэ — создатель и веб-разработчик',
     copyright: 'Приход Святителя Николая, Хыртопул Мик',
@@ -207,10 +207,6 @@ const ru: Translations = {
       about: 'О приходе', bible: 'Священное Писание', books: 'Православная библиотека',
       calendar: 'Богослужебный календарь', history: 'История Церкви', saint: 'Святой Николай',
       news: 'Новости & Статьи', video: 'Православное видео',
-    },
-    schedule: {
-      sunday: 'Воскресенье', saturday: 'Суббота', friday: 'Пятница', feasts: 'Праздники',
-      liturgy: 'Св. Литургия', vespers: 'Вечерня', matins: 'Утреня',
     },
     privacyPolicy: 'Политика конфиденциальности',
   },
@@ -241,7 +237,6 @@ const ru: Translations = {
     title: 'Связаться с нами', subtitle: 'Мы рады ответить на ваши вопросы',
     addressLabel: 'Адрес', hramLabel: 'Престольный праздник', hramValue: 'Святитель Николай (19 декабря / 22 мая)',
     phoneLabel: 'Телефон', emailLabel: 'Эл. почта', facebookLabel: 'Facebook',
-    scheduleTitle: 'Расписание служб',
     mapTitle: 'Как нас найти',
     formTitle: 'Отправить сообщение', nameLabel: 'Имя', emailLabel2: 'Эл. почта', messageLabel: 'Сообщение',
     namePlaceholder: 'Ваше имя', emailPlaceholder: 'email@example.com', messagePlaceholder: 'Напишите ваше сообщение...',
@@ -310,7 +305,7 @@ const ru: Translations = {
     },
     contact: {
       title: 'Контакты',
-      description: 'Свяжитесь с приходом Святителя Николая в Хыртопул Мик, Криуляны, Молдова. Форма обратной связи, адрес, телефон и расписание богослужений.',
+      description: 'Свяжитесь с приходом Святителя Николая в Хыртопул Мик, Криуляны, Молдова. Форма обратной связи, адрес и телефон.',
     },
     cautare: {
       title: 'Поиск',
@@ -357,7 +352,7 @@ const ru: Translations = {
     brand: 'Отец Марин', navWord: 'Слово', navParish: 'Приход', navBible: 'Библия', navAbout: 'О приходе', navFather: 'Священник',
     openMenu: 'Открыть меню', closeMenu: 'Закрыть меню', mainMenu: 'Главное меню',
     profileRole: 'Настоятель храма Святителя Николая · Хыртопул Мик, Криулень',
-    follow: 'Подписаться', socialTitle: 'Соцсети', scheduleTitle: 'Расписание служб · Приход',
+    follow: 'Подписаться', socialTitle: 'Соцсети',
     feedFilter: 'Фильтр публикаций', feedAll: 'Все', feedWord: 'Слово', feedVideo: 'Видео', feedParish: 'Приход', feedLibrary: 'Библиотека',
     kindWord: 'Слово священника', kindVideo: 'Видео', kindParish: 'Из жизни прихода', kindLibrary: 'Библиотека',
     kindChurch: 'Из жизни Церкви', kindAnnouncement: 'Объявление',
