@@ -148,3 +148,20 @@ ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroa
   `/tmp/test.heic` (141 KB, 940×664) → `test.jpg`, `image/jpeg`, **168 217 octeți**, 940×664, 265 ms.
   Un fișier text numit `proba.heic` → mesajul de refuz în română.
 - `accept` și textul „JPG, PNG, WebP, HEIC” rămân neschimbate (acum sunt adevărate).
+
+## A3 + B3. Cardurile rupte se văd și se pot șterge (admin)
+
+- `GalleryImage` (în `MediaGallery.tsx`): miniatura → poza principală → chenar punctat de 120 px
+  „Poza nu se poate afișa” + `describeLoadFailure` (extensia din adresă și, dacă `HEAD` reușește cu
+  2xx, `content-type`). `HEAD` eșuat sau 404 → doar extensia, fără nimic în consolă din partea noastră
+  (browserul poate loga singur un eșec de rețea/CORS).
+- „Nefuncțională” = starea de eroare raportată de `GalleryImage` (un `Set` de id-uri), **nu** extensia.
+  Bannerul numără doar pozele încă afișate, deci scade live la ✕.
+- „🗑 Șterge pozele nefuncționale”: `confirm()` (ca în restul admin-ului) → editare: `DELETE
+  /api/admin/media/[id]` pe rând, progres „Se șterg i din N…”, apoi `load()`; eșecurile se numără și se
+  raportează la final. „În așteptare”: `removePending` pentru fiecare. Doar înregistrările din baza de date;
+  fișierele din Storage rămân.
+- Verificat în Chromium headless (componenta reală, `fetch` simulat, script necomis), ambele moduri,
+  4 poze (JPG bun, `.HEIC`, text numit `.jpg`, `.webp` lipsă): 3 chenare cu `.heic · image/heic`,
+  `.jpg · image/jpeg`, `.webp`; banner „3 poze…”; după buton: „în așteptare” rămâne 1 poză; editare cu un
+  `DELETE` forțat la 500 → „1 din 3 poze nu au putut fi șterse”, banner „1 poză…”; zero erori JS.
