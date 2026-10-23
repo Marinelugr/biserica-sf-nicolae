@@ -174,8 +174,10 @@ ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroa
   (`stripHtml` șters), descrierile `meta` din `stiri/[slug]`, `paroh`, `carti/[slug]`, `sfintii/[slug]`
   (înainte lipeau cuvintele: etichetele erau înlocuite cu `''`), `readingTime` din `utils.ts`.
 - Neatins: `src/lib/sfinti-scraper.ts` (decodează deja cu `he`; nu era pe listă).
-- `utils.ts` e importat și de un component client (`admin/video`, doar `slugify`); verificat după build
-  că tabela de entități din `he` nu ajunge în `.next/static`.
+- `utils.ts` e importat și de un component client (`admin/video`, doar `slugify`). `he` e CommonJS, deci
+  Turbopack nu-l elimină: după build, tabela de entități (93 KB necomprimat) apare într-un chunk cerut
+  **doar** de `/admin/video` (verificat în `*_client-reference-manifest.js`); nicio pagină publică.
+  Acceptat: e o pagină de admin. Dacă deranjează, `slugify` se mută într-un fișier propriu.
 - Teste: `utils.test.ts` (7). Cu vechea metodă în corpul funcției: 4 roșii (`&nbsp;`, entități,
   `<script>/<style>`, `readingTime`).
 
@@ -201,3 +203,9 @@ ca pe `main`** (cod existent); în fișierele modificate aici rămâne doar eroa
 - Neatinse (alt model decât `Article`/`MediaItem`): `magazin` (`Product.imageUrl`), `carti/[slug]`
   (`LibraryBook.imageUrl` + `galleryUrls`). Pot primi HEIC doar prin `ImageUploadButton`, care acum
   convertește sau refuză.
+
+## C. Verificări
+
+`npx tsc --noEmit` OK; `npm run lint` 16 erori / 33 avertismente, aceleași ca pe `main`; `npm test` 53/53
+(29 existente + 24 noi: `upload-decode` 5, `heic` 4, `imageLoad` 8, `utils` 7); `npm run build` OK. Pachet: `heic-to` 3,0 MB într-un chunk separat, încărcat
+doar la primul HEIC; restul chunk-urilor de client +~8 KB față de `main`; `he` +93 KB doar pe `/admin/video`.
