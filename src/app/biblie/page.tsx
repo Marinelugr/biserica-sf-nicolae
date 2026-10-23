@@ -153,7 +153,7 @@ export default async function BibliePage({
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.bible.pageSubtitle} title={t.bible.title}>
+      <PageHead sec="evanghelie" eyebrow={t.bible.pageSubtitle} title={t.bible.title}>
         <div className="mt-2">
           <SearchForm action="/biblie" id="bible-search" placeholder={t.bible.searchPlaceholder} button={t.bible.searchBtn} defaultValue={query} />
         </div>

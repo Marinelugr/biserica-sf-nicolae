@@ -30,7 +30,7 @@ export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: 
   if (variant === 'compact') {
     return (
       <>
-        <div className="card" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 16 }} data-intro>
+        <div className="card" style={{ padding: 22, display: 'flex', flexDirection: 'column', gap: 16 }} data-sec="profil" data-intro>
           <Link href={localizedHref('/paroh', locale)} className="flex items-center gap-4 group">
             <span className="block shrink-0" style={{ width: 96 }}>
               <ProfilePhoto src={profile.photoUrl} alt={profile.displayName} width={96} compact />
@@ -65,7 +65,7 @@ export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: 
 
   return (
     <>
-      <div className="card profile-card flex flex-col gap-3.5" style={{ padding: 28 }}>
+      <div className="card profile-card flex flex-col gap-3.5" style={{ padding: 28 }} data-sec="profil">
         <span data-intro-photo className="block">
           <ProfilePhoto src={profile.photoUrl} alt={profile.displayName} width={324} preload={preloadPhoto} />
         </span>
@@ -73,7 +73,6 @@ export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: 
           {profile.displayName}
         </NameTag>
         <p className="mute" data-intro-text>{t.shell.profileRole}</p>
-        <p className="lead" style={{ fontSize: 21 }} data-intro-text>{profile.lead}</p>
         <p className="gold" style={{ fontSize: 17 }} data-intro-text>{SITE_HOST}</p>
         <div className="flex flex-wrap gap-2.5" data-intro-text>
           <a className="btn gold" href={`#${SOCIAL_ANCHOR}`}>{t.shell.follow}</a>
@@ -101,7 +100,7 @@ export default async function ProfileAside({ variant, nameAsH1, preloadPhoto }: 
         ))}
       </div>
 
-      <div className="card aside-extra flex flex-col gap-1" style={{ padding: '22px 26px' }}>
+      <div className="card sec-lite aside-extra flex flex-col gap-1" style={{ padding: '22px 26px' }} data-sec="slujbe">
         <p className="eyebrow">{t.shell.scheduleTitle}</p>
         {schedule.map((s, i) => (
           <div

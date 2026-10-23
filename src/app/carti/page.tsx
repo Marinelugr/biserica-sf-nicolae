@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { shelfGroup } from '@/lib/sectionTheme'
 import Link from 'next/link'
 import { getServerT } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
@@ -61,7 +62,7 @@ export default async function CartiPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.books.subtitle} title={t.books.title}>
+      <PageHead sec="biblioteca" eyebrow={t.books.subtitle} title={t.books.title}>
         <div className="mt-2">
           <SearchForm action="/cautare" id="library-search" placeholder={t.books.searchPlaceholder} button={t.books.searchBtn} />
         </div>
@@ -81,7 +82,7 @@ export default async function CartiPage() {
             {CATEGORY_META.map(cat => {
               const count = counts[cat.key] || 0
               return (
-                <Link key={cat.key} href={`/carti/categorie/${cat.key.toLowerCase()}`} className="tile group" data-reveal>
+                <Link key={cat.key} href={`/carti/categorie/${cat.key.toLowerCase()}`} className="tile group" data-shelf={shelfGroup(cat.key)} data-reveal>
                   <span className="ic" aria-hidden="true">{cat.icon}</span>
                   <h2 className="h-s group-hover:text-gold transition-colors">{t.books.categories[cat.key as CategoryKey]}</h2>
                   {count > 0 && (

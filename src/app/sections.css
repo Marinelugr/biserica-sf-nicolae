@@ -1,0 +1,411 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Identitatea secțiunilor — fiecare secțiune are 4 semnale proprii:
+   culoare-accent, fundal/formă, ornament, aranjare.
+   Culorile se schimbă DOAR în blocurile de tokeni de mai jos (un bloc pe
+   secțiune). Testul src/lib/sectionTheme.test.ts citește acest fișier și
+   verifică contrastul (WCAG) pe ambele capete ale fiecărui gradient.
+   Tokeni:
+     --sec-accent       bare, medalion, linii (grafic, ≥ 3:1 pe fundal)
+     --sec-accent-text  text în culoarea accentului (≥ 4,5:1 pe fundal)
+     --sec-on-night     accentul pe antetul paginilor interioare (fundal noapte, ≥ 4,5:1)
+     --sec-bg           fundalul (gradient din culori opace)
+     --sec-edge         marginea
+     --sec-ink          textul (≥ 4,5:1)
+     --sec-mute         textul secundar (≥ 4,5:1)
+     --sec-glow         (opțional) lumina decorativă, verificată și ea
+     --sec-radius       colțurile
+   Decizii și valori finale: docs/DESIGN-SECTIUNI.md
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Filtrele din flux ascund cu atributul `hidden`; display:flex/grid de pe panouri nu-l mai anulează
+   (Preflight are aceeași regulă în @layer base; aici e și în afara straturilor, ca să fie sigur). */
+[hidden]:where(:not([hidden="until-found"])) { display: none !important; }
+
+/* Fără @layer: regulile mobile din globals.css (în afara straturilor) ar suprascrie altfel
+   forma secțiunilor (ex. `.card { border-radius: 20px }` sub 760 px). */
+
+  /* ─── Tokeni ─────────────────────────────────────────────────────────── */
+  [data-sec="astazi"], [data-head="astazi"] {
+    --sec-accent: #e0b84a;
+    --sec-accent-text: #f0cf72;
+    --sec-on-night: #e0b84a;
+    --sec-bg: linear-gradient(150deg, #33230f 0%, #0d1631 100%);
+    --sec-edge: rgba(224, 184, 74, 0.42);
+    --sec-ink: #f6eedc;
+    --sec-mute: #d6c8a8;
+    --sec-radius: 18px;
+  }
+  [data-sec="anunt"], [data-head="anunt"] {
+    --sec-accent: #e58a8a;
+    --sec-accent-text: #f6b8b2;
+    --sec-on-night: #f2a7a0;
+    --sec-bg: linear-gradient(160deg, #5c1117 0%, #22070a 100%);
+    --sec-edge: rgba(229, 138, 138, 0.45);
+    --sec-ink: #fbefeb;
+    --sec-mute: #ecc9c3;
+    --sec-radius: 10px;
+  }
+  [data-sec="slujbe"], [data-head="slujbe"] {
+    --sec-accent: #8fb0ff;
+    --sec-accent-text: #aec6ff;
+    --sec-on-night: #8fb0ff;
+    --sec-bg: linear-gradient(165deg, #182f78 0%, #0a1438 100%);
+    --sec-edge: rgba(143, 176, 255, 0.45);
+    --sec-ink: #eef2ff;
+    --sec-mute: #c3cdea;
+    --sec-radius: 14px;
+  }
+  [data-sec="cuvant"], [data-head="cuvant"] {
+    --sec-accent: #d0566c;
+    --sec-accent-text: #f0a0ab;
+    --sec-on-night: #f0a0ab;
+    --sec-bg: linear-gradient(170deg, #3a0f1c 0%, #1b0810 100%);
+    --sec-edge: rgba(224, 184, 74, 0.38);
+    --sec-ink: #f9ede7;
+    --sec-mute: #dcc2c2;
+    --sec-radius: 6px;
+  }
+  [data-sec="sfinti"], [data-head="sfinti"] {
+    --sec-accent: #f0c060;
+    --sec-accent-text: #f6d283;
+    --sec-on-night: #f0c060;
+    --sec-bg: linear-gradient(200deg, #43300f 0%, #150f08 100%);
+    --sec-edge: rgba(240, 192, 96, 0.4);
+    --sec-ink: #faf1dc;
+    --sec-mute: #dccca6;
+    --sec-glow: rgba(240, 192, 96, 0.16);
+    --sec-radius: 28px;
+  }
+  [data-sec="evanghelie"], [data-head="evanghelie"] {
+    --sec-accent: #9b1c1c;
+    --sec-accent-text: #8c1717;
+    --sec-on-night: #efe4cc;
+    --sec-bg: linear-gradient(175deg, #efe4cc 0%, #e2d1ab 100%);
+    --sec-edge: #b98f2c;
+    --sec-ink: #2b1d12;
+    --sec-mute: #5b4631;
+    --sec-radius: 4px;
+  }
+  [data-sec="rugaciune"], [data-head="rugaciune"] {
+    --sec-accent: #b3a8ff;
+    --sec-accent-text: #c9c0ff;
+    --sec-on-night: #b3a8ff;
+    --sec-bg: linear-gradient(180deg, #1a1640 0%, #0b0a24 100%);
+    --sec-edge: rgba(179, 168, 255, 0.4);
+    --sec-ink: #f2effd;
+    --sec-mute: #c6c0e6;
+    --sec-glow: rgba(255, 176, 92, 0.2);
+    --sec-radius: 56px 56px 20px 20px;
+  }
+  [data-sec="stiri"], [data-head="stiri"] {
+    --sec-accent: #e8c15a;
+    --sec-accent-text: #efcd6d;
+    --sec-on-night: #e8c15a;
+    --sec-bg: linear-gradient(180deg, #161b2b 0%, #0b0e19 100%);
+    --sec-edge: rgba(232, 193, 90, 0.34);
+    --sec-ink: #f4ecda;
+    --sec-mute: #bcc3d6;
+    --sec-radius: 8px;
+  }
+  [data-sec="biblioteca"], [data-head="biblioteca"] {
+    --sec-accent: #62c3b5;
+    --sec-accent-text: #82d6c9;
+    --sec-on-night: #62c3b5;
+    --sec-bg: linear-gradient(160deg, #0f2a2a 0%, #0a1a1c 100%);
+    --sec-edge: rgba(98, 195, 181, 0.4);
+    --sec-ink: #ebf6f3;
+    --sec-mute: #b6d2cc;
+    --sec-radius: 16px;
+  }
+  [data-sec="biserica"], [data-head="biserica"] {
+    --sec-accent: #9db8d9;
+    --sec-accent-text: #b4cbe8;
+    --sec-on-night: #9db8d9;
+    --sec-bg: linear-gradient(160deg, #0d1b33 0%, #091326 100%);
+    --sec-edge: rgba(157, 184, 217, 0.5);
+    --sec-ink: #edf2f9;
+    --sec-mute: #bccadb;
+    --sec-radius: 20px;
+  }
+  [data-sec="video"], [data-head="video"] {
+    --sec-accent: #ff6b6b;
+    --sec-accent-text: #ff9b9b;
+    --sec-on-night: #ff8a8a;
+    --sec-bg: linear-gradient(180deg, #120d10 0%, #050406 100%);
+    --sec-edge: rgba(255, 107, 107, 0.34);
+    --sec-ink: #f4ecda;
+    --sec-mute: #c8c0c3;
+    --sec-radius: 12px;
+  }
+  [data-sec="profil"], [data-head="profil"] {
+    --sec-accent: #e0b84a;
+    --sec-accent-text: #e9c766;
+    --sec-on-night: #e0b84a;
+    --sec-bg: linear-gradient(160deg, #18264f 0%, #080e24 100%);
+    --sec-edge: rgba(224, 184, 74, 0.32);
+    --sec-ink: #f4ecda;
+    --sec-mute: #b9c1d6;
+    --sec-radius: 24px;
+  }
+
+  /* ─── Baza comună ────────────────────────────────────────────────────── */
+  .card[data-sec], .panel[data-sec] {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--sec-bg);
+    border: 1px solid var(--sec-edge);
+    border-radius: var(--sec-radius);
+    color: var(--sec-ink);
+    min-width: 0;
+  }
+  .panel { padding: 26px 28px; display: flex; flex-direction: column; }
+  [data-sec] .mute { color: var(--sec-mute); }
+  [data-sec] .eyebrow, [data-sec] .kicker { color: var(--sec-accent-text); }
+  [data-sec] .link-gold { color: var(--sec-accent-text); }
+  [data-sec] .link-gold:hover { color: var(--sec-ink); }
+  [data-sec] .lead { color: var(--sec-ink); }
+
+  /* antetul unui card din flux: medalion + titlul secțiunii */
+  .sec-top { position: relative; display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding-bottom: 14px; }
+  .sec-medal {
+    flex: none; width: 40px; height: 40px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--sec-accent-text);
+    border: 1.5px solid var(--sec-accent);
+    background: color-mix(in srgb, var(--sec-accent) 14%, transparent);
+  }
+  .sec-kicker { font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sec-accent-text); font-weight: 500; }
+  .sec-author { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--sec-ink); margin-top: 2px; }
+  /* linia ornamentală de sub antet (se „desenează" la intrare, vezi RevealScope) */
+  .sec-rule {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 1px;
+    background: linear-gradient(90deg, var(--sec-accent), color-mix(in srgb, var(--sec-accent) 30%, transparent) 60%, transparent);
+    transform-origin: left center;
+  }
+
+  /* antetul unui panou de grup */
+  .panel .sec-head { position: relative; align-items: center; justify-content: flex-start; margin-bottom: 8px; padding-bottom: 16px; border-bottom: 0; }
+  .panel .sec-head > a { margin-left: auto; }
+  .sec-title { color: var(--sec-ink); }
+
+  /* rândurile plate dintr-un panou */
+  .sec-row { display: flex; gap: 18px; align-items: center; padding: 16px 0; min-width: 0; }
+  .sec-row + .sec-row, .news-lead + .sec-row { border-top: 1px solid color-mix(in srgb, var(--sec-accent) 22%, transparent); }
+  a.sec-row { transition: background-color .2s; }
+  a.sec-row:hover .h-s { color: var(--sec-accent-text); }
+  .sec-row .h-s { transition: color .2s; }
+
+  /* ─── astazi: bloc de dată + bandă aurie sus ─────────────────────────── */
+  .card[data-sec="astazi"]::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--sec-accent); }
+  .today { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 22px; align-items: start; }
+  .today-date {
+    display: flex; flex-direction: column; align-items: center; min-width: 104px;
+    padding: 10px 14px 12px; border-radius: 12px;
+    border: 1px solid var(--sec-edge); background: rgba(0, 0, 0, 0.22);
+  }
+  .today-day { font-family: var(--serif); font-weight: 600; font-size: 64px; line-height: 0.95; color: var(--sec-accent-text); font-variant-numeric: lining-nums; }
+  .today-month { font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--sec-ink); margin-top: 4px; }
+  .today-old { font-size: 14px; font-style: italic; color: var(--sec-mute); margin-top: 8px; text-align: center; line-height: 1.25; }
+
+  /* ─── anunt: margine stângă groasă, text mare ────────────────────────── */
+  .card[data-sec="anunt"] { border-left: 6px solid var(--sec-accent); }
+  .anunt-title { font-family: var(--serif); font-weight: 600; font-size: clamp(26px, 3vw, 32px); line-height: 1.15; color: var(--sec-ink); }
+  .anunt-text { font-size: 20px; line-height: 1.6; color: var(--sec-ink); }
+
+  /* ─── slujbe: chenar dublu, cifre în căsuțe, ani ca pastile ──────────── */
+  .card[data-sec="slujbe"]::after, .panel[data-sec="slujbe"]::after {
+    content: ''; position: absolute; inset: 6px; pointer-events: none; z-index: -1;
+    border: 1px solid var(--sec-edge); border-radius: calc(var(--sec-radius) - 6px);
+  }
+  .card[data-sec="slujbe"].sec-lite::after { content: none; }
+  .slujbe-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px 28px; }
+  .slujbe-grid > * + * { border-left: 1px solid var(--sec-edge); padding-left: 28px; }
+  .digits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .digit {
+    display: flex; flex-direction: column; align-items: center; min-width: 60px; padding: 8px 6px 7px;
+    border-radius: 8px; border: 1px solid var(--sec-edge); background: rgba(5, 10, 26, 0.45);
+  }
+  .digit b { font-family: var(--serif); font-weight: 600; font-size: 32px; line-height: 1; color: var(--sec-accent-text); font-variant-numeric: tabular-nums; }
+  .digit span { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sec-mute); margin-top: 5px; }
+  .pill {
+    min-height: 40px; padding: 6px 12px; border-radius: 999px; cursor: pointer;
+    border: 1px solid var(--sec-edge, var(--line)); background: transparent;
+    color: var(--sec-mute, var(--mute)); font-family: inherit; font-size: 15px;
+    transition: background-color .2s, color .2s;
+  }
+  .pill:hover { color: var(--sec-ink, var(--ink)); }
+  .pill[aria-pressed="true"] { background: var(--sec-accent, var(--gold)); border-color: var(--sec-accent, var(--gold)); color: #0a1330; font-weight: 600; }
+  .pill-arrow { min-height: 40px; padding: 6px 8px; background: none; border: 0; cursor: pointer; color: var(--sec-accent-text, var(--gold)); font-size: 17px; line-height: 1; }
+
+  /* ─── cuvant: scrisoare, dublă linie aurie sus și jos, ghilimele uriașe ─ */
+  .card[data-sec="cuvant"]::before, .card[data-sec="cuvant"]::after {
+    content: ''; position: absolute; left: 0; right: 0; height: 6px; pointer-events: none;
+    background: linear-gradient(var(--gold) 0 1px, transparent 1px 4px, var(--gold) 4px 5px, transparent 5px);
+    opacity: 0.85;
+  }
+  .card[data-sec="cuvant"]::before { top: 8px; }
+  .card[data-sec="cuvant"]::after { bottom: 8px; transform: scaleY(-1); }
+  [data-sec="cuvant"] .sec-rule { background: linear-gradient(90deg, var(--gold), rgba(224, 184, 74, 0.25) 55%, transparent); }
+  .letter-card { position: relative; margin: 0; }
+  .letter-card::before {
+    content: ''; position: absolute; top: -18px; right: -6px; width: 150px; height: 120px; z-index: -1;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 80'%3E%3Cpath fill='%23f0a0ab' d='M0 80V48C0 22 12 6 36 0l4 9C27 14 21 24 20 38h18v42Zm56 0V48C56 22 68 6 92 0l4 9C83 14 77 24 76 38h18v42Z'/%3E%3C/svg%3E") no-repeat center / contain;
+    opacity: 0.12;
+  }
+  .letter { font-family: var(--body); font-style: normal; font-size: 21px; line-height: 1.8; max-width: 64ch; color: var(--sec-ink, var(--ink)); }
+  .letter.excerpt { font-size: 22px; line-height: 1.6; }
+  .letter.excerpt.is-truncated {
+    max-height: calc(1.6em * 9); overflow: hidden;
+    -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent);
+    mask-image: linear-gradient(180deg, #000 62%, transparent);
+  }
+  .rich.letter > * + * { margin-top: 0.9em; }
+  .letter strong { color: var(--sec-ink, #fff6e2); }
+  .letter .salutare { font-family: var(--serif); font-weight: 600; font-size: 1.3em; line-height: 1.3; color: var(--gold); }
+  .letter .salutare strong, .letter .salutare em { color: inherit; font-weight: inherit; }
+  .letter .salutare + p::first-letter,
+  .letter > p:first-child:not(.salutare)::first-letter {
+    float: left; font-family: var(--serif); font-weight: 600; font-size: 3.7em; line-height: 0.82;
+    padding: 0.06em 0.1em 0 0; color: var(--sec-accent-text, var(--gold));
+  }
+  .letter-sign { font-family: var(--serif); font-style: italic; font-size: 22px; color: var(--sec-accent-text, var(--gold)); margin-top: 14px; }
+  .letter-sign::before { content: '✠ '; font-style: normal; color: var(--gold); opacity: 0.8; }
+  .letter-more { margin-top: 18px; }
+  .letter-page { padding: clamp(26px, 4vw, 44px); }
+  .letter-foot { margin-top: 28px; padding-top: 22px; position: relative; display: flex; flex-direction: column; gap: 4px; }
+  .letter-foot::before {
+    content: ''; position: absolute; top: 0; left: 0; width: min(280px, 70%); height: 9px;
+    background:
+      linear-gradient(var(--gold), var(--gold)) left 50% / calc(50% - 10px) 1px no-repeat,
+      linear-gradient(var(--gold), var(--gold)) right 50% / calc(50% - 10px) 1px no-repeat,
+      linear-gradient(45deg, transparent 35%, var(--gold) 35% 65%, transparent 65%) center / 9px 9px no-repeat;
+  }
+
+  /* ─── sfinti: nimb (cercuri fine + strălucire) în colțul din dreapta-sus ─ */
+  .card[data-sec="sfinti"]::before {
+    content: ''; position: absolute; top: -110px; right: -110px; width: 300px; height: 300px; z-index: -1; pointer-events: none;
+    background: radial-gradient(circle, var(--sec-glow) 0%, transparent 62%);
+  }
+  .card[data-sec="sfinti"]::after {
+    content: ''; position: absolute; top: -110px; right: -110px; width: 300px; height: 300px; z-index: -1; pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%23f0c060'%3E%3Ccircle cx='100' cy='100' r='96' stroke-width='.6' stroke-dasharray='2 5'/%3E%3Ccircle cx='100' cy='100' r='80' stroke-width='.7'/%3E%3Ccircle cx='100' cy='100' r='64' stroke-width='.6' stroke-dasharray='10 4'/%3E%3Ccircle cx='100' cy='100' r='48' stroke-width='.7'/%3E%3C/svg%3E") no-repeat center / contain;
+    opacity: 0.4;
+  }
+  .star-list { display: flex; flex-direction: column; gap: 10px; }
+  .star-list li { display: flex; gap: 12px; align-items: baseline; font-size: 20px; line-height: 1.35; }
+  .star-list svg { flex: none; color: var(--sec-accent); transform: translateY(1px); }
+
+  /* ─── evanghelie: singura carte deschisă la culoare, inițială roșie ──── */
+  .card[data-sec="evanghelie"] { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); }
+  .card[data-sec="evanghelie"]::after {
+    content: ''; position: absolute; inset: 5px; z-index: -1; pointer-events: none;
+    border: 1px solid rgba(155, 28, 28, 0.45); border-radius: 2px;
+  }
+  .card[data-sec="evanghelie"] .sec-medal { background: transparent; }
+  .rubric { font-family: var(--serif); font-size: 23px; line-height: 1.5; color: var(--sec-ink); }
+  .rubric::first-letter { float: left; font-weight: 700; font-size: 3.1em; line-height: 0.85; padding: 0.04em 0.08em 0 0; color: var(--sec-accent-text); }
+
+  /* ─── rugaciune: lumină de lumânare, text centrat, cruce-filigran ────── */
+  .card[data-sec="rugaciune"] { text-align: center; }
+  .card[data-sec="rugaciune"] .sec-top { justify-content: center; }
+  .card[data-sec="rugaciune"] .sec-top > div { align-items: center; }
+  .card[data-sec="rugaciune"] .sec-rule { transform-origin: center; background: linear-gradient(90deg, transparent, var(--sec-accent) 50%, transparent); }
+  .card[data-sec="rugaciune"]::before {
+    content: ''; position: absolute; left: -90px; bottom: -110px; width: 320px; height: 320px; z-index: -1; pointer-events: none;
+    background: radial-gradient(circle, var(--sec-glow) 0%, rgba(255, 176, 92, 0.06) 40%, transparent 65%);
+  }
+  .card[data-sec="rugaciune"]::after {
+    content: ''; position: absolute; left: 50%; top: 50%; width: 150px; height: 200px; margin: -100px 0 0 -75px; z-index: -1; pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 80' fill='none' stroke='%23b3a8ff' stroke-width='1.2' stroke-linecap='round'%3E%3Cpath d='M30 2v76M18 14h24M10 30h40M20 62l20-7'/%3E%3C/svg%3E") no-repeat center / contain;
+    opacity: 0.08;
+  }
+  .prayer { display: flex; flex-direction: column; align-items: center; gap: 8px; max-width: 46ch; margin: 0 auto; }
+
+  /* ─── stiri: panou de ziar (linie groasă + subțire deasupra titlului) ── */
+  .panel[data-sec="stiri"] .sec-head { padding-top: 18px; padding-bottom: 14px; }
+  .panel[data-sec="stiri"] .sec-rule {
+    top: 0; bottom: auto; height: 6px;
+    background: linear-gradient(var(--sec-accent) 0 3px, transparent 3px 5px, var(--sec-accent) 5px 6px);
+  }
+  .panel[data-sec="stiri"] .sec-title { font-size: clamp(30px, 3.4vw, 36px); letter-spacing: 0.01em; }
+  .news-no { font-family: var(--serif); font-size: 15px; letter-spacing: 0.12em; color: var(--sec-mute); }
+  .news-lead { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 22px; align-items: center; padding: 6px 0 18px; }
+  .news-lead .thumb { position: relative; aspect-ratio: 4 / 3; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: linear-gradient(155deg, #17295f, #0a1330 72%); }
+  .news-lead .h-s { font-size: 27px; }
+  .sec-row .thumb { position: relative; flex: 0 0 148px; height: 98px; border-radius: 6px; overflow: hidden; border: 1px solid var(--line); background: linear-gradient(155deg, #17295f, #0a1330 72%); }
+  .cat-tag {
+    position: absolute; top: 8px; left: 8px; z-index: 1; max-width: calc(100% - 16px);
+    padding: 3px 9px; border-radius: 3px; background: var(--sec-accent, var(--gold)); color: #1b1405;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .row-no { flex: none; width: 2ch; font-family: var(--serif); font-size: 22px; color: var(--sec-accent-text); font-variant-numeric: lining-nums; }
+
+  /* ─── biblioteca: un singur raft, cotor colorat după tip ─────────────── */
+  .panel[data-sec="biblioteca"] .sec-title { text-transform: uppercase; letter-spacing: 0.14em; font-size: clamp(22px, 2.4vw, 26px); }
+  .shelf-row { position: relative; padding-left: 22px; }
+  .shelf-row::before { content: ''; position: absolute; left: 0; top: 12px; bottom: 12px; width: 8px; border-radius: 2px; background: var(--spine); }
+  [data-shelf="acatiste"]  { --spine: #62c3b5; }
+  [data-shelf="rugaciuni"] { --spine: #e0b84a; }
+  [data-shelf="teologie"]  { --spine: #b3a8ff; }
+  [data-shelf="altele"]    { --spine: #9fb0c8; }
+
+  /* ─── biserica: chenar punctat (sursă externă), insigna sursei ───────── */
+  .panel[data-sec="biserica"] { border-style: dashed; border-width: 1.5px; }
+  .src-badge {
+    display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px;
+    border: 1px solid var(--sec-edge); color: var(--sec-accent-text); font-size: 14px;
+  }
+  .src-badge:hover { color: var(--sec-ink); border-color: var(--sec-accent); }
+
+  /* ─── video / live: aproape negru, bară roșie sus ────────────────────── */
+  .card[data-sec="video"]::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 4px; background: var(--sec-accent); }
+
+  /* ─── profil (coloana din stânga) ────────────────────────────────────── */
+  .card[data-sec="profil"]::before { content: ''; position: absolute; inset: 0 24px auto 24px; height: 1px; background: linear-gradient(90deg, transparent, var(--sec-accent), transparent); }
+
+  /* ─── Antetul paginilor interioare: accent sus 3 px, ornament, eyebrow ─ */
+  .page-head[data-head] { position: relative; overflow: hidden; isolation: isolate; }
+  .page-head[data-head]::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--sec-on-night); }
+  .page-head[data-head] .eyebrow { color: var(--sec-on-night); }
+  .page-head-ornament { position: absolute; top: 18px; right: 20px; z-index: -1; color: var(--sec-on-night); opacity: 0.28; }
+  .page-head-ornament svg { width: 64px; height: 64px; }
+
+  /* plăcile din /carti, după tipul cărților */
+  .tile[data-shelf] { border-top: 3px solid var(--spine); }
+  .tile[data-shelf] .ic { border-color: var(--spine); color: var(--spine); }
+
+  /* ─── Subsolul: bandă pe toată lățimea ───────────────────────────────── */
+  .site-foot { position: relative; background: linear-gradient(180deg, #03060f 0%, #02040a 100%); border-top: 1px solid rgba(224, 184, 74, 0.55); }
+  .foot-crest { position: absolute; top: 0; left: 50%; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; width: 54px; height: 54px; border-radius: 50%; background: #03060f; border: 1px solid rgba(224, 184, 74, 0.55); }
+  .foot-ornament { display: flex; align-items: center; justify-content: center; gap: 12px; color: var(--gold); opacity: 0.7; font-size: 14px; letter-spacing: 0.5em; }
+  .foot-ornament::before, .foot-ornament::after { content: ''; height: 1px; width: min(120px, 22vw); background: linear-gradient(90deg, transparent, var(--gold-d)); }
+  .foot-ornament::after { transform: scaleX(-1); }
+
+
+@media (max-width: 760px) {
+  .panel { padding: 22px 18px; }
+  .today { gap: 16px; }
+  .today-date { min-width: 88px; padding: 8px 10px 10px; }
+  .today-day { font-size: 52px; }
+  .slujbe-grid > * + * { border-left: 0; padding-left: 0; border-top: 1px solid var(--sec-edge); padding-top: 18px; }
+  .news-lead { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .sec-row .thumb { flex-basis: 108px; height: 76px; }
+  .sec-row .cat-tag { top: 5px; left: 5px; max-width: calc(100% - 10px); padding: 2px 6px; font-size: 10px; letter-spacing: 0.04em; }
+  .letter { font-size: 20px; }
+  .letter.excerpt { font-size: 21px; }
+  .row-no { display: none; }
+}
+
+/* ─── Mișcare: doar CSS, doar transform/opacity, doar dacă e permisă ──── */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes sec-candle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    40%      { opacity: 0.82; transform: scale(1.03); }
+    70%      { opacity: 0.94; transform: scale(0.99); }
+  }
+  @keyframes sec-halo { to { transform: rotate(360deg); } }
+  .card[data-sec="rugaciune"]::before { animation: sec-candle 3.6s ease-in-out infinite; }
+  .card[data-sec="sfinti"]::after { animation: sec-halo 120s linear infinite; }
+}

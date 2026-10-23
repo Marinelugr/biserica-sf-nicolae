@@ -1,4 +1,7 @@
 import Link from 'next/link'
+import type { SecId } from '@/lib/sectionTheme'
+import { SEC_ICON } from '@/lib/sectionTheme'
+import SectionIcon from './SectionIcon'
 
 interface Crumb { href?: string; label: string }
 
@@ -10,12 +13,19 @@ interface Props {
   children?: React.ReactNode
   /** Titlul paginii e mai mic (articole, cărți) */
   size?: 'l' | 'm'
+  /** Identitatea secțiunii: accent sus 3 px, ornament, culoarea eyebrow-ului (vezi sections.css). */
+  sec?: SecId
 }
 
 /** Antetul unei pagini în flux: firimituri, eyebrow, un singur h1, lead opțional. */
-export default function PageHead({ eyebrow, title, lead, crumbs, children, size = 'l' }: Props) {
+export default function PageHead({ eyebrow, title, lead, crumbs, children, size = 'l', sec }: Props) {
   return (
-    <header className="card flex flex-col gap-3">
+    <header className="card page-head flex flex-col gap-3" data-head={sec}>
+      {sec && (
+        <span className="page-head-ornament" aria-hidden="true">
+          <SectionIcon name={SEC_ICON[sec]} size={64} />
+        </span>
+      )}
       {crumbs && crumbs.length > 0 && (
         <nav aria-label="Breadcrumb" className="text-[16px] mute">
           <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">

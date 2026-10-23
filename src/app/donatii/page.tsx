@@ -59,7 +59,7 @@ export default async function DonationsPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.donate.badge} title={t.donate.title}>
+      <PageHead sec="anunt" eyebrow={t.donate.badge} title={t.donate.title}>
         <p className="lead" style={{ fontSize: 22 }}>
           {t.donate.verse}
           <br />

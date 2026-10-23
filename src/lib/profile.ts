@@ -1,14 +1,12 @@
 import { cache } from 'react'
 import { prisma } from '@/lib/prisma'
-import { FALLBACK_MESAJ, FALLBACK_PHOTO_URL, firstSentences } from '@/lib/priestMessage'
+import { FALLBACK_PHOTO_URL } from '@/lib/priestMessage'
 import { DEFAULT_CONTACT } from '@/lib/contact-info'
 
 export interface ProfileData {
   /** Numele afișat, ex. „Părintele Marin Grigoriță". */
   displayName: string
   photoUrl: string
-  /** Primele 2 propoziții din mesajul activ (ca în PriestMessageSection). */
-  lead: string
   /** Facebook din Admin → Contact (sau valoarea implicită). */
   facebook: string
 }
@@ -29,17 +27,16 @@ function withTitle(name: string): string {
 export const getProfileData = cache(async (): Promise<ProfileData> => {
   let nameRo: string | null = null
   let photoUrl: string | null = null
-  let mesajText = FALLBACK_MESAJ
   let facebook = DEFAULT_CONTACT.facebook
   try {
     const [priest, mesaj, fbSetting] = await Promise.all([
       prisma.priest.findFirst({ select: { nameRo: true, photoUrl: true } }),
-      prisma.priestMessage.findFirst({ where: { active: true } }),
+      // doar poza (rezervă pentru poza parohului) — textul mesajului apare numai în „Cuvântul Părintelui"
+      prisma.priestMessage.findFirst({ where: { active: true }, select: { photoUrl: true } }),
       prisma.setting.findUnique({ where: { key: 'contact_facebook' } }),
     ])
     nameRo = priest?.nameRo ?? null
     photoUrl = priest?.photoUrl || mesaj?.photoUrl || null
-    mesajText = mesaj?.mesajRo || FALLBACK_MESAJ
     facebook = fbSetting?.value || DEFAULT_CONTACT.facebook
   } catch {
     // fără DB: rămân fallback-urile
@@ -47,7 +44,6 @@ export const getProfileData = cache(async (): Promise<ProfileData> => {
   return {
     displayName: withTitle(nameRo || FALLBACK_NAME),
     photoUrl: photoUrl || FALLBACK_PHOTO_URL,
-    lead: firstSentences(mesajText, 2),
     facebook,
   }
 })

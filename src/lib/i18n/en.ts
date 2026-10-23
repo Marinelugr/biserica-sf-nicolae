@@ -361,6 +361,7 @@ const en: Translations = {
     feedFilter: 'Filter posts', feedAll: 'All', feedWord: 'Word', feedVideo: 'Video', feedParish: 'Parish', feedLibrary: 'Library',
     kindWord: 'Word of the priest', kindVideo: 'Video', kindParish: 'Parish life', kindLibrary: 'Library',
     kindChurch: 'Church life', kindAnnouncement: 'Announcement',
+    kindServices: 'Services & Paschal calendar', readAnnouncement: 'Read the announcement',
     today: 'Today', oldStyle: 'old style', readFullMessage: 'Read the full message →', read: 'Read →', backHome: 'Home',
     coverAlt: 'St. Nicholas Church in Hîrtopul Mic, seen from above',
     emblemAlt: 'Emblem of St. Nicholas Church', liveBadge: 'LIVE', feedEmpty: 'No posts of this kind right now.', dateLabel: 'Date',

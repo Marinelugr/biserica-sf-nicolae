@@ -39,7 +39,7 @@ export default async function StiriPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.newsPage.badge} title={t.newsPage.title} />
+      <PageHead sec="stiri" eyebrow={t.newsPage.badge} title={t.newsPage.title} />
 
       {articles.length === 0 ? (
         <div className="card text-center">
@@ -49,7 +49,7 @@ export default async function StiriPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {articles.map(article => (
-            <article key={article.slug} className="news group relative" data-reveal>
+            <article key={article.slug} className="news group relative" data-sec="stiri" data-reveal>
               <div className="media">
                 {isDisplayableImageUrl(article.imageUrl) ? (
                   <Image
@@ -62,9 +62,9 @@ export default async function StiriPage() {
                 ) : (
                   <div className="ph w-full h-full" aria-hidden="true"><span style={{ fontSize: 44 }}>☦</span></div>
                 )}
+                {article.category && <span className="cat-tag">{article.category}</span>}
               </div>
               <div className="body">
-                {article.category && <span className="kicker">{article.category}</span>}
                 <h2 className="h-s">
                   <Link href={`/stiri/${article.slug}`} className="after:absolute after:inset-0 group-hover:text-gold transition-colors">
                     {article.titleRo}

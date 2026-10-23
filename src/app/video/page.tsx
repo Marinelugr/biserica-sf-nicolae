@@ -73,7 +73,7 @@ export default async function VideoPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.priest.badge} title={t.video.title} lead={t.video.subtitle} />
+      <PageHead sec="video" eyebrow={t.priest.badge} title={t.video.title} lead={t.video.subtitle} />
 
       {!hasVideos && (
         <div className="card text-center">

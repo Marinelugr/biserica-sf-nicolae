@@ -48,7 +48,7 @@ export default async function IstoriaBisericiiPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.priest.badge} title={t.historyPage.pageTitle}>
+      <PageHead sec="sfinti" eyebrow={t.priest.badge} title={t.historyPage.pageTitle}>
         <p className="mute text-[17px]">
           {t.home.heroSubtitle}
           <br />

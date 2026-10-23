@@ -56,7 +56,7 @@ export default async function VideoCategoryPage({ params }: Props) {
 
   return (
     <PageShell aside="compact">
-      <PageHead crumbs={[{ href: '/', label: t.nav.home }, { href: '/video', label: t.nav.video }, { label: category.name }]} title={category.name} />
+      <PageHead sec="video" crumbs={[{ href: '/', label: t.nav.home }, { href: '/video', label: t.nav.video }, { label: category.name }]} title={category.name} />
 
       {category.videos.length === 0 ? (
         <div className="card"><p className="mute">{t.video.comingSoon}</p></div>

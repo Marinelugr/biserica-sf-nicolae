@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { getLiturgicalDates, toJulianDate } from '@/lib/utils'
 import { isApostlesFast, FIXED_FASTS, getSingleDayFast, getFixedFeasts } from '@/lib/constants/oldCalendarFeasts'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
@@ -6,7 +5,7 @@ import { localeToIntl } from '@/lib/i18n/pick'
 import type { Translations } from '@/lib/i18n/ro'
 import { getActiveAnunt } from '@/lib/anunturi.server'
 import AnnouncementCard from './AnnouncementCard'
-import FeedCard from '@/components/shell/FeedCard'
+import LiturgicalTodayView from './LiturgicalTodayView'
 
 function getFastInfo(now: Date, t: Translations): string | null {
   const year = now.getFullYear()
@@ -45,7 +44,6 @@ export default async function LiturgicalTodayWidget({ saint, prayerHref }: Props
 
   const dateStr = now.toLocaleDateString(intl, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
   const dateLabel = dateStr.charAt(0).toUpperCase() + dateStr.slice(1)
-  const shortDate = now.toLocaleDateString(intl, { day: 'numeric', month: 'long' })
   const jd = toJulianDate(now)
   const julianLabel = new Date(jd.year, jd.month - 1, jd.day).toLocaleDateString(intl, { day: 'numeric', month: 'long' })
   const feast = getFixedFeasts(now.getDate(), now.getMonth() + 1)[0]
@@ -54,28 +52,19 @@ export default async function LiturgicalTodayWidget({ saint, prayerHref }: Props
 
   return (
     <>
-      <FeedCard kind="parohie" kicker={t.calendar.todayWidget} author={t.shell.brand}>
-        <div className="flex flex-col gap-2.5">
-          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <span className="eyebrow">{t.shell.today} · {shortDate}</span>
-            <span className="mute italic text-[17px]">{julianLabel}, {t.shell.oldStyle}</span>
-          </div>
-          <h2 className="h-s">
-            <Link href={calendarHref} className="hover:text-gold transition-colors">{feastName || dateLabel}</Link>
-          </h2>
-          {feastName && <p className="mute text-[17px]">{dateLabel}</p>}
-          {fastInfo && (
-            <p className="text-[17px]" style={{ color: 'var(--gold)' }}>
-              🕯 {fastInfo}
-            </p>
-          )}
-          <div className="flex flex-wrap gap-x-5 gap-y-1 mt-1 text-[17px]">
-            <Link href={calendarHref} className="link-gold">{t.home.saintsToday} →</Link>
-            <Link href={prayerHref} className="link-blue">{t.home.prayerToday} →</Link>
-            <Link href={calendarHref} className="mute hover:text-gold transition-colors">{t.home.openCalendarLink}</Link>
-          </div>
-        </div>
-      </FeedCard>
+      <LiturgicalTodayView
+        t={t}
+        data={{
+          day: now.getDate(),
+          month: now.toLocaleDateString(intl, { month: 'long' }),
+          julianLabel,
+          dateLabel,
+          feastName,
+          fastInfo,
+          calendarHref,
+          prayerHref,
+        }}
+      />
       {anunt && (
         <AnnouncementCard
           titlu={anunt.titlu}
@@ -83,6 +72,7 @@ export default async function LiturgicalTodayWidget({ saint, prayerHref }: Props
           linkArticol={anunt.linkArticol}
           author={t.shell.brand}
           kicker={t.shell.kindAnnouncement}
+          moreLabel={t.shell.readAnnouncement}
         />
       )}
     </>

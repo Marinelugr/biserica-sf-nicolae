@@ -34,9 +34,13 @@ export default async function Footer() {
   const linkCls = 'inline-flex items-center min-h-[32px] transition-colors hover:text-gold'
 
   return (
-    <footer className="mt-auto" style={{ borderTop: '1px solid var(--line)' }}>
-      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 py-12">
-        <div className="card grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10" style={{ padding: 'clamp(22px, 4vw, 40px)' }}>
+    <footer className="site-foot mt-auto">
+      {/* emblema pe linia aurie de sus */}
+      <span className="foot-crest" aria-hidden="true">
+        <Image src="/logo-mark.png" alt="" width={17} height={36} style={{ height: 32, width: 'auto' }} />
+      </span>
+      <div className="max-w-[1200px] mx-auto px-5 sm:px-8 pt-16 pb-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
 
           {/* Coloana 1 — Emblemă & adresă */}
           <div>
@@ -122,8 +126,10 @@ export default async function Footer() {
           </div>
         </div>
 
+        <p className="foot-ornament mt-12" aria-hidden="true">✦ ✦ ✦</p>
+
         {/* Bara de jos */}
-        <div className="mt-10 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[16px] mute text-center md:text-left" style={{ borderTop: '1px solid var(--line)' }}>
+        <div className="mt-8 pt-6 flex flex-col md:flex-row items-center justify-between gap-3 text-[16px] mute text-center md:text-left" style={{ borderTop: '1px solid var(--line)' }}>
           <p>© {year} {t.footer.copyright}</p>
           <p className="italic">
             {t.footer.blessing} · <a href="tel:+37367306191" className="transition-colors hover:text-gold">+373 67 306 191</a> ☦

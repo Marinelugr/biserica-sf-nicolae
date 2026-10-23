@@ -1,4 +1,6 @@
 @import "tailwindcss";
+/* identitatea secțiunilor (tokeni + ornamente), vezi fișierul */
+@import "./sections.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Tema „Profil și flux" (stilul 9) — doar întunecată („noapte").
@@ -351,6 +353,7 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .page-fade, .live-dot { animation: none; }
+  .sec-rule { transform: none !important; }
   [data-reveal] { opacity: 1 !important; transform: none !important; }
   .card, .news, .tile, .btn, .chip, .soc, .play { transition: none; }
 }

@@ -37,7 +37,7 @@ export default async function MagazinPage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.shop.subtitle} title={t.shop.title} />
+      <PageHead sec="profil" eyebrow={t.shop.subtitle} title={t.shop.title} />
 
       {products.length === 0 ? (
         <div className="card text-center">

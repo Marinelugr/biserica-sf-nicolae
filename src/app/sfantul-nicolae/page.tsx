@@ -95,7 +95,7 @@ export default async function SfantulNicolaePage() {
 
   return (
     <PageShell aside="compact">
-      <PageHead eyebrow={t.saintNicholasPage.badge} title={t.saintNicholasPage.pageTitle}>
+      <PageHead sec="sfinti" eyebrow={t.saintNicholasPage.badge} title={t.saintNicholasPage.pageTitle}>
         <p className="lead" style={{ fontSize: 22 }}>{t.saintNicholasPage.subtitle}</p>
       </PageHead>
 
