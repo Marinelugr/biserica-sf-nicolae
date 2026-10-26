@@ -24,6 +24,15 @@ export interface Translations {
     oldTestamentBooks: string; newTestamentBooks: string
     chapter: string; verse: string
     otBooksLabel: string; ntBooksLabel: string; totalLabel: string
+    reader: {
+      chapters: string; chooseChapter: string; allChapters: string; readFromStart: string
+      prevChapter: string; nextChapter: string; comingSoon: string
+      bookNumber: string; oldTestamentName: string; newTestamentName: string
+      textSize: string; sizeNormal: string; sizeLarge: string; sizeXLarge: string
+      versesTitle: string; versesFound: string; noVerseResults: string
+      prevPage: string; nextPage: string; pageLabel: string
+      langNote: string; metaSuffix: string
+    }
   }
   calendar: {
     title: string; subtitle: string
@@ -231,6 +240,16 @@ const ro: Translations = {
     oldTestamentBooks: '(53 de cărți)', newTestamentBooks: '(27 de cărți)',
     chapter: 'Capitol', verse: 'Verset',
     otBooksLabel: 'cărți VT', ntBooksLabel: 'cărți NT', totalLabel: 'total',
+    reader: {
+      chapters: 'Capitole', chooseChapter: 'Alege capitolul', allChapters: 'Toate capitolele', readFromStart: 'Citește de la capitolul 1',
+      prevChapter: 'Capitolul anterior', nextChapter: 'Capitolul următor',
+      comingSoon: 'Textul acestei cărți va fi disponibil în curând.',
+      bookNumber: 'Cartea {n} din 80', oldTestamentName: 'Vechiul Testament', newTestamentName: 'Noul Testament',
+      textSize: 'Mărimea textului', sizeNormal: 'Normal', sizeLarge: 'Mare', sizeXLarge: 'Foarte mare',
+      versesTitle: 'Versete', versesFound: '{n} versete găsite', noVerseResults: 'Niciun verset nu conține toate aceste cuvinte.',
+      prevPage: '← Pagina anterioară', nextPage: 'Pagina următoare →', pageLabel: 'Pagina {n} din {total}',
+      langNote: 'Textul Bibliei este în limba română.', metaSuffix: 'Biblia Ortodoxă',
+    },
   },
   calendar: {
     title: 'Calendarul Sfinților', subtitle: 'Ortodox',

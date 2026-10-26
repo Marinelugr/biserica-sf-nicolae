@@ -1,9 +1,17 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
+import { redirect } from 'next/navigation'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { matchesAllWords } from '@/lib/search'
-import { BIBLE_BOOKS } from '@/lib/bible/books'
+import { BIBLE_BOOKS, bookLabel, getBook } from '@/lib/bible/books'
+import { parseReference } from '@/lib/bible/reference'
+import { searchWords } from '@/lib/bible/search'
+import { getChapterCount, searchVerses, SEARCH_PAGE_SIZE } from '@/lib/bible/queries'
+import { fill } from '@/lib/bible/viewModel'
+import { localizedHref } from '@/lib/i18n/href'
+import VerseResults, { type VerseResultItem } from '@/components/bible/VerseResults'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
@@ -11,12 +19,16 @@ import SearchForm from '@/components/shell/SearchForm'
 
 export const dynamic = 'force-dynamic'
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getServerT()
+type Search = Promise<{ q?: string; pagina?: string }>
+
+export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
+  const [t, { q }] = await Promise.all([getServerT(), searchParams])
   return {
     title: t.meta.biblie.title,
     description: t.meta.biblie.description,
     alternates: buildAlternates('/biblie'),
+    // paginile de rezultate ale căutării nu se indexează
+    ...(q?.trim() ? { robots: { index: false, follow: false } } : {}),
   }
 }
 
@@ -28,14 +40,33 @@ function matchesQuery(book: { labelRo: string; labelRu: string; labelEn: string 
   return matchesAllWords(query, [book.labelRo, book.labelRu, book.labelEn])
 }
 
-export default async function BibliePage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string }>
-}) {
+export default async function BibliePage({ searchParams }: { searchParams: Search }) {
   const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
-  const { q } = await searchParams
-  const query = q?.trim() || ''
+  const { q, pagina } = await searchParams
+  const query = q?.trim().slice(0, 100) || ''
+  const r = t.bible.reader
+
+  // „Ioan 3:16" → direct la verset; capitol peste numărul existent → pagina cărții
+  const ref = query ? parseReference(query) : null
+  if (ref?.chapter) {
+    const count = await getChapterCount(ref.slug)
+    if (count && ref.chapter <= count) {
+      redirect(localizedHref(`/biblie/${ref.slug}/${ref.chapter}`, locale) + (ref.verse ? `#v${ref.verse}` : ''))
+    }
+    redirect(localizedHref(`/biblie/${ref.slug}`, locale))
+  }
+
+  // Versete: toate cuvintele (fără diacritice), 25 pe pagină
+  const words = query ? searchWords(query) : []
+  const page = Math.max(1, Math.min(1000, Number.parseInt(pagina || '1', 10) || 1))
+  const verseSearch = words.length ? await searchVerses(words, page) : null
+  const pages = verseSearch ? Math.max(1, Math.ceil(verseSearch.total / SEARCH_PAGE_SIZE)) : 1
+  const pageHref = (n: number) => `${localizedHref('/biblie', locale)}?q=${encodeURIComponent(query)}${n > 1 ? `&pagina=${n}` : ''}`
+  const verseItems: VerseResultItem[] = (verseSearch?.hits ?? []).map(h => {
+    const book = getBook(h.slug)
+    const name = book ? (locale === 'ro' ? book.aliases[0] : bookLabel(book, locale)) : h.slug
+    return { href: `${localizedHref(`/biblie/${h.slug}/${h.chapter}`, locale)}#v${h.verse}`, reference: `${name} ${h.chapter}:${h.verse}`, text: h.text }
+  })
 
   const vtNumbered = VT_BOOKS.map((book, i) => ({ ...book, num: i + 1 }))
   const ntNumbered = NT_BOOKS.map((book, i) => ({ ...book, num: VT_BOOKS.length + i + 1 }))
@@ -83,12 +114,28 @@ export default async function BibliePage({
         )}
       </PageHead>
 
-      {query && totalResults === 0 ? (
+      {verseSearch && verseSearch.total > 0 && (
+        <VerseResults
+          title={r.versesTitle}
+          summary={fill(r.versesFound, { n: verseSearch.total })}
+          items={verseItems}
+          words={words}
+          empty={r.noVerseResults}
+          pager={{
+            prevHref: page > 1 ? pageHref(page - 1) : null,
+            nextHref: page < pages ? pageHref(page + 1) : null,
+            label: fill(r.pageLabel, { n: page, total: pages }),
+            prev: r.prevPage, next: r.nextPage,
+          }}
+        />
+      )}
+
+      {query && totalResults === 0 && !verseSearch?.total ? (
         <div className="card text-center">
           <span className="gold" style={{ fontSize: '44px' }} aria-hidden="true">☦</span>
           <p className="mt-3 text-[19px]">Nu s-au găsit rezultate pentru &ldquo;{query}&rdquo;</p>
           <p className="mute text-[16px] mt-2">Încercați un alt termen sau răsfoiți lista completă mai jos.</p>
-          <a href="/biblie" className="btn mt-5">Vezi toate cărțile</a>
+          <Link href="/biblie" className="btn mt-5">Vezi toate cărțile</Link>
         </div>
       ) : (
         <>

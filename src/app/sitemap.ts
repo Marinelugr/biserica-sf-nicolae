@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { translatePath } from '@/lib/i18n/slugs'
 import { publicArticleWhere } from '@/lib/articleVisibility'
 import { SITE_URL } from '@/lib/site'
+import { listAllChapters } from '@/lib/bible/queries'
 
 // Generat la cerere: build-ul CI nu are acces la DB, iar un sitemap static ar conține doar rutele fixe.
 export const dynamic = 'force-dynamic'
@@ -91,18 +92,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch { /* skip */ }
 
-  let bibleRoutes: MetadataRoute.Sitemap = []
-  try {
-    const bibleBooks = await prisma.bibleBook.findMany({
-      select: { slug: true },
-    })
-    bibleRoutes = bibleBooks.map(b => ({
-      url: `${BASE}/biblie/${b.slug}/1`,
-      changeFrequency: 'yearly' as const,
-      priority: 0.6,
-      alternates: langAlternates(`/biblie/${b.slug}/1`),
-    }))
-  } catch { /* skip */ }
+  // Toate capitolele existente în baza de date (o singură interogare); tabele goale → nimic
+  const bibleRoutes: MetadataRoute.Sitemap = (await listAllChapters()).map(c => ({
+    url: `${BASE}/biblie/${c.slug}/${c.chapter}`,
+    changeFrequency: 'yearly' as const,
+    priority: 0.6,
+    alternates: langAlternates(`/biblie/${c.slug}/${c.chapter}`),
+  }))
 
   return [...staticRoutes, ...articleRoutes, ...bookRoutes, ...saintRoutes, ...bibleRoutes]
 }
