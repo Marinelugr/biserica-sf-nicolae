@@ -63,3 +63,7 @@
 @media (max-width: 760px) {
   .chapter-nav .btn { flex: 1 1 auto; }
 }
+
+/* butoanele de pe pergament: text închis, nu culoarea implicită (deschisă) a .btn */
+[data-sec="evanghelie"] .btn { color: var(--sec-ink); border-color: var(--sec-edge); }
+[data-sec="evanghelie"] .btn:hover { color: var(--sec-accent-text); background: color-mix(in srgb, var(--sec-accent) 8%, transparent); }
