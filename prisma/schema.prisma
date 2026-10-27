@@ -71,6 +71,8 @@ model BibleChapter {
   book       BibleBook    @relation(fields: [bookId], references: [id])
   chapterNum Int
   verses     BibleVerse[]
+
+  @@unique([bookId, chapterNum])
 }
 
 model BibleVerse {
@@ -79,6 +81,10 @@ model BibleVerse {
   chapter   BibleChapter @relation(fields: [chapterId], references: [id])
   verseNum  Int
   textRo    String       @db.Text
+  /// textRo prin normalizeForSearch (src/lib/bible/search.ts): căutare fără diacritice
+  textSearch String      @db.Text
+
+  @@unique([chapterId, verseNum])
 }
 
 // ─── Sfinți ──────────────────────────────────────────────────────────────────

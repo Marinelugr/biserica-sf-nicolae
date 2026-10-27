@@ -39,6 +39,16 @@ const en: Translations = {
     oldTestamentBooks: '(53 books)', newTestamentBooks: '(27 books)',
     chapter: 'Chapter', verse: 'Verse',
     otBooksLabel: 'OT books', ntBooksLabel: 'NT books', totalLabel: 'total',
+    reader: {
+      chapters: 'Chapters', chooseChapter: 'Choose a chapter', allChapters: 'All chapters', readFromStart: 'Read from chapter 1',
+      prevChapter: 'Previous chapter', nextChapter: 'Next chapter',
+      comingSoon: 'The text of this book will be available soon.',
+      bookNumber: 'Book {n} of 80', oldTestamentName: 'Old Testament', newTestamentName: 'New Testament',
+      textSize: 'Text size', sizeNormal: 'Normal', sizeLarge: 'Large', sizeXLarge: 'Very large',
+      versesTitle: 'Verses', versesFound: '{n} verses found', noVerseResults: 'No verse contains all of these words.',
+      prevPage: '← Previous page', nextPage: 'Next page →', pageLabel: 'Page {n} of {total}',
+      langNote: 'The text of the Bible is in Romanian.', metaSuffix: 'Orthodox Bible',
+    },
   },
   calendar: {
     title: 'Calendar of Saints', subtitle: 'Orthodox',

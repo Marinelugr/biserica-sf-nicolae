@@ -16,7 +16,12 @@
     "db:backfill-saints": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/backfill-saints.ts",
     "db:recompress-images": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/recompress-storage.ts",
     "db:studio": "prisma studio",
-    "test": "vitest run"
+    "test": "vitest run",
+    "bible:extract": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/extract.ts",
+    "bible:validate": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/validate.ts",
+    "bible:import": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/import.ts",
+    "bible:wipe": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/wipe.ts",
+    "bible:verify-live": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/verify-live.ts"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
@@ -61,6 +66,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "mammoth": "^1.13.0",
     "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",

@@ -39,6 +39,16 @@ const ru: Translations = {
     oldTestamentBooks: '(53 книги)', newTestamentBooks: '(27 книг)',
     chapter: 'Глава', verse: 'Стих',
     otBooksLabel: 'книг ВЗ', ntBooksLabel: 'книг НЗ', totalLabel: 'всего',
+    reader: {
+      chapters: 'Главы', chooseChapter: 'Выберите главу', allChapters: 'Все главы', readFromStart: 'Читать с первой главы',
+      prevChapter: 'Предыдущая глава', nextChapter: 'Следующая глава',
+      comingSoon: 'Текст этой книги скоро будет доступен.',
+      bookNumber: 'Книга {n} из 80', oldTestamentName: 'Ветхий Завет', newTestamentName: 'Новый Завет',
+      textSize: 'Размер текста', sizeNormal: 'Обычный', sizeLarge: 'Крупный', sizeXLarge: 'Очень крупный',
+      versesTitle: 'Стихи', versesFound: 'Найдено стихов: {n}', noVerseResults: 'Ни один стих не содержит все эти слова.',
+      prevPage: '← Предыдущая страница', nextPage: 'Следующая страница →', pageLabel: 'Страница {n} из {total}',
+      langNote: 'Текст Библии — на румынском языке.', metaSuffix: 'Православная Библия',
+    },
   },
   calendar: {
     title: 'Календарь Святых', subtitle: 'Православный',

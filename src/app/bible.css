@@ -1,0 +1,69 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Cititorul Bibliei (/biblie/<carte>/<capitol>) — pe pergament, identitatea
+   `evanghelie` din sections.css. Doar tokenii existenți (--sec-*, --gold,
+   --line…), fără culori noi. În afara straturilor, ca sections.css.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.reader-card { padding: clamp(22px, 4vw, 44px); }
+
+.reader-controls { display: flex; align-items: center; justify-content: flex-end; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+.reader-controls .mute { margin-right: 4px; }
+.size-btn {
+  min-width: 48px; min-height: 48px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--sec-edge, var(--line)); background: transparent;
+  color: var(--sec-ink, var(--ink)); font-family: var(--serif); font-weight: 600; line-height: 1;
+}
+.size-btn.size-s { font-size: 18px; }
+.size-btn.size-m { font-size: 23px; }
+.size-btn.size-l { font-size: 28px; }
+.size-btn[aria-pressed="true"] { background: var(--sec-accent); border-color: var(--sec-accent); color: var(--sec-on-night); }
+.size-btn:focus-visible { outline: 3px solid var(--sec-accent-text, var(--gold)); outline-offset: 2px; }
+
+.reader-text { max-width: 68ch; margin: 0 auto; font-family: var(--body); font-size: 22px; line-height: 1.75; color: var(--sec-ink, var(--ink)); }
+.reader[data-size="m"] .reader-text { font-size: 26px; }
+.reader[data-size="l"] .reader-text { font-size: 30px; line-height: 1.7; }
+
+.verse { display: block; padding: 3px 8px; margin: 0 -8px 4px; border-radius: 4px; scroll-margin-top: calc(var(--header-h) + 20px); }
+.verse:target { background: color-mix(in srgb, var(--sec-accent) 10%, transparent); box-shadow: inset 3px 0 0 var(--sec-accent); }
+/* numărul vine din data-n (::before): nu intră niciodată în textul copiat */
+.vnum { user-select: none; -webkit-user-select: none; font-size: 0.6em; font-weight: 600; color: var(--sec-accent-text); margin-right: 0.35em; vertical-align: super; line-height: 0; }
+.vnum::before { content: attr(data-n); }
+
+.reader-foot { max-width: 68ch; margin: 28px auto 0; padding-top: 16px; border-top: 1px solid var(--sec-edge, var(--line)); font-size: 16px; color: var(--sec-mute, var(--mute)); display: flex; flex-direction: column; gap: 4px; }
+
+.chapter-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.chapter-nav .btn { min-height: 48px; }
+
+.chapter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(56px, 1fr)); gap: 8px; }
+.chapter-cell {
+  display: flex; align-items: center; justify-content: center; min-height: 52px; border-radius: 8px;
+  border: 1px solid var(--sec-edge, var(--line)); color: var(--sec-ink, var(--ink));
+  font-family: var(--serif); font-size: 21px; font-weight: 600; transition: background-color .2s, color .2s;
+}
+.chapter-cell:hover { background: color-mix(in srgb, var(--sec-accent, var(--gold)) 12%, transparent); }
+.chapter-cell[aria-current="page"] { background: var(--sec-accent, var(--gold)); border-color: var(--sec-accent, var(--gold)); color: var(--sec-on-night, var(--bg)); }
+.chapter-cell:focus-visible { outline: 3px solid var(--sec-accent-text, var(--gold)); outline-offset: 2px; }
+
+/* selectorul de capitole din antet (fără JS: <details>) — pe fundalul noapte */
+.chapter-picker { margin-top: 6px; }
+.chapter-picker > summary { list-style: none; width: fit-content; }
+.chapter-picker > summary::-webkit-details-marker { display: none; }
+.chapter-picker[open] > summary { margin-bottom: 14px; }
+.chapter-picker .chapter-cell { border-color: var(--line); color: var(--ink); }
+.chapter-picker .chapter-cell[aria-current="page"] { background: var(--gold); border-color: var(--gold); color: var(--bg); }
+
+.page-head nav a, .page-head nav [aria-current] { display: inline-flex; align-items: center; min-height: 44px; }
+
+.verse-hits { display: flex; flex-direction: column; }
+.verse-hits li { padding: 14px 0; display: flex; flex-direction: column; gap: 4px; }
+.verse-hits li + li { border-top: 1px solid var(--line); }
+.verse-hits a { display: inline-flex; align-items: center; min-height: 44px; width: fit-content; }
+.verse-hits mark { background: color-mix(in srgb, var(--gold) 28%, transparent); color: inherit; border-radius: 2px; padding: 0 1px; }
+
+@media (max-width: 760px) {
+  .chapter-nav .btn { flex: 1 1 auto; }
+}
+
+/* butoanele de pe pergament: text închis, nu culoarea implicită (deschisă) a .btn */
+[data-sec="evanghelie"] .btn { color: var(--sec-ink); border-color: var(--sec-edge); }
+[data-sec="evanghelie"] .btn:hover { color: var(--sec-accent-text); background: color-mix(in srgb, var(--sec-accent) 8%, transparent); }

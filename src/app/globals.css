@@ -1,6 +1,8 @@
 @import "tailwindcss";
 /* identitatea secțiunilor (tokeni + ornamente), vezi fișierul */
 @import "./sections.css";
+/* cititorul Bibliei */
+@import "./bible.css";
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Tema „Profil și flux" (stilul 9) — doar întunecată („noapte").

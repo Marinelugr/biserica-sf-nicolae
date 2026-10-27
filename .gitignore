@@ -43,3 +43,7 @@ next-env.d.ts
 /src/generated/prisma
 .claude/worktrees/
 backups/
+
+# Biblia: fișierele Word ale lui Marin și datele extrase — repo public, nu se comit niciodată
+/bible-source/
+/bible-data/

@@ -28,12 +28,13 @@ export function I18nProvider({ children, initialLocale = 'ro' }: { children: Rea
   const [locale, setLocaleState] = useState<Locale>(initialLocale)
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, initialLocale)
+    // localStorage poate fi blocat (date de site blocate): limba rămâne în cookie
+    try { localStorage.setItem(STORAGE_KEY, initialLocale) } catch { /* localStorage blocat */ }
   }, [initialLocale])
 
   const setLocale = useCallback((l: Locale) => {
     setLocaleState(l)
-    localStorage.setItem(STORAGE_KEY, l)
+    try { localStorage.setItem(STORAGE_KEY, l) } catch { /* localStorage blocat */ }
     document.cookie = `${COOKIE_NAME}=${l};path=/;max-age=31536000;SameSite=Lax`
   }, [])
 

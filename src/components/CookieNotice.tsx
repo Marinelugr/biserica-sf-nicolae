@@ -14,8 +14,11 @@ export default function CookieNotice() {
   useEffect(() => {
     // One-time read of an external system (localStorage) on mount to decide
     // whether to show the banner; there is no pre-mount way to know this.
+    // Cu datele site-ului blocate, localStorage aruncă eroare: arătăm bannerul, fără să cadă pagina.
+    let accepted = false
+    try { accepted = !!localStorage.getItem(STORAGE_KEY) } catch { /* localStorage blocat */ }
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!localStorage.getItem(STORAGE_KEY)) setVisible(true)
+    if (!accepted) setVisible(true)
   }, [])
 
   if (!visible) return null
@@ -39,7 +42,7 @@ export default function CookieNotice() {
         </p>
         <button
           onClick={() => {
-            localStorage.setItem(STORAGE_KEY, '1')
+            try { localStorage.setItem(STORAGE_KEY, '1') } catch { /* localStorage blocat */ }
             setVisible(false)
           }}
           className="btn red sm shrink-0"
