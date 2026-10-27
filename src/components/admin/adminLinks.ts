@@ -3,7 +3,6 @@ export const ADMIN_LINKS: { href: string; label: string; exact?: boolean }[] = [
   { href: '/admin', label: '📊 Dashboard', exact: true },
   { href: '/admin/stiri', label: '📰 Știri și articole' },
   { href: '/admin/carti', label: '📖 Bibliotecă' },
-  { href: '/admin/slujbe', label: '🗓️ Slujbe' },
   { href: '/admin/anunturi', label: '🔔 Anunțuri' },
   { href: '/admin/sfinti', label: '👤 Sfinți' },
   { href: '/admin/istoria-bisericii', label: '🏛️ Istoria bisericii' },

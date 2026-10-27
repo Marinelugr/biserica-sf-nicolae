@@ -31,6 +31,11 @@ const nextConfig: NextConfig = {
       // „Media" a fost unificat în „Video" — evită linkuri moarte din bookmark-uri vechi
       { source: '/admin/media', destination: '/admin/video', permanent: false },
       { source: '/admin/media/:path*', destination: '/admin/video', permanent: false },
+      // Pagina Live a fost scoasă (2026-10-23) — linkurile vechi (Facebook, WhatsApp) duc la Video.
+      // Și variantele cu limbă: redirecturile de aici rulează înaintea src/proxy.ts.
+      { source: '/live', destination: '/video', permanent: true },
+      { source: '/ru/live', destination: '/ru/video', permanent: true },
+      { source: '/en/live', destination: '/en/video', permanent: true },
     ]
   },
 };

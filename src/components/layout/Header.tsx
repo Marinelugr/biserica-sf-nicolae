@@ -6,7 +6,6 @@ import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { useI18n } from '@/lib/i18n/context'
 import { localizedHref } from '@/lib/i18n/href'
-import { useLiveStatus } from '@/lib/hooks/useLiveStatus'
 
 function SearchIcon({ size = 18 }: { size?: number }) {
   return (
@@ -28,13 +27,7 @@ function Chevron({ open }: { open: boolean }) {
   )
 }
 
-function LiveDot() {
-  return (
-    <span className="live-dot" style={{ color: '#ff5a5a', fontSize: '0.6rem' }} aria-hidden="true">●</span>
-  )
-}
-
-interface NavItem { href: string; label: string; live?: boolean }
+interface NavItem { href: string; label: string }
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -45,7 +38,6 @@ export default function Header() {
   const router = useRouter()
   const pathname = usePathname()
   const { t, locale } = useI18n()
-  const isLive = useLiveStatus()?.isLive ?? false
   const searchInputRef = useRef<HTMLInputElement>(null)
   const parishRef = useRef<HTMLDivElement>(null)
   const parishBtnRef = useRef<HTMLButtonElement>(null)
@@ -139,7 +131,6 @@ export default function Header() {
     { href: L('/istoria-bisericii'), label: t.nav.churchHistory },
     { href: L('/sfantul-nicolae'), label: t.nav.saintNicholas },
     { href: L('/paroh'), label: t.shell.navFather },
-    { href: L('/live'), label: t.nav.live, live: true },
   ]
   const contact: NavItem = { href: L('/contact'), label: t.nav.contact }
   const mobileTop: NavItem[] = [
@@ -154,7 +145,6 @@ export default function Header() {
 
   const donateHref = L('/donatii')
   const homeHref = L('/')
-  const liveHref = L('/live')
   const parishActive = parish.some(p => isCurrent(p.href))
   const mobileParishExpanded = mobileParishOpen || parishActive
 
@@ -222,7 +212,6 @@ export default function Header() {
                         onClick={() => setParishOpen(false)}
                       >
                         {link.label}
-                        {link.live && isLive && <LiveDot />}
                       </Link>
                     </li>
                   ))}
@@ -235,14 +224,8 @@ export default function Header() {
             </Link>
           </nav>
 
-          {/* Dreapta: LIVE, căutare, Donații, hamburger */}
+          {/* Dreapta: căutare, Donații, hamburger */}
           <div className="flex items-center gap-2 sm:gap-2.5 ml-auto lg:ml-0">
-            {isLive && (
-              <Link href={liveHref} className="live-pill" aria-label={`${t.shell.liveBadge} — ${t.nav.live}`}>
-                <span className="live-dot" aria-hidden="true">●</span>
-                {t.shell.liveBadge}
-              </Link>
-            )}
             <button
               type="button"
               onClick={() => setSearchOpen(o => !o)}
@@ -363,7 +346,6 @@ export default function Header() {
                 aria-current={isCurrent(link.href) ? 'page' : undefined}
               >
                 {link.label}
-                {link.live && isLive && <LiveDot />}
               </Link>
             ))}
           </div>

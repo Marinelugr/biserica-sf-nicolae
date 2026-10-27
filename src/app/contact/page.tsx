@@ -26,11 +26,6 @@ export default async function ContactPage() {
     { icon: '🌐', label: t.contactPage.facebookLabel, content: <a href={contact.facebook} target="_blank" rel="noopener noreferrer" className="link-gold break-all">{contact.facebook.replace(/^https?:\/\/(www\.)?/, '')}</a> },
   ]
 
-  const scheduleItems = contact.schedule.split('\n').filter(Boolean).map(line => {
-    const [zi, ora, ...rest] = line.split(' - ')
-    return { zi, ora, slujba: rest.join(' - ') }
-  })
-
   return (
     <PageShell aside="compact">
       <PageHead sec="slujbe" eyebrow={t.contactPage.subtitle} title={t.contactPage.title}>
@@ -50,17 +45,6 @@ export default async function ContactPage() {
             </div>
           ))}
         </div>
-        <hr className="sep my-6" />
-        <h3 className="eyebrow mb-3">{t.contactPage.scheduleTitle}</h3>
-        <ul className="flex flex-col">
-          {scheduleItems.map((item, i) => (
-            <li key={i} className="flex items-baseline gap-3 py-2" style={i < scheduleItems.length - 1 ? { borderBottom: '1px solid var(--line)' } : undefined}>
-              <span className="w-24 shrink-0 mute text-[16px]">{item.zi}</span>
-              <span className="gold serif font-semibold">{item.ora}</span>
-              <span>{item.slujba}</span>
-            </li>
-          ))}
-        </ul>
       </section>
 
       <section className="card" aria-label={t.contactPage.formTitle}>

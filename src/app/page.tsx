@@ -2,7 +2,6 @@ export const dynamic = 'force-dynamic'
 
 import type { Metadata } from 'next'
 import { Fragment, type ReactNode } from 'react'
-import LiveStreamCard from '@/components/homepage/LiveStreamCard'
 import DailyCards from '@/components/homepage/DailyCards'
 import NewsAndLibrary from '@/components/homepage/NewsAndLibrary'
 import LiturgicalTodayWidget from '@/components/homepage/LiturgicalTodayWidget'
@@ -189,7 +188,7 @@ export default async function HomePage() {
         )
       case 'pascal_slujbe':
         return enabled['pascal_slujbe'] === false ? null : (
-          <ServicesCard key="pascal_slujbe" kicker={t.shell.kindServices} />
+          <ServicesCard key="pascal_slujbe" kicker={t.nav.pascalCalendar} />
         )
       case 'mesajul_parintelui':
         return enabled['mesajul_parintelui'] === false ? null : <PriestMessageSection key="mesajul_parintelui" />
@@ -227,7 +226,6 @@ export default async function HomePage() {
         options={[
           { kind: 'all', label: t.shell.feedAll },
           { kind: 'cuvant', label: t.shell.feedWord },
-          { kind: 'video', label: t.shell.feedVideo },
           { kind: 'parohie', label: t.shell.feedParish },
           { kind: 'biblioteca', label: t.shell.feedLibrary },
         ]}
@@ -236,7 +234,6 @@ export default async function HomePage() {
         {units.map(u => (
           <Fragment key={u}>
             {renderUnit(u)}
-            {u === 'hero' && <LiveStreamCard />}
           </Fragment>
         ))}
       </div>

@@ -4,7 +4,7 @@ const en: Translations = {
   nav: {
     home: 'Home', bible: 'Bible', calendar: 'Calendar', pascalCalendar: 'Paschal Calendar', books: 'Library',
     churchHistory: 'Church History', saintNicholas: 'Saint Nicholas', priest: 'Our Parish Priest',
-    video: 'Video', news: 'News', live: 'Live', shop: 'Shop', donate: 'Donate',
+    video: 'Video', news: 'News', shop: 'Shop', donate: 'Donate',
     contact: 'Contact',
   },
   home: {
@@ -20,10 +20,6 @@ const en: Translations = {
     latestNews: 'Latest News', allNews: 'All news →',
     orthodoxLibrary: 'Orthodox Library', allBooks: 'All books →',
     noSaints: 'No saints registered for today.',
-    liveNow: 'Live now', watchLiveService: 'Watch the service live',
-    openOnYoutube: 'Open on YouTube ↗',
-    liveStreamTitle: 'Live stream — Saint Nicholas Parish',
-    liveFooterNote: '☦ Saint Nicholas Parish, Hîrtopul Mic — live stream',
     allSaintsLink: 'All saints of the day →', readFullGospel: 'Read in full →',
     allPrayersLink: 'All prayers →', readFullPrayer: 'Read in full →', fullCalendarLink: 'Full calendar →',
     ourParish: 'Our Parish', noNews: 'No articles published at the moment.',
@@ -208,7 +204,7 @@ const en: Translations = {
   footer: {
     parish: 'Orthodox Parish', address: 'Hîrtopul Mic, Criuleni District',
     country: 'Republic of Moldova', metropolis: 'Metropolis of Chișinău and All Moldova',
-    pagesTitle: 'PAGES', scheduleTitle: 'SERVICE SCHEDULE', contactTitle: 'CONTACT & SOCIAL',
+    pagesTitle: 'PAGES', contactTitle: 'CONTACT & SOCIAL',
     support: '❤ Support the Parish', contact: 'Contact form',
     blessing: 'Website built by Marin Grigorița — creator and web developer',
     copyright: 'Parish of Saint Nicholas, Hîrtopul Mic',
@@ -217,10 +213,6 @@ const en: Translations = {
       about: 'About the Parish', bible: 'Holy Scripture', books: 'Orthodox Library',
       calendar: 'Liturgical Calendar', history: 'Church History', saint: 'Saint Nicholas',
       news: 'News & Articles', video: 'Orthodox Video',
-    },
-    schedule: {
-      sunday: 'Sunday', saturday: 'Saturday', friday: 'Friday', feasts: 'Feasts',
-      liturgy: 'Holy Liturgy', vespers: 'Vespers', matins: 'Matins',
     },
     privacyPolicy: 'Privacy Policy',
   },
@@ -251,7 +243,6 @@ const en: Translations = {
     title: 'Contact Us', subtitle: 'We are happy to answer your questions',
     addressLabel: 'Address', hramLabel: 'Patron Feast', hramValue: 'Saint Nicholas the Hierarch (December 19 / May 22)',
     phoneLabel: 'Phone', emailLabel: 'Email', facebookLabel: 'Facebook',
-    scheduleTitle: 'Service Schedule',
     mapTitle: 'How to find us',
     formTitle: 'Send a message', nameLabel: 'Name', emailLabel2: 'Email', messageLabel: 'Message',
     namePlaceholder: 'Your name', emailPlaceholder: 'email@example.com', messagePlaceholder: 'Write your message...',
@@ -262,7 +253,7 @@ const en: Translations = {
   meta: {
     site: {
       title: 'Saint Nicholas Church — Hîrtopul Mic, Criuleni',
-      description: 'Official website of Saint Nicholas the Hierarch Parish in Hîrtopul Mic, Criuleni District, Republic of Moldova. Orthodox Bible, liturgical calendar, live streaming.',
+      description: 'Official website of Saint Nicholas the Hierarch Parish in Hîrtopul Mic, Criuleni District, Republic of Moldova. Orthodox Bible, liturgical calendar, Orthodox books and videos.',
       ogTitle: 'Saint Nicholas Church — Hîrtopul Mic, Moldova',
       ogDescription: 'Orthodox Parish in Hîrtopul Mic, Criuleni, Republic of Moldova.',
       twitterTitle: 'Saint Nicholas Church',
@@ -320,7 +311,7 @@ const en: Translations = {
     },
     contact: {
       title: 'Contact',
-      description: 'Contact Saint Nicholas Parish in Hîrtopul Mic, Criuleni, Moldova. Contact form, address, phone number, and service schedule.',
+      description: 'Contact Saint Nicholas Parish in Hîrtopul Mic, Criuleni, Moldova. Contact form, address and phone number.',
     },
     cautare: {
       title: 'Search',
@@ -367,14 +358,14 @@ const en: Translations = {
     brand: 'Father Marin', navWord: 'The Word', navParish: 'Parish', navBible: 'Bible', navAbout: 'About the parish', navFather: 'The Priest',
     openMenu: 'Open menu', closeMenu: 'Close menu', mainMenu: 'Main menu',
     profileRole: 'Parish priest of St. Nicholas Church · Hîrtopul Mic, Criuleni',
-    follow: 'Follow', socialTitle: 'Social media', scheduleTitle: 'Service schedule · Parish',
-    feedFilter: 'Filter posts', feedAll: 'All', feedWord: 'Word', feedVideo: 'Video', feedParish: 'Parish', feedLibrary: 'Library',
-    kindWord: 'Word of the priest', kindVideo: 'Video', kindParish: 'Parish life', kindLibrary: 'Library',
+    follow: 'Follow', socialTitle: 'Social media',
+    feedFilter: 'Filter posts', feedAll: 'All', feedWord: 'Word', feedParish: 'Parish', feedLibrary: 'Library',
+    kindWord: 'Word of the priest', kindParish: 'Parish life', kindLibrary: 'Library',
     kindChurch: 'Church life', kindAnnouncement: 'Announcement',
-    kindServices: 'Services & Paschal calendar', readAnnouncement: 'Read the announcement',
+    readAnnouncement: 'Read the announcement',
     today: 'Today', oldStyle: 'old style', readFullMessage: 'Read the full message →', read: 'Read →', backHome: 'Home',
     coverAlt: 'St. Nicholas Church in Hîrtopul Mic, seen from above',
-    emblemAlt: 'Emblem of St. Nicholas Church', liveBadge: 'LIVE', feedEmpty: 'No posts of this kind right now.', dateLabel: 'Date',
+    emblemAlt: 'Emblem of St. Nicholas Church', feedEmpty: 'No posts of this kind right now.', dateLabel: 'Date',
   },
 }
 

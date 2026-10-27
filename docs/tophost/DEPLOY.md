@@ -66,7 +66,7 @@ Instalate (doar nume):
 | `NEXTAUTH_SECRET` | sesiunile admin (Auth.js citește `AUTH_SECRET ?? NEXTAUTH_SECRET`) |
 | `AUTH_URL=https://parintelemarin.com`, `AUTH_TRUST_HOST=true` | ne-secrete; fără ele Auth.js respinge gazda (`UntrustedHost`) în afara Vercel |
 | `NEXT_PUBLIC_SITE_URL=https://parintelemarin.com` | ne-secret |
-| `YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_ID` | pagina Live |
+| `YOUTUBE_API_KEY`, `YOUTUBE_CHANNEL_ID` | nu mai sunt folosite de aplicație (pagina Live a fost scoasă, 2026-10-23); pot fi șterse din `~/.config/parohie/env` (de Marin) |
 | `CRON_SECRET` | generat nou pentru TopHost (cel din Vercel nu mai e folosit) |
 
 Nu se pun pe server: `DIRECT_URL` (doar pentru CLI Prisma). Lipsesc intenționat: `RESEND_API_KEY`,
