@@ -31,12 +31,3 @@ export function chapterLabels(t: Translations) {
     sizes: [r.sizeNormal, r.sizeLarge, r.sizeXLarge] as [string, string, string],
   }
 }
-
-/** Descrierea meta: primele versete, tăiate la limită de cuvânt (~155 de caractere). */
-export function versesDescription(verses: { text: string }[], max = 155): string {
-  const s = verses.map(v => v.text).join(' ').replace(/\s+/g, ' ').trim()
-  if (s.length <= max) return s
-  const cut = s.slice(0, max - 1)
-  const sp = cut.lastIndexOf(' ')
-  return (sp > 0 ? cut.slice(0, sp) : cut).replace(/[\s,;:.–—-]+$/, '') + '…'
-}
