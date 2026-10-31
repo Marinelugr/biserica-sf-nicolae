@@ -2,6 +2,42 @@
 
 Audit și reparații pentru paginile publice ale Bibliei, ramura `feat/biblia-seo` (octombrie 2026).
 
+## Titlul „Sfânta Scriptură (Biblia)” și imaginea proprie
+
+Această secțiune descrie starea curentă. Mai jos, coloanele „După” arată starea de după PR #17: canonicul și `og:url` rămân valabile, dar titlurile, descrierile și `og:image` au fost înlocuite de valorile de aici.
+
+| Rută | Titlu și `og:title` | `og:image` |
+|---|---|---|
+| `/biblie` | Sfânta Scriptură (Biblia) | `/og/biblie/ro.png` |
+| `/biblie/ioan` | Ioan — Sfânta Scriptură (Biblia) | `/og/biblie/ro/ioan.png` |
+| `/biblie/ioan/3` | Ioan 3 — Sfânta Scriptură (Biblia) | `/og/biblie/ro/ioan/3.png` |
+| `/en/bible` | Holy Scripture (the Bible) | `/og/biblie/en.png` |
+| `/en/bible/ioan/3` | John 3 — Holy Scripture (the Bible) | `/og/biblie/en/ioan/3.png` |
+| `/ru/bibliya` | Священное Писание (Библия) | `/og/biblie/ru.png` |
+| `/ru/bibliya/ioan/3` | От Иоанна 3 — Священное Писание (Библия) | `/og/biblie/ru/ioan/3.png` |
+
+**Titluri**
+- Layoutul are șablonul `%s | <numele site-ului>`, dar paginile Bibliei folosesc `title.absolute`, ca și înainte. `<title>` și `og:title` sunt deci identice și fără sufix, iar sufixul ar fi depășit limita de lungime.
+- Peste 65 de caractere, titlul devine „<Carte> <capitol> — Sfânta Scriptură”. Regula nu se aplică acum la nicio carte din cele 80 până la capitolul 151; un test verifică limita de 70 de caractere în toate limbile.
+- În engleză și rusă, numele scurte sunt în `src/lib/bible/shortNames.ts`, fiindcă `books.ts` are doar etichete lungi în aceste limbi.
+
+**De ce o rută proprie și nu `opengraph-image`**
+- Rutele `/en/bible` și `/ru/bibliya` sunt rescrise spre `/biblie`, iar limba vine dintr-un cookie. Facebook cere imaginea fără cookie, deci `opengraph-image` ar fi dat mereu varianta în română.
+- `src/app/og/biblie/[...parts]/route.tsx` folosește același `ImageResponse`, dar cu limba în URL. Sufixul `.png` ocolește `src/proxy.ts`, deci răspunsul nu setează cookie.
+
+**De ce imagine dinamică și nu statică**
+- Imaginea e o cerere separată, deci nu încetinește paginile. Aplicația rulează pe Node 22 standalone, pe care `ImageResponse` funcționează.
+- Măsurat local pe un pachet identic cu cel din `build-standalone.yml`: 240 de imagini (80 de cărți × 3 limbi), cel mult 35 ms și 118 KB per imagine, zero conexiuni ieșitoare.
+- **Nemăsurat pe TopHost.** Timpii sunt de pe Mac. Dacă randarea eșuează acolo, soluția de rezervă sunt imagini statice pentru `/biblie` și una generică pentru capitole.
+
+**Fonturi**
+- EB Garamond 500 stă în `public/og/`, convertit în TTF din `@fontsource/eb-garamond` (licență OFL, inclusă alături).
+- Fiecare subset are alt nume de familie. Cu același nume, Satori păstrează un singur font, iar o glifă lipsă declanșează descărcarea unui font de rezervă de pe rețea (așa au apărut „ă” și chirilica fără serife la prima randare).
+
+**Capturi:** `docs/design/biblia-og/`.
+
+**Test local:** serverul standalone trebuie pornit cu `HOSTNAME=0.0.0.0`, ca în wrapperul de pe TopHost. Cu `HOSTNAME=127.0.0.1`, rescrierea din proxy rulează de două ori, iar `/en` și `/ru` ies în română; pe site-ul live nu a apărut problema.
+
 ## Concluzii
 
 - **`og:url` era greșit pe toate paginile Bibliei.** Indica prima pagină, iar `og:title` și `og:description` erau cele implicite ale site-ului. Paginile aveau `generateMetadata`, dar fără `openGraph`, iar Next combină metadata superficial, deci valorile veneau din `src/app/layout.tsx`.
@@ -28,8 +64,8 @@ Audit și reparații pentru paginile publice ale Bibliei, ramura `feat/biblia-se
 
 ## Decizii
 
-- **Numele cărții în română** este numele scurt folosit deja la referințe (`aliases[0]`): „Ioan 3 — Biblia”, nu „Sfânta Evanghelie după Ioan 3 — Biblia”. În engleză și rusă rămâne eticheta existentă.
-- **Titlurile sunt absolute**, fără sufixul cu numele site-ului din layout, ca să fie exact formatul cerut.
+- **Numele cărții în română** este numele scurt folosit deja la referințe (`aliases[0]`), nu eticheta lungă „Sfânta Evanghelie după Ioan”.
+- **Titlurile sunt absolute**, fără sufixul cu numele site-ului din layout.
 - **`og:type`** este `article` la capitole și `website` la index și cărți, ca în restul site-ului (`carti/[slug]` și `carti/categorie/[slug]`).
 - **Hreflang:** site-ul îl folosește deja, deci paginile Bibliei îl păstrează, iar canonicul e propriu în limba paginii.
 - **Fără text încă:** cărțile și capitolele neimportate rămân `noindex, follow`, ca înainte.
@@ -240,7 +276,7 @@ Valorile sunt identice înainte și după reparație.
 3. **`og:locale` fixat pe `ro_RO`** pe știri, cărți, sfinți, video, paroh și mesajul părintelui, inclusiv pe variantele `/en` și `/ru`. `og:url` e deja reparat acolo. Tot aici, `/despre` nu are `og:locale` și `og:type`.
 4. **Fără `og:image` la știri și cărți fără imagine proprie.** Confirmat la știrea și cartea de probă.
 5. **Eroare 500 la `/biblie?q=a&q=b`.** Parametrul repetat ajunge ca listă și `q?.trim()` eșuează. Codul exista și înainte; nu e o problemă de SEO, deci nu s-a schimbat.
-6. **`twitter:title` și `twitter:description` rămân cele implicite ale site-ului pe paginile Bibliei.** Nu erau cerute.
+6. **Rezolvat pe paginile Bibliei: `twitter:*`.** Au acum titlu, descriere și imagine proprii. Celelalte pagini fără valori proprii păstrează valorile implicite.
 7. **`themeColor` în metadata** din `src/app/layout.tsx` produce avertismente la rulare; Next îl vrea în `viewport`.
 8. **`npm test` cade fără `DATABASE_URL`.** Suita `src/lib/bible/adminCore.test.ts` importă Prisma și nu pornește fără variabilă, inclusiv pe `main` nemodificat. Cu un URL fictiv (`postgresql://x:x@127.0.0.1:1/x`) trec toate cele 30 de suite (378 de teste).
 9. **`/og-default.jpg` lipsește din `public/`.** `src/app/paroh/page.tsx` îl folosește ca imagine când parohul nu are fotografie.
