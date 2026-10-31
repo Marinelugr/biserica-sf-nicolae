@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
-import { buildAlternates } from '@/lib/i18n/alternates'
 import { localizedHref } from '@/lib/i18n/href'
 import { bookLabel, getBook } from '@/lib/bible/books'
 import { getChapterCount } from '@/lib/bible/queries'
+import { bibleBookMetadata } from '@/lib/bible/seo'
 import { bibleCrumbs, bookMeta } from '@/lib/bible/viewModel'
 import PageShell from '@/components/shell/PageShell'
 import BookView from '@/components/bible/BookView'
@@ -18,13 +18,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const book = getBook(carte)
   if (!book) return {}
   const [t, locale, count] = await Promise.all([getServerT(), getServerLocale(), getChapterCount(carte)])
-  return {
-    title: { absolute: `${bookLabel(book, locale)} | ${t.bible.reader.metaSuffix}` },
-    description: `${bookLabel(book, locale)} — ${bookMeta(book, t)}.`,
-    alternates: buildAlternates(`/biblie/${book.slug}`),
-    // fără text încă: pagina există (linkurile din listă nu dau 404), dar nu se indexează
-    ...(count ? {} : { robots: { index: false, follow: true } }),
-  }
+  return bibleBookMetadata(book, t, locale, Boolean(count))
 }
 
 export default async function BibleBookPage({ params }: { params: Params }) {

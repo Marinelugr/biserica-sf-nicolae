@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { getServerT, getServerLocale } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
-import { buildAlternates } from '@/lib/i18n/alternates'
+import { bibleIndexMetadata } from '@/lib/bible/seo'
 import { matchesAllWords } from '@/lib/search'
 import { BIBLE_BOOKS, bookLabel, getBook } from '@/lib/bible/books'
 import { parseReference } from '@/lib/bible/reference'
@@ -22,14 +22,8 @@ export const dynamic = 'force-dynamic'
 type Search = Promise<{ q?: string; pagina?: string }>
 
 export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
-  const [t, { q }] = await Promise.all([getServerT(), searchParams])
-  return {
-    title: t.meta.biblie.title,
-    description: t.meta.biblie.description,
-    alternates: buildAlternates('/biblie'),
-    // paginile de rezultate ale căutării nu se indexează
-    ...(q?.trim() ? { robots: { index: false, follow: false } } : {}),
-  }
+  const [t, locale, { q }] = await Promise.all([getServerT(), getServerLocale(), searchParams])
+  return bibleIndexMetadata(t, locale, Boolean(q?.trim()))
 }
 
 // Lista celor 80 de cărți stă în src/lib/bible/books.ts (folosită și de cititor și de import).

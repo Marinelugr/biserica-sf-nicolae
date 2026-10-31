@@ -1,13 +1,13 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { getServerLocale, getServerT } from '@/lib/i18n/server'
-import { buildAlternates } from '@/lib/i18n/alternates'
 import { localizedHref } from '@/lib/i18n/href'
 import { bookLabel, getBook, neighbors } from '@/lib/bible/books'
 import { chapterNav, chapterPath, parseChapterParam } from '@/lib/bible/nav'
 import { getChapterCount, getChapterVerses } from '@/lib/bible/queries'
 import { BIBLE_SOURCE_NOTE } from '@/lib/bible/source'
-import { bibleCrumbs, bookMeta, chapterLabels, versesDescription } from '@/lib/bible/viewModel'
+import { bibleChapterMetadata } from '@/lib/bible/seo'
+import { bibleCrumbs, bookMeta, chapterLabels } from '@/lib/bible/viewModel'
 import PageShell from '@/components/shell/PageShell'
 import BookView from '@/components/bible/BookView'
 import ChapterView from '@/components/bible/ChapterView'
@@ -33,13 +33,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const data = await load(carte, capitol)
   if (!data) return {}
   const [t, locale] = await Promise.all([getServerT(), getServerLocale()])
-  const title = `${bookLabel(data.book, locale)} ${data.n}`
-  return {
-    title: { absolute: `${title} | ${t.bible.reader.metaSuffix}` },
-    description: data.verses.length ? versesDescription(data.verses) : `${title} — ${bookMeta(data.book, t)}.`,
-    alternates: buildAlternates(`/biblie/${data.book.slug}/${data.n}`),
-    ...(data.verses.length ? {} : { robots: { index: false, follow: true } }),
-  }
+  return bibleChapterMetadata(data.book, data.n, t, locale, data.verses.length > 0)
 }
 
 export default async function BibleChapterPage({ params }: { params: Params }) {
