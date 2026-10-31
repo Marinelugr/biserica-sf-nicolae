@@ -191,16 +191,16 @@ describe('imaginea Open Graph', () => {
     env.locale = 'en'
     const m = await chapterMeta('ioan', '3')
     const image = (m.openGraph as { images: Record<string, unknown>[] }).images[0]
-    const url = `${SITE_URL}/og/biblie/en/ioan/3.png`
+    const url = `${SITE_URL}/og/biblie/en/ioan/3.png?v=2`
     expect(image).toMatchObject({ url, width: 1200, height: 630, type: 'image/png' })
     expect(image.alt).toContain('John 3')
     expect(m.twitter).toMatchObject({ card: 'summary_large_image', images: [url] })
   })
 
   it.each([
-    ['/biblie', () => indexMeta(), `${SITE_URL}/og/biblie/ro.png`],
-    ['/biblie/ioan', async () => (await book()).generateMetadata({ params: Promise.resolve({ carte: 'ioan' }) }), `${SITE_URL}/og/biblie/ro/ioan.png`],
-    ['/biblie/ioan/3', () => chapterMeta('ioan', '3'), `${SITE_URL}/og/biblie/ro/ioan/3.png`],
+    ['/biblie', () => indexMeta(), `${SITE_URL}/og/biblie/ro.png?v=2`],
+    ['/biblie/ioan', async () => (await book()).generateMetadata({ params: Promise.resolve({ carte: 'ioan' }) }), `${SITE_URL}/og/biblie/ro/ioan.png?v=2`],
+    ['/biblie/ioan/3', () => chapterMeta('ioan', '3'), `${SITE_URL}/og/biblie/ro/ioan/3.png?v=2`],
   ])('%s: og:image are URL absolut, 1200×630 și alt', async (_route, load, url) => {
     const m = await load()
     const [image] = (m.openGraph as { images: { url: string; width: number; height: number; alt: string }[] }).images
