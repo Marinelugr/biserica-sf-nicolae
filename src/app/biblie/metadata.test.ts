@@ -3,7 +3,7 @@ import ro from '@/lib/i18n/ro'
 import ru from '@/lib/i18n/ru'
 import en from '@/lib/i18n/en'
 import { BIBLE_BOOKS, getBook } from '@/lib/bible/books'
-import { bibleChapterMetadata, bibleOgImagePath, bibleTitle, parseBibleOgParts } from '@/lib/bible/seo'
+import { bibleChapterMetadata, bibleOgImagePath, bibleOgText, bibleTitle, ogSubtitleSize, parseBibleOgParts } from '@/lib/bible/seo'
 import { bookShortName } from '@/lib/bible/shortNames'
 import { SITE_URL } from '@/lib/site'
 
@@ -195,6 +195,43 @@ describe('imaginea Open Graph', () => {
     expect(image).toMatchObject({ url, width: 1200, height: 630, type: 'image/png' })
     expect(image.alt).toContain('John 3')
     expect(m.twitter).toMatchObject({ card: 'summary_large_image', images: [url] })
+  })
+
+  it.each([
+    ['/biblie', () => indexMeta(), `${SITE_URL}/og/biblie/ro.png`],
+    ['/biblie/ioan', async () => (await book()).generateMetadata({ params: Promise.resolve({ carte: 'ioan' }) }), `${SITE_URL}/og/biblie/ro/ioan.png`],
+    ['/biblie/ioan/3', () => chapterMeta('ioan', '3'), `${SITE_URL}/og/biblie/ro/ioan/3.png`],
+  ])('%s: og:image are URL absolut, 1200×630 și alt', async (_route, load, url) => {
+    const m = await load()
+    const [image] = (m.openGraph as { images: { url: string; width: number; height: number; alt: string }[] }).images
+    expect(image.url).toBe(url)
+    expect(new URL(image.url).protocol).toBe('https:')
+    expect(image.width).toBe(1200)
+    expect(image.height).toBe(630)
+    expect(image.alt.length).toBeGreaterThan(0)
+  })
+
+  it.each([
+    ['ro', undefined, undefined, 'Sfânta Scriptură', '(Biblia)', 'Vechiul și Noul Testament'],
+    ['en', undefined, undefined, 'Holy Scripture', '(the Bible)', 'Old and New Testament'],
+    ['ru', undefined, undefined, 'Священное Писание', '(Библия)', 'Ветхий и Новый Завет'],
+    ['ro', 'ioan', undefined, 'Sfânta Scriptură', '(Biblia)', 'Evanghelia după Ioan'],
+    ['ro', 'ioan', 3, 'Sfânta Scriptură', '(Biblia)', 'Ioan 3'],
+    ['en', 'faptele-apostolilor', 1, 'Holy Scripture', '(the Bible)', 'Acts of the Apostles 1'],
+    ['ru', '1-corinteni', 13, 'Священное Писание', '(Библия)', '1 Коринфянам 13'],
+  ])('textele imaginii: %s %s %s', (locale, slug, chapter, scripture, bible, subtitle) => {
+    expect(bibleOgText(locale as L, slug ? getBook(slug) : undefined, chapter)).toEqual({ scripture, bible, subtitle })
+  })
+
+  it('subtitlul: 40 px la texte scurte, niciodată sub 28 px, și încape în rama de 1040 px', () => {
+    expect(ogSubtitleSize('Ioan 3')).toBe(40)
+    expect(ogSubtitleSize('x'.repeat(500))).toBe(28)
+    for (const locale of ['ro', 'en', 'ru'] as L[]) for (const b of BIBLE_BOOKS) {
+      const { subtitle } = bibleOgText(locale, b)
+      const size = ogSubtitleSize(subtitle)
+      expect(size).toBeGreaterThanOrEqual(28)
+      expect(subtitle.length * size * 0.5).toBeLessThanOrEqual(1040)
+    }
   })
 
   it('calea se poate citi înapoi', () => {

@@ -10,7 +10,7 @@ import { buildAlternates } from '../i18n/alternates'
 import { localizedHref } from '../i18n/href'
 import { OG_LOCALE } from '../openGraph'
 import { SITE_URL } from '../site'
-import { getBook, type BibleBookInfo } from './books'
+import { bookLabel, getBook, type BibleBookInfo } from './books'
 import { bookShortName } from './shortNames'
 
 const MAX_TITLE = 65
@@ -22,6 +22,7 @@ const COPY: Record<Locale, {
   /** „Sfânta Scriptură" + „(Biblia)": titlul se scurtează prin renunțarea la paranteză. */
   scripture: string
   bible: string
+  testaments: string
   indexDescription: string
   bookDescription: (name: string) => string
   chapterDescription: (name: string, n: number) => string
@@ -30,6 +31,7 @@ const COPY: Record<Locale, {
   ro: {
     scripture: 'Sfânta Scriptură',
     bible: '(Biblia)',
+    testaments: 'Vechiul și Noul Testament',
     indexDescription: 'Sfânta Scriptură în limba română: Vechiul și Noul Testament, pe cărți și capitole.',
     bookDescription: name => `Citește ${name} în limba română, capitol cu capitol.`,
     chapterDescription: (name, n) => `Citește ${name}, capitolul ${n}, în limba română.`,
@@ -38,6 +40,7 @@ const COPY: Record<Locale, {
   en: {
     scripture: 'Holy Scripture',
     bible: '(the Bible)',
+    testaments: 'Old and New Testament',
     indexDescription: 'The Holy Scripture, with the text in Romanian: the Old and New Testament, by book and chapter.',
     bookDescription: name => `Read ${name}, chapter by chapter. The text is in Romanian.`,
     chapterDescription: (name, n) => `Read ${name}, chapter ${n}. The text is in Romanian.`,
@@ -46,6 +49,7 @@ const COPY: Record<Locale, {
   ru: {
     scripture: 'Священное Писание',
     bible: '(Библия)',
+    testaments: 'Ветхий и Новый Завет',
     indexDescription: 'Священное Писание, текст на румынском языке: Ветхий и Новый Завет, по книгам и главам.',
     bookDescription: name => `Читайте: ${name}, глава за главой. Текст на румынском языке.`,
     chapterDescription: (name, n) => `Читайте: ${name}, глава ${n}. Текст на румынском языке.`,
@@ -69,10 +73,25 @@ export function bibleTitle(locale: Locale, book?: BibleBookInfo, chapter?: numbe
   return title.length <= MAX_TITLE ? title : `${ref} — ${scripture}`
 }
 
+/** Pe pagina de carte, numele întreg; „Evanghelia după Ioan", nu „Sfânta Evanghelie după Ioan". */
+function bookFullName(book: BibleBookInfo, locale: Locale): string {
+  const gospel = locale === 'ro' ? book.aliases.find(a => a.startsWith('Evanghelia după')) : undefined
+  return gospel ?? bookLabel(book, locale)
+}
+
 /** Textele de pe imagine. */
 export function bibleOgText(locale: Locale, book?: BibleBookInfo, chapter?: number) {
-  const { scripture, bible } = COPY[locale]
-  return { scripture, bible, reference: reference(locale, book, chapter) }
+  const { scripture, bible, testaments } = COPY[locale]
+  const subtitle = !book ? testaments : chapter ? `${bookShortName(book, locale)} ${chapter}` : bookFullName(book, locale)
+  return { scripture, bible, subtitle }
+}
+
+/**
+ * Mărimea subtitlului, ca să încapă pe un rând între ramele imaginii: 40 px, cel mult
+ * până la 28 px. Satori nu măsoară textul; 0,5 em e peste lățimea medie a literelor.
+ */
+export function ogSubtitleSize(text: string, maxWidth = 1040): number {
+  return Math.max(28, Math.min(40, Math.floor(maxWidth / (text.length * 0.5))))
 }
 
 /**

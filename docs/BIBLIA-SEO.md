@@ -26,15 +26,31 @@ Această secțiune descrie starea curentă. Mai jos, coloanele „După” arat�
 - `src/app/og/biblie/[...parts]/route.tsx` folosește același `ImageResponse`, dar cu limba în URL. Sufixul `.png` ocolește `src/proxy.ts`, deci răspunsul nu setează cookie.
 
 **De ce imagine dinamică și nu statică**
-- Imaginea e o cerere separată, deci nu încetinește paginile. Aplicația rulează pe Node 22 standalone, pe care `ImageResponse` funcționează.
-- Măsurat local pe un pachet identic cu cel din `build-standalone.yml`: 240 de imagini (80 de cărți × 3 limbi), cel mult 35 ms și 118 KB per imagine, zero conexiuni ieșitoare.
-- **Nemăsurat pe TopHost.** Timpii sunt de pe Mac. Dacă randarea eșuează acolo, soluția de rezervă sunt imagini statice pentru `/biblie` și una generică pentru capitole.
+- Imaginea e o cerere separată, deci nu încetinește paginile. Pe site-ul live, varianta anterioară a mers pe TopHost: 200, `image/png`, 87–179 ms inclusiv rețeaua.
+- Măsurat local pe varianta 1, pe un pachet identic cu cel din `build-standalone.yml`: 480 de imagini (80 de cărți, pagina de carte și de capitol, 3 limbi), cel mult 39 ms și 103 KB per imagine, zero conexiuni ieșitoare.
+
+**Varianta 1: compoziție centrată**
+- **Stema:** `public/logo-mark.png`, același fișier ca în `src/components/layout/Header.tsx`, afișat la 73×150 px.
+- **Culori:** paleta site-ului, care diferă puțin de specificație:
+
+| Element | Specificație | Folosit (`globals.css`) |
+|---|---|---|
+| Gradient | `#1b2a5c` → `#0b1230` → `#070b1f` | `#17295f` → `#0a1330` → `#050a1a` |
+| Auriu | `#c9a24b` | `#e0b84a` (`--gold`) |
+| Text | `#f3ead2` | `#f4ecda` (`--ink`) |
+
+- **Subtitlu:** 40 px, cu micșorare automată până la 28 px. Satori nu măsoară textul, deci mărimea se calculează din numărul de caractere, la 0,5 em pe literă. Pe numele actuale, mărimea nu coboară până la 28 px.
+- **Pagina de carte:** în română, Evangheliile folosesc „Evanghelia după Ioan”, ca în specificație; celelalte cărți și variantele en/ru folosesc eticheta întreagă din `books.ts`.
 
 **Fonturi**
-- EB Garamond 500 stă în `public/og/`, convertit în TTF din `@fontsource/eb-garamond` (licență OFL, inclusă alături).
-- Fiecare subset are alt nume de familie. Cu același nume, Satori păstrează un singur font, iar o glifă lipsă declanșează descărcarea unui font de rezervă de pe rețea (așa au apărut „ă” și chirilica fără serife la prima randare).
+- Cormorant Garamond (600, 500 și 500 italic) stă în `public/og/`, convertit în TTF din `@fontsource/cormorant-garamond` (licență OFL, inclusă alături). A înlocuit EB Garamond din varianta anterioară.
+- Cifrele din subsetul latin indică variantele aliniate (`one.lf` etc.) din același font. Cifrele implicite ale fontului fac „1” să semene cu un „ı” mic, deci „1 Corinteni 13” se citea greșit. `ImageResponse` nu poate activa `lnum`, de aceea schimbarea e în fișierele TTF.
+- Fiecare subset are alt nume de familie. Cu același nume, Satori păstrează un singur font, iar o glifă lipsă declanșează descărcarea unui font de rezervă de pe rețea.
+- Accentul înalt de pe „â” este desenul fontului, nu o eroare de randare.
 
-**Capturi:** `docs/design/biblia-og/`.
+**Satori:** nu aplică `inset`; ramele au nevoie de `top`, `left`, `width` și `height`.
+
+**Capturi:** varianta curentă în `docs/design/biblia-og-v1/`, varianta anterioară în `docs/design/biblia-og/`.
 
 **Test local:** serverul standalone trebuie pornit cu `HOSTNAME=0.0.0.0`, ca în wrapperul de pe TopHost. Cu `HOSTNAME=127.0.0.1`, rescrierea din proxy rulează de două ori, iar `/en` și `/ru` ies în română; pe site-ul live nu a apărut problema.
 
