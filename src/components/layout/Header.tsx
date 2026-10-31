@@ -123,6 +123,7 @@ export default function Header() {
     { href: L('/mesajul-parintelui'), label: t.shell.navWord },
     { href: L('/video'), label: t.nav.video },
     { href: L('/calendar'), label: t.nav.calendar },
+    { href: L('/biblie'), label: t.shell.navBible },
     { href: L('/carti'), label: t.nav.books },
   ]
   const parish: NavItem[] = [
@@ -140,7 +141,7 @@ export default function Header() {
     primary[2],
     { href: L('/calendar-pascal'), label: t.nav.pascalCalendar },
     primary[3],
-    { href: L('/biblie'), label: t.shell.navBible },
+    primary[4],
   ]
 
   const donateHref = L('/donatii')
