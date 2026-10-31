@@ -78,6 +78,7 @@ export default function AdminParohPage() {
         const time = new Date(parsed._savedAt).toLocaleTimeString('ro-RO', { hour: '2-digit', minute: '2-digit' })
         if (confirm(`Există un draft nesalvat din ${time}. Restaurezi?`)) {
           const { _savedAt: _, ...rest } = parsed as PriestForm & { _savedAt: string }
+          // eslint-disable-next-line react-hooks/set-state-in-effect -- tipar existent, comportament neschimbat
           setForm(rest)
           setLoading(false)
           return

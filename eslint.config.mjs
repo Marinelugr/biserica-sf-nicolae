@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // fișiere locale, neversionate (ignorate de git)
+    "backups/**",
+    ".claude/**",
   ]),
 ]);
 
