@@ -113,6 +113,10 @@ redirectul `http` → `https`. Rulare manuală:
 iar un sitemap pre-randat ar conține doar rutele fixe. Orice pagină publică nouă care citește din DB
 trebuie să fie dinamică (ƒ în tabelul de rute din `next build`), nu statică (○).
 
+Rezultatul stă în memorie o oră, separat în fiecare proces (`TtlCache`, fără interogări în acel timp). Un articol nou
+sau o carte importată apare în sitemap în cel mult o oră, ori imediat după restart. Dacă o interogare eșuează, sitemap-ul
+parțial se servește, dar nu se păstrează.
+
 ## Observații
 
 - Serverul nu are `rsync`; upload-ul se face cu `tar` prin SSH într-un director gol.

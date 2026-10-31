@@ -111,12 +111,12 @@ export async function searchVerses(words: string[], page: number): Promise<{ tot
   }
 }
 
-/** Toate capitolele existente (pentru sitemap) — o singură interogare. */
-export async function listAllChapters(): Promise<{ slug: string; chapter: number }[]> {
+/** Toate capitolele existente (pentru sitemap) — o singură interogare; null = baza nu răspunde. */
+export async function listAllChapters(): Promise<{ slug: string; chapter: number }[] | null> {
   try {
     const rows = await prisma.bibleChapter.findMany({ select: { chapterNum: true, book: { select: { slug: true } } } })
     return rows.map(r => ({ slug: r.book.slug, chapter: r.chapterNum }))
   } catch {
-    return []
+    return null
   }
 }

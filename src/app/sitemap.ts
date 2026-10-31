@@ -4,11 +4,16 @@ import { translatePath } from '@/lib/i18n/slugs'
 import { publicArticleWhere } from '@/lib/articleVisibility'
 import { SITE_URL } from '@/lib/site'
 import { listAllChapters } from '@/lib/bible/queries'
+import { TtlCache } from '@/lib/bible/cache'
 
 // Generat la cerere: build-ul CI nu are acces la DB, iar un sitemap static ar conține doar rutele fixe.
 export const dynamic = 'force-dynamic'
 
 const BASE = SITE_URL
+
+// O oră, separat în fiecare proces Passenger. Un articol nou apare în sitemap în cel mult o oră.
+const SITEMAP_TTL_MS = 60 * 60 * 1000
+const cache = new TtlCache<MetadataRoute.Sitemap>(SITEMAP_TTL_MS, 1)
 
 function langAlternates(path: string) {
   const clean = (p: string) => (p === '/' ? '' : p)
@@ -22,6 +27,12 @@ function langAlternates(path: string) {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const cached = cache.get('sitemap')
+  if (cached) return cached
+
+  // Un sitemap parțial (o interogare a eșuat) se servește, dar nu se păstrează.
+  let complete = true
+
   const staticPaths: { path: string; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }[] = [
     { path: '/', changeFrequency: 'daily', priority: 1 },
     { path: '/despre', changeFrequency: 'monthly', priority: 0.8 },
@@ -63,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
       alternates: langAlternates(`/stiri/${a.slug}`),
     }))
-  } catch { /* skip */ }
+  } catch { complete = false }
 
   let bookRoutes: MetadataRoute.Sitemap = []
   try {
@@ -77,7 +88,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
       alternates: langAlternates(`/carti/${b.slug}`),
     }))
-  } catch { /* skip */ }
+  } catch { complete = false }
 
   let saintRoutes: MetadataRoute.Sitemap = []
   try {
@@ -90,15 +101,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
       alternates: langAlternates(`/sfintii/${s.slug}`),
     }))
-  } catch { /* skip */ }
+  } catch { complete = false }
 
   // Toate capitolele existente în baza de date (o singură interogare); tabele goale → nimic
-  const bibleRoutes: MetadataRoute.Sitemap = (await listAllChapters()).map(c => ({
+  const chapters = await listAllChapters()
+  if (!chapters) complete = false
+  const bibleRoutes: MetadataRoute.Sitemap = (chapters ?? []).map(c => ({
     url: `${BASE}/biblie/${c.slug}/${c.chapter}`,
     changeFrequency: 'yearly' as const,
     priority: 0.6,
     alternates: langAlternates(`/biblie/${c.slug}/${c.chapter}`),
   }))
 
-  return [...staticRoutes, ...articleRoutes, ...bookRoutes, ...saintRoutes, ...bibleRoutes]
+  const routes = [...staticRoutes, ...articleRoutes, ...bookRoutes, ...saintRoutes, ...bibleRoutes]
+  if (complete) cache.set('sitemap', routes)
+  return routes
 }
