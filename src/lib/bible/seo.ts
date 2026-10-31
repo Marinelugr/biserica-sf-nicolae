@@ -17,6 +17,8 @@ const MAX_TITLE = 65
 /** Psalmii au 151 de capitole: cel mai mare număr din canon. */
 const MAX_CHAPTER = 151
 export const OG_SIZE = { width: 1200, height: 630 }
+/** Facebook păstrează miniatura pe URL: se mărește când se schimbă desenul imaginii. */
+const OG_IMAGE_VERSION = 2
 
 const COPY: Record<Locale, {
   /** „Sfânta Scriptură" + „(Biblia)": titlul se scurtează prin renunțarea la paranteză. */
@@ -131,7 +133,7 @@ interface PageSeo {
 function bibleMetadata({ book, chapter, path, description, ogType, robots }: PageSeo, t: Translations, locale: Locale): Metadata {
   const canonical = `${SITE_URL}${localizedHref(path, locale)}`
   const title = bibleTitle(locale, book, chapter)
-  const image = `${SITE_URL}${bibleOgImagePath(locale, book, chapter)}`
+  const image = `${SITE_URL}${bibleOgImagePath(locale, book, chapter)}?v=${OG_IMAGE_VERSION}`
   return {
     title: { absolute: title },
     description,

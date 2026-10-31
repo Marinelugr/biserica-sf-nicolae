@@ -8,13 +8,13 @@ Această secțiune descrie starea curentă. Mai jos, coloanele „După” arat�
 
 | Rută | Titlu și `og:title` | `og:image` |
 |---|---|---|
-| `/biblie` | Sfânta Scriptură (Biblia) | `/og/biblie/ro.png` |
-| `/biblie/ioan` | Ioan — Sfânta Scriptură (Biblia) | `/og/biblie/ro/ioan.png` |
-| `/biblie/ioan/3` | Ioan 3 — Sfânta Scriptură (Biblia) | `/og/biblie/ro/ioan/3.png` |
-| `/en/bible` | Holy Scripture (the Bible) | `/og/biblie/en.png` |
-| `/en/bible/ioan/3` | John 3 — Holy Scripture (the Bible) | `/og/biblie/en/ioan/3.png` |
-| `/ru/bibliya` | Священное Писание (Библия) | `/og/biblie/ru.png` |
-| `/ru/bibliya/ioan/3` | От Иоанна 3 — Священное Писание (Библия) | `/og/biblie/ru/ioan/3.png` |
+| `/biblie` | Sfânta Scriptură (Biblia) | `/og/biblie/ro.png?v=2` |
+| `/biblie/ioan` | Ioan — Sfânta Scriptură (Biblia) | `/og/biblie/ro/ioan.png?v=2` |
+| `/biblie/ioan/3` | Ioan 3 — Sfânta Scriptură (Biblia) | `/og/biblie/ro/ioan/3.png?v=2` |
+| `/en/bible` | Holy Scripture (the Bible) | `/og/biblie/en.png?v=2` |
+| `/en/bible/ioan/3` | John 3 — Holy Scripture (the Bible) | `/og/biblie/en/ioan/3.png?v=2` |
+| `/ru/bibliya` | Священное Писание (Библия) | `/og/biblie/ru.png?v=2` |
+| `/ru/bibliya/ioan/3` | От Иоанна 3 — Священное Писание (Библия) | `/og/biblie/ru/ioan/3.png?v=2` |
 
 **Titluri**
 - Layoutul are șablonul `%s | <numele site-ului>`, dar paginile Bibliei folosesc `title.absolute`, ca și înainte. `<title>` și `og:title` sunt deci identice și fără sufix, iar sufixul ar fi depășit limita de lungime.
@@ -49,6 +49,8 @@ Această secțiune descrie starea curentă. Mai jos, coloanele „După” arat�
 - Accentul înalt de pe „â” este desenul fontului, nu o eroare de randare.
 
 **Satori:** nu aplică `inset`; ramele au nevoie de `top`, `left`, `width` și `height`.
+
+**Cache-ul Facebook:** Facebook păstrează miniatura pe URL, iar „Scrape Again” nu o schimbă întotdeauna, chiar dacă citește fișierul nou. De aceea `og:image` are `?v=2`, din `OG_IMAGE_VERSION` în `src/lib/bible/seo.ts`; la orice schimbare de desen, numărul se mărește. Ruta ignoră parametrul.
 
 **Capturi:** varianta curentă în `docs/design/biblia-og-v1/`, varianta anterioară în `docs/design/biblia-og/`.
 
