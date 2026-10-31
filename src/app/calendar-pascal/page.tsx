@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getPascalData } from '@/lib/pascal'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
 
@@ -11,6 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.calendarPascal.title,
     description: t.meta.calendarPascal.description,
     alternates: buildAlternates('/calendar-pascal'),
+    openGraph: await pageOpenGraph('/calendar-pascal'),
   }
 }
 

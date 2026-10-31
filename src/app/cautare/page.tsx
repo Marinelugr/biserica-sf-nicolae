@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { buildAlternates } from '@/lib/i18n/alternates'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { scheduledGate } from '@/lib/articleVisibility'
 import { buildWordWhere } from '@/lib/search'
 import PageShell from '@/components/shell/PageShell'
@@ -16,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.cautare.title,
     description: t.meta.cautare.description,
     alternates: buildAlternates('/cautare'),
+    openGraph: await pageOpenGraph('/cautare'),
   }
 }
 

@@ -9,6 +9,7 @@ import PageTransition from '@/components/PageTransition'
 import ScrollToTop from '@/components/ScrollToTop'
 import CookieNotice from '@/components/CookieNotice'
 import { SITE_URL } from '@/lib/site'
+import { siteOpenGraph } from '@/lib/openGraph'
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin', 'latin-ext'],
@@ -27,8 +28,6 @@ const ebGaramond = EB_Garamond({
   display: 'swap',
 })
 
-const OG_LOCALE: Record<'ro' | 'ru' | 'en', string> = { ro: 'ro_RO', ru: 'ru_RU', en: 'en_US' }
-
 export async function generateMetadata(): Promise<Metadata> {
   const [locale, t] = await Promise.all([getServerLocale(), getServerT()])
   const m = t.meta.site
@@ -43,15 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: ['biserică ortodoxă', 'Moldova', 'Criuleni', 'Hîrtopul Mic', 'Sfântul Nicolae', 'parohie', 'biblie online'],
     manifest: '/manifest.json',
     appleWebApp: { capable: true, title: 'Sf. Nicolae', statusBarStyle: 'black-translucent' },
-    openGraph: {
-      type: 'website',
-      locale: OG_LOCALE[locale],
-      url: SITE_URL,
-      siteName: m.twitterTitle,
-      title: m.ogTitle,
-      description: m.ogDescription,
-      images: [{ url: '/images/12.jpg', width: 1200, height: 800, alt: m.ogTitle }],
-    },
+    openGraph: siteOpenGraph(t, locale),
     twitter: {
       card: 'summary_large_image',
       title: m.twitterTitle,

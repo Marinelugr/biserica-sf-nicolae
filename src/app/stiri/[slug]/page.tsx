@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { formatDate, readingTime, htmlToPlainText } from '@/lib/utils'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { getServerT, getServerLocale, pageUrl } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import ContentCoverImage from '@/components/shared/ContentCoverImage'
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description: plainText,
       type: 'article',
-      url: `/stiri/${slug}`,
+      url: await pageUrl(`/stiri/${slug}`),
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
       publishedTime: article.publishedAt?.toISOString(),

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { prisma } from '@/lib/prisma'
 
@@ -16,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.video.title,
     description: t.meta.video.description,
     alternates: buildAlternates('/video'),
+    openGraph: await pageOpenGraph('/video'),
   }
 }
 

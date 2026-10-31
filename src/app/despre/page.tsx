@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { buildAlternates } from '@/lib/i18n/alternates'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageUrl } from '@/lib/i18n/server'
 import { prisma } from '@/lib/prisma'
 
 import PageShell from '@/components/shell/PageShell'
@@ -25,6 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: m.description,
     alternates: buildAlternates('/despre'),
     openGraph: {
+      url: await pageUrl('/despre'),
       title: m.ogTitle,
       description: m.ogDescription,
       images: ['/images/12.jpg'],

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageUrl } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { prisma } from '@/lib/prisma'
 
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       type: 'website',
-      url: `/video/${catSlug}`,
+      url: await pageUrl(`/video/${catSlug}`),
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
       images: category.videos[0] ? [{ url: `https://img.youtube.com/vi/${category.videos[0].videoId}/maxresdefault.jpg`, width: 1280, height: 720, alt: title }] : [],

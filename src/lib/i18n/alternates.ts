@@ -1,7 +1,7 @@
 import { translatePath } from './slugs'
 import { SITE_URL } from '@/lib/site'
 
-function localeUrl(path: string, locale: 'ro' | 'ru' | 'en'): string {
+export function localeUrl(path: string, locale: 'ro' | 'ru' | 'en'): string {
   const translated = translatePath(path, locale)
   const clean = translated === '/' ? '' : translated
   if (locale === 'ro') return `${SITE_URL}${clean}`

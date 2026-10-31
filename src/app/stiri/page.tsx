@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { formatDate, readingTime } from '@/lib/utils'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { getServerT, getServerLocale, pageOpenGraph } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { publicArticleWhere } from '@/lib/articleVisibility'
@@ -18,6 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.stiri.title,
     description: t.meta.stiri.description,
     alternates: buildAlternates('/stiri'),
+    openGraph: await pageOpenGraph('/stiri'),
   }
 }
 

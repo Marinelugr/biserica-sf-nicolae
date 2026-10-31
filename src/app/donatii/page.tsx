@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { prisma } from '@/lib/prisma'
 import { DONATII_DEFAULTS, type DonationConfigData, type DonationLocalAccount, type DonationIbanAccount, type DonationVideoLink } from '@/lib/donatii-defaults'
 import PublicGallery from '@/components/PublicGallery'
@@ -17,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.donatii.title,
     description: t.meta.donatii.description,
     alternates: buildAlternates('/donatii'),
+    openGraph: await pageOpenGraph('/donatii'),
   }
 }
 

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
 import PageShell from '@/components/shell/PageShell'
@@ -11,6 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.politicaConfidentialitate.title,
     description: t.meta.politicaConfidentialitate.description,
     alternates: buildAlternates('/politica-de-confidentialitate'),
+    openGraph: await pageOpenGraph('/politica-de-confidentialitate'),
     robots: { index: true, follow: true },
   }
 }

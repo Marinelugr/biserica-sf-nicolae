@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageUrl } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { htmlToPlainText } from '@/lib/utils'
 
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `${priest?.nameRo ?? 'Preot Paroh'} — Parohul Bisericii`,
       description: plainBio,
       type: 'profile',
-      url: '/paroh',
+      url: await pageUrl('/paroh'),
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
       images: [{ url: priest?.photoUrl || '/og-default.jpg', width: 800, height: 600, alt: priest?.nameRo ?? 'Parohul Bisericii' }],

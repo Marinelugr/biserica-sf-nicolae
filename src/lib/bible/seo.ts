@@ -8,12 +8,9 @@ import type { Translations } from '../i18n/ro'
 import type { Locale } from '../i18n/pick'
 import { buildAlternates } from '../i18n/alternates'
 import { localizedHref } from '../i18n/href'
+import { OG_IMAGE, OG_LOCALE } from '../openGraph'
 import { SITE_URL } from '../site'
 import { bookLabel, type BibleBookInfo } from './books'
-
-// La fel ca în src/app/layout.tsx (verificat de metadata.test.ts).
-const OG_IMAGE = { url: '/images/12.jpg', width: 1200, height: 800 }
-const OG_LOCALE: Record<Locale, string> = { ro: 'ro_RO', ru: 'ru_RU', en: 'en_US' }
 
 const COPY: Record<Locale, {
   indexTitle: string

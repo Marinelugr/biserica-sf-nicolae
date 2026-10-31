@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import ContactForm from './ContactForm'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { getContactInfo } from '@/lib/contact-info'
 import PageShell from '@/components/shell/PageShell'
@@ -12,6 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.contact.title,
     description: t.meta.contact.description,
     alternates: buildAlternates('/contact'),
+    openGraph: await pageOpenGraph('/contact'),
   }
 }
 

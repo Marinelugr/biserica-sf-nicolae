@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs'
-import path from 'node:path'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ro from '@/lib/i18n/ro'
 import ru from '@/lib/i18n/ru'
@@ -109,12 +107,6 @@ describe('index și căutare', () => {
     expect(og(m).url).toBe(`${SITE_URL}/biblie`)
     expect(og(m).type).toBe('website')
     expect(m.robots).toBeUndefined()
-  })
-
-  it('imaginea OG este cea din layout', async () => {
-    const layout = readFileSync(path.resolve(process.cwd(), 'src/app/layout.tsx'), 'utf8')
-    const { url } = og(await indexMeta()).images[0]
-    expect(layout).toContain(`url: '${url}', width: 1200, height: 800`)
   })
 
   it('?q=…: canonical spre /biblie, noindex, follow', async () => {

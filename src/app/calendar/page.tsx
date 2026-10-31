@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLiturgicalDates, formatDate } from '@/lib/utils'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { getServerT, getServerLocale, pageOpenGraph } from '@/lib/i18n/server'
 import { localeToIntl } from '@/lib/i18n/pick'
 import { getFixedFeasts, FIXED_FASTS, isApostlesFast, getSingleDayFast } from '@/lib/constants/oldCalendarFeasts'
 import { buildAlternates } from '@/lib/i18n/alternates'
@@ -17,6 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.calendar.title,
     description: t.meta.calendar.description,
     alternates: buildAlternates('/calendar'),
+    openGraph: await pageOpenGraph('/calendar'),
   }
 }
 

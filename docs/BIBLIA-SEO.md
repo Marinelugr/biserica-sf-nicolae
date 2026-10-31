@@ -40,7 +40,7 @@ Audit și reparații pentru paginile publice ale Bibliei, ramura `feat/biblia-se
 
 `src/app/sitemap.ts` nu s-a schimbat. Pe baza sintetică are 206 adrese înainte și 206 după, cu XML identic (fără `lastmod`), iar URL-urile `/biblie` și `/biblie/ioan/3` din sitemap coincid cu canonicele paginilor.
 
-**Numărul de 13.157 de adrese nu a fost măsurat**, pentru că necesită datele de producție. Rămâne valabil prin faptul că generatorul nu s-a schimbat.
+După deploy, sitemap-ul live are 13.157 de adrese unice, dintre care 1.347 de capitole.
 
 ## Înainte și după
 
@@ -235,11 +235,12 @@ Valorile sunt identice înainte și după reparație.
 
 ## Alte probleme găsite (nemodificate)
 
-1. **`og:url` spre prima pagină, în afara Bibliei.** Paginile fără `openGraph` propriu moștenesc `og:url`, `og:title` și `og:description` din layout: `contact`, `istoria-bisericii`, `video`, `calendar`, `calendar-pascal`, `magazin`, `politica-de-confidentialitate`, `carti`, `cautare`, `donatii`, `sfintii`, `sfantul-nicolae`, `stiri`. La fel `despre`, care are `openGraph` fără `url` (din cod, neverificat prin extragere). Confirmat prin extragere la `/contact`.
+1. **Rezolvat: `og:url` spre prima pagină, în afara Bibliei.** Toate paginile publice își declară acum `og:url`, în limba paginii. `og:title` și `og:description` rămân cele implicite ale site-ului pe paginile care nu au valori proprii.
 2. **Canonical spre română pe variantele `/en` și `/ru`, în tot site-ul.** Vine din `buildAlternates`; confirmat la `/en/contact`, `/ru/kontakt` și `/en/stiri/stire-proba`. Dacă paginile traduse trebuie indexate separat, trebuie reparat acolo.
-3. **`og:url` și `og:locale` în română pe știri traduse.** `/en/stiri/stire-proba` are `og:url` spre varianta română și `og:locale` `ro_RO`, fixat în cod.
+3. **`og:locale` fixat pe `ro_RO`** pe știri, cărți, sfinți, video, paroh și mesajul părintelui, inclusiv pe variantele `/en` și `/ru`. `og:url` e deja reparat acolo. Tot aici, `/despre` nu are `og:locale` și `og:type`.
 4. **Fără `og:image` la știri și cărți fără imagine proprie.** Confirmat la știrea și cartea de probă.
 5. **Eroare 500 la `/biblie?q=a&q=b`.** Parametrul repetat ajunge ca listă și `q?.trim()` eșuează. Codul exista și înainte; nu e o problemă de SEO, deci nu s-a schimbat.
 6. **`twitter:title` și `twitter:description` rămân cele implicite ale site-ului pe paginile Bibliei.** Nu erau cerute.
 7. **`themeColor` în metadata** din `src/app/layout.tsx` produce avertismente la rulare; Next îl vrea în `viewport`.
 8. **`npm test` cade fără `DATABASE_URL`.** Suita `src/lib/bible/adminCore.test.ts` importă Prisma și nu pornește fără variabilă, inclusiv pe `main` nemodificat. Cu un URL fictiv (`postgresql://x:x@127.0.0.1:1/x`) trec toate cele 30 de suite (378 de teste).
+9. **`/og-default.jpg` lipsește din `public/`.** `src/app/paroh/page.tsx` îl folosește ca imagine când parohul nu are fotografie.

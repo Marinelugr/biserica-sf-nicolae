@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { buildWordWhere } from '@/lib/search'
 import PageShell from '@/components/shell/PageShell'
@@ -15,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.sfintii.title,
     description: t.meta.sfintii.description,
     alternates: buildAlternates('/sfintii'),
+    openGraph: await pageOpenGraph('/sfintii'),
   }
 }
 
