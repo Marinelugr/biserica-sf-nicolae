@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import PublicGallery from '@/components/PublicGallery'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageUrl } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { htmlToPlainText } from '@/lib/utils'
 import PageShell from '@/components/shell/PageShell'
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: buildAlternates(`/sfintii/${slug}`),
     openGraph: {
       title, description: plain, type: 'article',
-      url: `/sfintii/${slug}`,
+      url: await pageUrl(`/sfintii/${slug}`),
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
       images: saint.iconUrl ? [{ url: saint.iconUrl }] : [],

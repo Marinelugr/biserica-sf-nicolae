@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import PublicGallery from '@/components/PublicGallery'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { getServerT, getServerLocale, pageOpenGraph } from '@/lib/i18n/server'
 import { pick } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 
@@ -18,6 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.sfantulNicolae.title,
     description: t.meta.sfantulNicolae.description,
     alternates: buildAlternates('/sfantul-nicolae'),
+    openGraph: await pageOpenGraph('/sfantul-nicolae'),
   }
 }
 

@@ -5,7 +5,7 @@ import ContentCoverImage from '@/components/shared/ContentCoverImage'
 import PublicGallery from '@/components/PublicGallery'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { getServerT, getServerLocale, pageUrl } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { htmlToPlainText } from '@/lib/utils'
 
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: buildAlternates(`/carti/${slug}`),
     openGraph: {
       title, description: plain, type: 'article',
-      url: `/carti/${slug}`,
+      url: await pageUrl(`/carti/${slug}`),
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
       images: book.imageUrl ? [{ url: book.imageUrl }] : [],

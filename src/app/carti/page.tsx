@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { shelfGroup } from '@/lib/sectionTheme'
 import Link from 'next/link'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
@@ -15,6 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.carti.title,
     description: t.meta.carti.description,
     alternates: buildAlternates('/carti'),
+    openGraph: await pageOpenGraph('/carti'),
   }
 }
 

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { getServerT, getServerLocale } from '@/lib/i18n/server'
+import { getServerT, getServerLocale, pageOpenGraph } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { localizedHref } from '@/lib/i18n/href'
 import { htmlToPlainText } from '@/lib/utils'
@@ -16,6 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: t.meta.magazin.title,
     description: t.meta.magazin.description,
     alternates: buildAlternates('/magazin'),
+    openGraph: await pageOpenGraph('/magazin'),
   }
 }
 

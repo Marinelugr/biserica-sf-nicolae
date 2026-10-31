@@ -1,3 +1,4 @@
+import { pageUrl } from '@/lib/i18n/server'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
@@ -27,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: 'Mesajul Părintelui',
       description,
       type: 'article',
-      url: '/mesajul-parintelui',
+      url: await pageUrl('/mesajul-parintelui'),
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
       ...(mesaj?.photoUrl ? { images: [{ url: mesaj.photoUrl }] } : {}),

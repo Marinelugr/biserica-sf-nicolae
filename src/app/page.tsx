@@ -12,7 +12,7 @@ import FeedFilter from '@/components/shell/FeedFilter'
 import ChurchLifeSection from '@/components/homepage/ChurchLifeSection'
 import { getChurchLifeCards } from '@/lib/externalFeeds'
 import { getTodayDate, htmlToPlainText } from '@/lib/utils'
-import { getServerLocale, getServerT } from '@/lib/i18n/server'
+import { getServerLocale, getServerT, pageOpenGraph } from '@/lib/i18n/server'
 import { localeToIntl, type Locale } from '@/lib/i18n/pick'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { publicArticleWhere } from '@/lib/articleVisibility'
@@ -25,6 +25,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: { absolute: t.meta.site.title },
     description: t.meta.site.description,
     alternates: buildAlternates('/'),
+    openGraph: await pageOpenGraph('/'),
   }
 }
 

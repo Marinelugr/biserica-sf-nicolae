@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getServerT } from '@/lib/i18n/server'
+import { getServerT, pageUrl } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${label} | Bibliotecă Ortodoxă`,
       description,
       type: 'website',
-      url: `/carti/categorie/${slug}`,
+      url: await pageUrl(`/carti/categorie/${slug}`),
       siteName: 'Biserica Sfântul Ierarh Nicolae',
       locale: 'ro_RO',
     },
