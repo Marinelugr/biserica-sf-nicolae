@@ -25,3 +25,15 @@ describe('TtlCache', () => {
     expect(c.get('y')).toBeUndefined()
   })
 })
+
+describe('TtlCache: ștergere', () => {
+  it('delete și clear', () => {
+    const c = new TtlCache<number>(60_000, 10)
+    c.set('a', 1); c.set('b', 2)
+    c.delete('a')
+    expect(c.get('a')).toBeUndefined()
+    expect(c.get('b')).toBe(2)
+    c.clear()
+    expect(c.size).toBe(0)
+  })
+})

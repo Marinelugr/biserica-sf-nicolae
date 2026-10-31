@@ -83,8 +83,34 @@ model BibleVerse {
   textRo    String       @db.Text
   /// textRo prin normalizeForSearch (src/lib/bible/search.ts): căutare fără diacritice
   textSearch String      @db.Text
+  /// Bifa „Revizuit" din Admin. Cititorul public nu citește coloana.
+  reviewed  Boolean      @default(false)
+  /// Ultima modificare din Admin (null = neatins). Cititorul public nu citește coloana.
+  editedAt  DateTime?
+  edits     BibleEdit[]
 
   @@unique([chapterId, verseNum])
+}
+
+/// Jurnalul modificărilor din Admin. Locul e copiat în rând, iar legătura devine NULL
+/// când versetul e șters (bible:wipe, --replace-book): jurnalul nu blochează ștergerea și rămâne.
+model BibleEdit {
+  id         String      @id @default(cuid())
+  verseId    String?
+  verse      BibleVerse? @relation(fields: [verseId], references: [id], onDelete: SetNull)
+  bookSlug   String
+  chapterNum Int
+  verseNum   Int
+  /// EDIT | CREATE | BULK
+  action     String
+  oldText    String?     @db.Text
+  newText    String      @db.Text
+  /// Emailul administratorului
+  editor     String
+  createdAt  DateTime    @default(now())
+
+  @@index([bookSlug, chapterNum, verseNum])
+  @@index([createdAt])
 }
 
 // ─── Sfinți ──────────────────────────────────────────────────────────────────

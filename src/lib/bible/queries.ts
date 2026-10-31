@@ -9,17 +9,57 @@ import { TtlCache } from './cache'
 export interface VerseRow { n: number; text: string }
 
 const HOUR = 60 * 60 * 1000
-const chapterCountCache = new TtlCache<number>(HOUR, 300)
-const chapterCache = new TtlCache<VerseRow[]>(HOUR, 300)
+/** Rândul din `Setting` schimbat de Admin la fiecare scriere: așa află și celelalte procese Passenger. */
+export const READER_CACHE_VERSION_KEY = 'bible_cache_version'
+const VERSION_CHECK_MS = 5000
+
+interface ReaderCacheState {
+  chapterCounts: TtlCache<number>
+  chapters: TtlCache<VerseRow[]>
+  seenVersion: string | null | undefined
+  lastCheck: number
+}
+
+// Pe globalThis: acțiunile din Admin și paginile /biblie pot fi în pachete diferite, cu instanțe separate de modul.
+const holder = globalThis as unknown as { __bibleReaderCache?: ReaderCacheState }
+const cache: ReaderCacheState = holder.__bibleReaderCache ??= {
+  chapterCounts: new TtlCache<number>(HOUR, 300),
+  chapters: new TtlCache<VerseRow[]>(HOUR, 300),
+  seenVersion: undefined,
+  lastCheck: 0,
+}
+
+/** Golește capitolul din cache-ul acestui proces (celelalte procese află prin versiune, în cel mult 5 secunde). */
+export function invalidateChapterCache(slug: string, chapter: number): void {
+  cache.chapters.delete(`${slug}/${chapter}`)
+}
+
+/** Cel mult o dată la 5 secunde: dacă Adminul a scris între timp, golește cache-ul procesului. Tabelul `Setting` există și fără schema nouă. */
+async function syncWithAdminEdits(): Promise<void> {
+  const now = Date.now()
+  if (now - cache.lastCheck < VERSION_CHECK_MS) return
+  cache.lastCheck = now
+  try {
+    const row = await prisma.setting.findUnique({ where: { key: READER_CACHE_VERSION_KEY }, select: { value: true } })
+    const version = row?.value ?? null
+    if (cache.seenVersion !== undefined && version !== cache.seenVersion) {
+      cache.chapters.clear()
+      cache.chapterCounts.clear()
+    }
+    cache.seenVersion = version
+  } catch {
+    // baza nu răspunde: rămâne TTL-ul de o oră
+  }
+}
 
 /** Numărul de capitole din baza de date (0 = carte neimportată); null = baza nu răspunde. */
 export async function getChapterCount(slug: string): Promise<number | null> {
   try {
-    const hit = chapterCountCache.get(slug)
+    const hit = cache.chapterCounts.get(slug)
     if (hit !== undefined) return hit
     const n = await prisma.bibleChapter.count({ where: { book: { slug } } })
     // 0 nu se păstrează: o carte importată după pornirea serverului apare imediat
-    if (n > 0) chapterCountCache.set(slug, n)
+    if (n > 0) cache.chapterCounts.set(slug, n)
     return n
   } catch {
     return null
@@ -29,8 +69,9 @@ export async function getChapterCount(slug: string): Promise<number | null> {
 /** Versetele unui capitol, în ordine; null = baza nu răspunde. */
 export async function getChapterVerses(slug: string, chapter: number): Promise<VerseRow[] | null> {
   try {
+    await syncWithAdminEdits()
     const key = `${slug}/${chapter}`
-    const hit = chapterCache.get(key)
+    const hit = cache.chapters.get(key)
     if (hit) return hit
     const rows = await prisma.bibleVerse.findMany({
       where: { chapter: { chapterNum: chapter, book: { slug } } },
@@ -38,7 +79,7 @@ export async function getChapterVerses(slug: string, chapter: number): Promise<V
       orderBy: { verseNum: 'asc' },
     })
     const verses = rows.map(r => ({ n: r.verseNum, text: r.textRo }))
-    if (verses.length) chapterCache.set(key, verses)
+    if (verses.length) cache.chapters.set(key, verses)
     return verses
   } catch {
     return null

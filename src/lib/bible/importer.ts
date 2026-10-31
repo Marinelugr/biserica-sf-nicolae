@@ -56,6 +56,9 @@ export interface BibleTx {
     deleteMany(args?: { where?: { chapter?: { bookId: string } } }): Promise<Count>
     count(args: { where: { chapter: { book: { slug: string } } } }): Promise<number>
   }
+  bibleEdit: {
+    count(args: { where: { bookSlug: string } }): Promise<number>
+  }
 }
 
 export interface BibleDb extends BibleTx {
@@ -157,13 +160,27 @@ export async function verifyBook(db: BibleTx, book: ParsedBook): Promise<string 
   return null
 }
 
+export const EDITS_REFUSAL = 'Cartea are modificări făcute în Admin; exportă-le în bible-data/ și rulează cu `--force-overwrite-edits`.'
+
+/** Motivul refuzului dacă `--replace-book` ar suprascrie modificări din Admin; null = se poate. */
+export async function replaceRefusal(db: BibleTx, slug: string, forceOverwriteEdits = false): Promise<string | null> {
+  if (forceOverwriteEdits) return null
+  return (await db.bibleEdit.count({ where: { bookSlug: slug } })) > 0 ? EDITS_REFUSAL : null
+}
+
 export interface ApplyLog { (line: string): void }
 
 /**
  * Aplică planul: fiecare carte în tranzacția ei (o eroare anulează doar cartea
  * respectivă și oprește importul). Întoarce erorile; lista goală = totul scris și verificat.
  */
-export async function applyPlan(db: BibleDb, books: ParsedBook[], plan: ImportPlan, log: ApplyLog = () => {}, batchSize = BATCH_SIZE): Promise<string[]> {
+export async function applyPlan(db: BibleDb, books: ParsedBook[], plan: ImportPlan, log: ApplyLog = () => {}, batchSize = BATCH_SIZE, opts: { forceOverwriteEdits?: boolean } = {}): Promise<string[]> {
+  // înainte de orice scriere: un refuz nu lasă import parțial
+  for (const item of plan.items) {
+    if (item.action !== 'replace') continue
+    const refusal = await replaceRefusal(db, item.slug, opts.forceOverwriteEdits)
+    if (refusal) return [`${item.slug}: ${refusal}`]
+  }
   for (const item of plan.items) {
     if (item.action === 'skip') { log(`= ${item.slug}: are deja ${item.existing} capitole, omisă`); continue }
     const info = getBook(item.slug)!

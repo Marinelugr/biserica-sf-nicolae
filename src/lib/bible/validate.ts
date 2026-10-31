@@ -53,8 +53,8 @@ export const USUAL_VT_CHAPTERS: Readonly<Record<string, number>> = {
 
 export const LIMITS = { versesPerChapter: 180, verseChars: 4000, totalMin: 30_000, totalMax: 40_000 }
 
-const BAD_CHAR_RE = /[�\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/
-const MOJIBAKE_RE = /[ÃÂ][\u0080-¿ -ÿ€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]|Ä[ƒ‚]|Å[Ÿ£¢ž]|È[™›š˜]/
+export const BAD_CHAR_RE = /[�\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f]/
+export const MOJIBAKE_RE = /[ÃÂ][\u0080-¿ -ÿ€‚ƒ„…†‡ˆ‰Š‹ŒŽ‘’“”•–—˜™š›œžŸ]|Ä[ƒ‚]|Å[Ÿ£¢ž]|È[™›š˜]/
 const CEDILLA_RE = /[şţŞŢ]/
 
 function block(code: IssueCode, detail: string, at: Partial<Issue> = {}): Issue {

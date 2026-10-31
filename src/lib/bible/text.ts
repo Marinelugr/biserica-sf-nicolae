@@ -13,16 +13,16 @@ export function countCedillas(text: string): number {
 }
 
 /**
- * NFC; ş ţ Ş Ţ (sedilă) → ș ț Ș Ț (virgulă); spațiul nerupt devine spațiu;
- * caracterele de lățime zero și cratima moale dispar; spațiile multiple devin
- * unul; fără spații la capete.
+ * Caracterele de lățime zero și cratima moale dispar (întâi, ca să nu rămână
+ * după NFC un semn diacritic separat); NFC; ş ţ Ş Ţ (sedilă) → ș ț Ș Ț (virgulă);
+ * spațiul nerupt devine spațiu; spațiile multiple devin unul; fără spații la capete.
  */
 export function normalizeVerseText(text: string): string {
   return text
+    .replace(/[​-‍⁠﻿­]/g, '')
     .normalize('NFC')
     .replace(CEDILLA_RE, c => CEDILLA[c])
     .replace(/[   ]/g, ' ')
-    .replace(/[​-‍⁠﻿­]/g, '')
     .replace(/[ \t\r\n\f\v]+/g, ' ')
     .trim()
 }

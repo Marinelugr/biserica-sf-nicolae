@@ -5,11 +5,12 @@
  *   --apply                       scrie
  *   --allow-remote --yes-host=<gazda exactă>   obligatorii pentru o bază care nu e pe localhost
  *   --only=<slug,slug>            doar aceste cărți
- *   --replace-book=<slug>         șterge și reimportă o carte care există deja
+ *   --replace-book=<slug>         șterge și reimportă o carte care există deja (refuză dacă are modificări din Admin)
+ *   --force-overwrite-edits       permite --replace-book peste modificările din Admin (după export în bible-data/)
  *   --offline                     doar planul, fără conexiune (ca și cum baza ar fi goală)
  * Rulează validatorul întâi și refuză dacă sunt probleme blocante.
  */
-import { applyPlan, checkWriteAllowed, existingChapters, planImport, type ImportPlan } from '../../src/lib/bible/importer'
+import { applyPlan, checkWriteAllowed, existingChapters, planImport, replaceRefusal, type ImportPlan } from '../../src/lib/bible/importer'
 import { formatIssue } from '../../src/lib/bible/validate'
 import { args } from './_shared'
 import { runValidation } from './validate'
@@ -26,6 +27,7 @@ async function main() {
   const a = args()
   const only = typeof a.get('only') === 'string' ? String(a.get('only')).split(',').map(s => s.trim()).filter(Boolean) : undefined
   const replaceBook = typeof a.get('replace-book') === 'string' ? String(a.get('replace-book')) : undefined
+  const forceOverwriteEdits = a.has('force-overwrite-edits')
 
   const { books, result } = runValidation()
   if (!books.length) { console.error('Nu există date în bible-data/. Rulează întâi: npm run bible:extract'); process.exit(2) }
@@ -49,12 +51,16 @@ async function main() {
     printDb(host, source, await describeDb(prisma))
     const plan = planImport(books, await existingChapters(db), { only, replaceBook })
     printPlan(plan)
+    if (replaceBook) {
+      const refusal = await replaceRefusal(db, replaceBook, forceOverwriteEdits)
+      if (refusal) { console.error(refusal); process.exitCode = 1; return }
+    }
     if (!a.has('apply')) { console.log('\nDRY-RUN: nimic nu s-a scris. Pentru scriere adaugă --apply.'); return }
 
     const guard = checkWriteAllowed(host, { allowRemote: a.has('allow-remote'), yesHost: typeof a.get('yes-host') === 'string' ? String(a.get('yes-host')) : undefined })
     if (!guard.ok) { console.error(guard.reason); process.exitCode = 1; return }
 
-    const errors = await applyPlan(db, books, plan, line => console.log('  ' + line))
+    const errors = await applyPlan(db, books, plan, line => console.log('  ' + line), undefined, { forceOverwriteEdits })
     if (errors.length) { for (const e of errors) console.error('EROARE: ' + e); process.exitCode = 1; return }
     printDb(host, source, await describeDb(prisma))
     console.log('Import încheiat și verificat (capitole și versete = JSON).')

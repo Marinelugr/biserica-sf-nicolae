@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { applyPlan, checkWriteAllowed, existingChapters, hostOf, isLocalHost, planImport, wipeBible, type BibleDb, type BibleTx } from './importer'
+import { applyPlan, checkWriteAllowed, EDITS_REFUSAL, replaceRefusal, existingChapters, hostOf, isLocalHost, planImport, wipeBible, type BibleDb, type BibleTx } from './importer'
 import { syntheticBible } from './synthetic'
 import { normalizeForSearch } from './search'
 
@@ -10,7 +10,7 @@ interface Store {
 }
 
 /** Client fals: aceeași formă ca Prisma pentru ce folosește importatorul; tranzacția se anulează la eroare. */
-function fakeDb(opts: { failOnVerseBatch?: number } = {}) {
+function fakeDb(opts: { failOnVerseBatch?: number; edits?: Record<string, number> } = {}) {
   let store: Store = { books: [], chapters: [], verses: [] }
   let seq = 0
   const writes = { count: 0 }
@@ -45,6 +45,7 @@ function fakeDb(opts: { failOnVerseBatch?: number } = {}) {
       deleteMany: async (a) => { writes.count++; const before = store.verses.length; store.verses = a?.where?.chapter ? store.verses.filter(v => bookOf(v.chapterId) !== a.where!.chapter!.bookId) : []; return { count: before - store.verses.length } },
       count: async ({ where }) => store.verses.filter(v => slugOf(bookOf(v.chapterId)) === where.chapter.book.slug).length,
     },
+    bibleEdit: { count: async ({ where }) => opts.edits?.[where.bookSlug] ?? 0 },
   }
   const db: BibleDb = {
     ...tx,
@@ -133,5 +134,28 @@ describe('plan și aplicare', () => {
     const r = await wipeBible(f.db)
     expect(r.books).toBe(3)
     expect(f.store()).toEqual({ books: [], chapters: [], verses: [] })
+  })
+})
+
+describe('--replace-book și modificările din Admin', () => {
+  const iona = books.filter(b => b.slug === 'iona')
+  const replacePlan = planImport(iona, new Map([['iona', 1]]), { replaceBook: 'iona' })
+
+  it('refuză cu mesajul cerut și nu scrie nimic', async () => {
+    const f = fakeDb({ edits: { iona: 2 } })
+    expect(await applyPlan(f.db, iona, replacePlan)).toEqual([`iona: ${EDITS_REFUSAL}`])
+    expect(f.writes.count).toBe(0)
+    expect(EDITS_REFUSAL).toBe('Cartea are modificări făcute în Admin; exportă-le în bible-data/ și rulează cu `--force-overwrite-edits`.')
+  })
+  it('cu --force-overwrite-edits înlocuiește', async () => {
+    const f = fakeDb({ edits: { iona: 2 } })
+    expect(await applyPlan(f.db, iona, replacePlan, undefined, undefined, { forceOverwriteEdits: true })).toEqual([])
+    expect(f.store().books.map(b => b.slug)).toEqual(['iona'])
+  })
+  it('modificările altei cărți nu blochează; fără jurnal merge ca înainte', async () => {
+    const f = fakeDb({ edits: { iuda: 5 } })
+    expect(await replaceRefusal(f.db, 'iona')).toBeNull()
+    expect(await replaceRefusal(f.db, 'iuda')).toBe(EDITS_REFUSAL)
+    expect(await applyPlan(f.db, iona, replacePlan)).toEqual([])
   })
 })
