@@ -1,62 +1,118 @@
 /**
- * Metadata pentru paginile publice ale Bibliei. Next combină metadata superficial:
- * fără `openGraph` propriu, pagina moștenește din layout `og:url` = prima pagină.
- * Descrierile sunt generice: textul biblic nu se copiază în meta.
+ * Metadata și imaginile Open Graph ale paginilor publice ale Bibliei. Next combină
+ * metadata superficial: fără `openGraph` propriu, pagina moștenește din layout
+ * `og:url` = prima pagină. Textul biblic nu se copiază în meta sau în imagini.
  */
 import type { Metadata } from 'next'
 import type { Translations } from '../i18n/ro'
 import type { Locale } from '../i18n/pick'
 import { buildAlternates } from '../i18n/alternates'
 import { localizedHref } from '../i18n/href'
-import { OG_IMAGE, OG_LOCALE } from '../openGraph'
+import { OG_LOCALE } from '../openGraph'
 import { SITE_URL } from '../site'
-import { bookLabel, type BibleBookInfo } from './books'
+import { getBook, type BibleBookInfo } from './books'
+import { bookShortName } from './shortNames'
+
+const MAX_TITLE = 65
+/** Psalmii au 151 de capitole: cel mai mare număr din canon. */
+const MAX_CHAPTER = 151
+export const OG_SIZE = { width: 1200, height: 630 }
 
 const COPY: Record<Locale, {
-  indexTitle: string
+  /** „Sfânta Scriptură" + „(Biblia)": titlul se scurtează prin renunțarea la paranteză. */
+  scripture: string
+  bible: string
   indexDescription: string
-  suffix: string
   bookDescription: (name: string) => string
   chapterDescription: (name: string, n: number) => string
+  imageAlt: string
 }> = {
   ro: {
-    indexTitle: 'Biblia — text în limba română',
-    indexDescription: 'Citește Biblia în limba română: Vechiul și Noul Testament, pe cărți și capitole.',
-    suffix: 'Biblia',
+    scripture: 'Sfânta Scriptură',
+    bible: '(Biblia)',
+    indexDescription: 'Sfânta Scriptură în limba română: Vechiul și Noul Testament, pe cărți și capitole.',
     bookDescription: name => `Citește ${name} în limba română, capitol cu capitol.`,
     chapterDescription: (name, n) => `Citește ${name}, capitolul ${n}, în limba română.`,
+    imageAlt: 'Emblema parohiei, pe fundal bleumarin, și titlul',
   },
   en: {
-    indexTitle: 'The Bible — text in Romanian',
-    indexDescription: 'Read the Bible in Romanian: the Old and New Testament, by book and chapter.',
-    suffix: 'The Bible',
-    bookDescription: name => `Read ${name} in Romanian, chapter by chapter.`,
-    chapterDescription: (name, n) => `Read ${name}, chapter ${n}, in Romanian.`,
+    scripture: 'Holy Scripture',
+    bible: '(the Bible)',
+    indexDescription: 'The Holy Scripture, with the text in Romanian: the Old and New Testament, by book and chapter.',
+    bookDescription: name => `Read ${name}, chapter by chapter. The text is in Romanian.`,
+    chapterDescription: (name, n) => `Read ${name}, chapter ${n}. The text is in Romanian.`,
+    imageAlt: 'The parish emblem on a dark blue background, with the title',
   },
   ru: {
-    indexTitle: 'Библия — текст на румынском языке',
-    indexDescription: 'Читайте Библию на румынском языке: Ветхий и Новый Завет, по книгам и главам.',
-    suffix: 'Библия',
-    bookDescription: name => `Читайте: ${name}, на румынском языке, глава за главой.`,
-    chapterDescription: (name, n) => `Читайте: ${name}, глава ${n}, на румынском языке.`,
+    scripture: 'Священное Писание',
+    bible: '(Библия)',
+    indexDescription: 'Священное Писание, текст на румынском языке: Ветхий и Новый Завет, по книгам и главам.',
+    bookDescription: name => `Читайте: ${name}, глава за главой. Текст на румынском языке.`,
+    chapterDescription: (name, n) => `Читайте: ${name}, глава ${n}. Текст на румынском языке.`,
+    imageAlt: 'Эмблема прихода на тёмно-синем фоне и заголовок',
   },
 }
 
-/** În română, numele scurt folosit deja la referințe („Ioan", nu „Sfânta Evanghelie după Ioan"). */
-function bookName(book: BibleBookInfo, locale: Locale): string {
-  return locale === 'ro' ? book.aliases[0] : bookLabel(book, locale)
+/** „Ioan 3" sau „Ioan"; null pe pagina /biblie. */
+function reference(locale: Locale, book?: BibleBookInfo, chapter?: number): string | null {
+  if (!book) return null
+  const name = bookShortName(book, locale)
+  return chapter ? `${name} ${chapter}` : name
+}
+
+export function bibleTitle(locale: Locale, book?: BibleBookInfo, chapter?: number): string {
+  const { scripture, bible } = COPY[locale]
+  const full = `${scripture} ${bible}`
+  const ref = reference(locale, book, chapter)
+  if (!ref) return full
+  const title = `${ref} — ${full}`
+  return title.length <= MAX_TITLE ? title : `${ref} — ${scripture}`
+}
+
+/** Textele de pe imagine. */
+export function bibleOgText(locale: Locale, book?: BibleBookInfo, chapter?: number) {
+  const { scripture, bible } = COPY[locale]
+  return { scripture, bible, reference: reference(locale, book, chapter) }
+}
+
+/**
+ * Limba stă în URL, nu în cookie: Facebook cere imaginea fără cookie-uri. Cu `.png`
+ * la sfârșit, cererea ocolește src/proxy.ts (care ar seta cookie-ul de limbă).
+ */
+export function bibleOgImagePath(locale: Locale, book?: BibleBookInfo, chapter?: number): string {
+  return `/og/biblie/${[locale, book?.slug, chapter].filter(Boolean).join('/')}.png`
+}
+
+/** Inversul lui bibleOgImagePath; null = URL necunoscut (404). */
+export function parseBibleOgParts(parts: string[]): { locale: Locale; book?: BibleBookInfo; chapter?: number } | null {
+  if (parts.length < 1 || parts.length > 3) return null
+  const last = parts[parts.length - 1]
+  if (!last.endsWith('.png')) return null
+  const [rawLocale, slug, rawChapter] = [...parts.slice(0, -1), last.slice(0, -'.png'.length)]
+  if (rawLocale !== 'ro' && rawLocale !== 'ru' && rawLocale !== 'en') return null
+  const locale: Locale = rawLocale
+  if (slug === undefined) return { locale }
+  const book = getBook(slug)
+  if (!book) return null
+  if (rawChapter === undefined) return { locale, book }
+  if (!/^[1-9]\d{0,2}$/.test(rawChapter)) return null
+  const chapter = Number(rawChapter)
+  return chapter <= MAX_CHAPTER ? { locale, book, chapter } : null
 }
 
 interface PageSeo {
+  book?: BibleBookInfo
+  chapter?: number
   path: string
-  title: string
   description: string
   ogType: 'website' | 'article'
   robots?: Metadata['robots']
 }
 
-function bibleMetadata({ path, title, description, ogType, robots }: PageSeo, t: Translations, locale: Locale): Metadata {
+function bibleMetadata({ book, chapter, path, description, ogType, robots }: PageSeo, t: Translations, locale: Locale): Metadata {
   const canonical = `${SITE_URL}${localizedHref(path, locale)}`
+  const title = bibleTitle(locale, book, chapter)
+  const image = `${SITE_URL}${bibleOgImagePath(locale, book, chapter)}`
   return {
     title: { absolute: title },
     description,
@@ -68,19 +124,18 @@ function bibleMetadata({ path, title, description, ogType, robots }: PageSeo, t:
       type: ogType,
       locale: OG_LOCALE[locale],
       siteName: t.meta.site.twitterTitle,
-      images: [{ ...OG_IMAGE, alt: t.meta.site.ogTitle }],
+      images: [{ url: image, ...OG_SIZE, type: 'image/png', alt: `${COPY[locale].imageAlt}: ${title}` }],
     },
+    twitter: { card: 'summary_large_image', title, description, images: [image] },
     ...(robots ? { robots } : {}),
   }
 }
 
 /** /biblie; rezultatele căutării nu se indexează, dar linkurile lor se urmează. */
 export function bibleIndexMetadata(t: Translations, locale: Locale, isSearch: boolean): Metadata {
-  const c = COPY[locale]
   return bibleMetadata({
     path: '/biblie',
-    title: c.indexTitle,
-    description: c.indexDescription,
+    description: COPY[locale].indexDescription,
     ogType: 'website',
     robots: isSearch ? { index: false, follow: true } : undefined,
   }, t, locale)
@@ -88,12 +143,10 @@ export function bibleIndexMetadata(t: Translations, locale: Locale, isSearch: bo
 
 /** /biblie/[carte]; fără text încă: pagina există, dar nu se indexează. */
 export function bibleBookMetadata(book: BibleBookInfo, t: Translations, locale: Locale, hasText: boolean): Metadata {
-  const c = COPY[locale]
-  const name = bookName(book, locale)
   return bibleMetadata({
+    book,
     path: `/biblie/${book.slug}`,
-    title: `${name} — ${c.suffix}`,
-    description: c.bookDescription(name),
+    description: COPY[locale].bookDescription(bookShortName(book, locale)),
     ogType: 'website',
     robots: hasText ? undefined : { index: false, follow: true },
   }, t, locale)
@@ -101,12 +154,11 @@ export function bibleBookMetadata(book: BibleBookInfo, t: Translations, locale: 
 
 /** /biblie/[carte]/[capitol]; fără text încă: pagina există, dar nu se indexează. */
 export function bibleChapterMetadata(book: BibleBookInfo, chapter: number, t: Translations, locale: Locale, hasText: boolean): Metadata {
-  const c = COPY[locale]
-  const name = bookName(book, locale)
   return bibleMetadata({
+    book,
+    chapter,
     path: `/biblie/${book.slug}/${chapter}`,
-    title: `${name} ${chapter} — ${c.suffix}`,
-    description: c.chapterDescription(name, chapter),
+    description: COPY[locale].chapterDescription(bookShortName(book, locale), chapter),
     ogType: 'article',
     robots: hasText ? undefined : { index: false, follow: true },
   }, t, locale)

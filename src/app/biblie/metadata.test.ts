@@ -2,8 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ro from '@/lib/i18n/ro'
 import ru from '@/lib/i18n/ru'
 import en from '@/lib/i18n/en'
-import { BIBLE_BOOKS } from '@/lib/bible/books'
-import { bibleChapterMetadata } from '@/lib/bible/seo'
+import { BIBLE_BOOKS, getBook } from '@/lib/bible/books'
+import { bibleChapterMetadata, bibleOgImagePath, bibleTitle, parseBibleOgParts } from '@/lib/bible/seo'
+import { bookShortName } from '@/lib/bible/shortNames'
 import { SITE_URL } from '@/lib/site'
 
 type L = 'ro' | 'ru' | 'en'
@@ -43,9 +44,9 @@ beforeEach(() => {
 
 describe('capitol', () => {
   it.each([
-    ['ioan', '3', 'Ioan 3 — Biblia', 'Citește Ioan, capitolul 3, în limba română.'],
-    ['psalmi', '50', 'Psalmii 50 — Biblia', 'Citește Psalmii, capitolul 50, în limba română.'],
-    ['1-corinteni', '13', '1 Corinteni 13 — Biblia', 'Citește 1 Corinteni, capitolul 13, în limba română.'],
+    ['ioan', '3', 'Ioan 3 — Sfânta Scriptură (Biblia)', 'Citește Ioan, capitolul 3, în limba română.'],
+    ['psalmi', '50', 'Psalmii 50 — Sfânta Scriptură (Biblia)', 'Citește Psalmii, capitolul 50, în limba română.'],
+    ['1-corinteni', '13', '1 Corinteni 13 — Sfânta Scriptură (Biblia)', 'Citește 1 Corinteni, capitolul 13, în limba română.'],
   ])('%s/%s: titlu, descriere, canonical și og:url proprii', async (carte, capitol, title, description) => {
     const m = await chapterMeta(carte, capitol)
     const url = `${SITE_URL}/biblie/${carte}/${capitol}`
@@ -83,7 +84,7 @@ describe('capitol', () => {
     for (const b of BIBLE_BOOKS) {
       const m = bibleChapterMetadata(b, 1, ro, 'ro', true)
       expect(b.aliases[0]).toBeTruthy()
-      expect(titleOf(m)).toBe(`${b.aliases[0]} 1 — Biblia`)
+      expect(titleOf(m)).toBe(`${b.aliases[0]} 1 — Sfânta Scriptură (Biblia)`)
       expect(m.alternates?.canonical).toBe(`${SITE_URL}/biblie/${b.slug}/1`)
     }
   })
@@ -92,7 +93,7 @@ describe('capitol', () => {
 describe('carte', () => {
   it('/biblie/ioan: titlu și canonical proprii', async () => {
     const m = await (await book()).generateMetadata({ params: Promise.resolve({ carte: 'ioan' }) })
-    expect(titleOf(m)).toBe('Ioan — Biblia')
+    expect(titleOf(m)).toBe('Ioan — Sfânta Scriptură (Biblia)')
     expect(m.alternates?.canonical).toBe(`${SITE_URL}/biblie/ioan`)
     expect(og(m).url).toBe(`${SITE_URL}/biblie/ioan`)
     expect(og(m).type).toBe('website')
@@ -102,7 +103,8 @@ describe('carte', () => {
 describe('index și căutare', () => {
   it('/biblie: titlu, canonical, Open Graph și imaginea implicită', async () => {
     const m = await indexMeta()
-    expect(titleOf(m)).toBe('Biblia — text în limba română')
+    expect(titleOf(m)).toBe('Sfânta Scriptură (Biblia)')
+    expect(m.description).toBe('Sfânta Scriptură în limba română: Vechiul și Noul Testament, pe cărți și capitole.')
     expect(m.alternates?.canonical).toBe(`${SITE_URL}/biblie`)
     expect(og(m).url).toBe(`${SITE_URL}/biblie`)
     expect(og(m).type).toBe('website')
@@ -141,5 +143,71 @@ describe('limbi', () => {
       'x-default': `${SITE_URL}/biblie/ioan/3`,
     })
     expect((await indexMeta('dumnezeu')).alternates?.canonical).toBe(indexUrl)
+  })
+})
+
+describe('titluri: limite și traduceri', () => {
+  const locales: L[] = ['ro', 'en', 'ru']
+
+  it.each([
+    ['ro', 'Sfânta Scriptură (Biblia)', 'Ioan 3 — Sfânta Scriptură (Biblia)'],
+    ['en', 'Holy Scripture (the Bible)', 'John 3 — Holy Scripture (the Bible)'],
+    ['ru', 'Священное Писание (Библия)', 'От Иоанна 3 — Священное Писание (Библия)'],
+  ])('%s', (locale, index, chapter) => {
+    expect(bibleTitle(locale as L)).toBe(index)
+    expect(bibleTitle(locale as L, getBook('ioan'), 3)).toBe(chapter)
+  })
+
+  it.each([
+    ['1-corinteni', 16, '1 Corinteni 16 — Sfânta Scriptură (Biblia)'],
+    ['cantarea-cantarilor', 8, 'Cântarea Cântărilor 8 — Sfânta Scriptură (Biblia)'],
+    ['faptele-apostolilor', 28, 'Faptele Apostolilor 28 — Sfânta Scriptură (Biblia)'],
+  ])('nume lung, în română: %s', (slug, chapter, title) => {
+    expect(bibleTitle('ro', getBook(slug), chapter)).toBe(title)
+  })
+
+  it('peste 65 de caractere, paranteza dispare', () => {
+    const long = { ...getBook('ioan')!, aliases: ['Un nume de carte foarte lung, de probă'] }
+    expect(bibleTitle('ro', long, 3)).toBe('Un nume de carte foarte lung, de probă 3 — Sfânta Scriptură')
+  })
+
+  it('toate cărțile, în toate limbile: ≤ 70 de caractere, nume scurt, og:title fără sufix', () => {
+    for (const locale of locales) for (const b of BIBLE_BOOKS) {
+      expect(bookShortName(b, locale)).toBeTruthy()
+      for (const chapter of [undefined, 151]) {
+        expect(bibleTitle(locale, b, chapter).length).toBeLessThanOrEqual(70)
+      }
+      const m = bibleChapterMetadata(b, 151, dicts[locale], locale, true)
+      expect(og(m).title).toBe(bibleTitle(locale, b, 151))
+      expect(og(m).title).not.toContain('|')
+    }
+  })
+})
+
+describe('imaginea Open Graph', () => {
+  const ioan = getBook('ioan')!
+
+  it('URL absolut, dimensiuni, alt și twitter:card, în limba paginii', async () => {
+    env.locale = 'en'
+    const m = await chapterMeta('ioan', '3')
+    const image = (m.openGraph as { images: Record<string, unknown>[] }).images[0]
+    const url = `${SITE_URL}/og/biblie/en/ioan/3.png`
+    expect(image).toMatchObject({ url, width: 1200, height: 630, type: 'image/png' })
+    expect(image.alt).toContain('John 3')
+    expect(m.twitter).toMatchObject({ card: 'summary_large_image', images: [url] })
+  })
+
+  it('calea se poate citi înapoi', () => {
+    for (const [locale, book, chapter] of [['ro'], ['ru', ioan], ['en', ioan, 3]] as [L, typeof ioan?, number?][]) {
+      const parts = bibleOgImagePath(locale, book, chapter).split('/').slice(3)
+      expect(parseBibleOgParts(parts)).toEqual({ locale, ...(book ? { book } : {}), ...(chapter ? { chapter } : {}) })
+    }
+  })
+
+  it.each([
+    [['fr.png']], [['ro']], [['ro', 'nu-exista.png']], [['ro', 'ioan', '0.png']],
+    [['ro', 'ioan', '03.png']], [['ro', 'ioan', '152.png']], [['ro', 'ioan', '3', 'x.png']], [[]],
+  ])('URL necunoscut: %j', parts => {
+    expect(parseBibleOgParts(parts)).toBeNull()
   })
 })
