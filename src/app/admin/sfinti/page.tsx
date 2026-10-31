@@ -81,6 +81,7 @@ export default function AdminSfintiPage() {
     setLoading(false)
   }, [])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- tipar existent, comportament neschimbat
   useEffect(() => { fetchSaints() }, [fetchSaints])
 
   function openNew() {

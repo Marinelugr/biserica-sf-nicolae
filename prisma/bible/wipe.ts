@@ -18,6 +18,9 @@ async function main() {
     if (!a.has('apply')) { console.log('DRY-RUN: nimic nu s-a șters. Pentru ștergere: --apply'); return }
     const guard = checkWriteAllowed(host, { allowRemote: a.has('allow-remote'), yesHost: typeof a.get('yes-host') === 'string' ? String(a.get('yes-host')) : undefined })
     if (!guard.ok) { console.error(guard.reason); process.exitCode = 1; return }
+    // .catch: rollback-ul trebuie să meargă și dacă schema Adminului nu e aplicată
+    const edits = await prisma.bibleEdit.count().catch(() => 0)
+    if (edits) console.log(`ATENȚIE: ${edits} rânduri în jurnalul Adminului — modificările dispar din text dacă nu sunt exportate; jurnalul rămâne.`)
     const rl = readline.createInterface({ input: process.stdin, output: process.stdout })
     const typed = (await rl.question(`Se șterge TOATĂ Biblia din baza de pe ${host}. Tastează „${CONFIRM_TEXT}" ca să continui: `)).trim()
     rl.close()

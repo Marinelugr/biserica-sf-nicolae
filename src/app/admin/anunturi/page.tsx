@@ -90,6 +90,7 @@ export default function AdminAnunturiPage() {
     }
   }, [showToast])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- tipar existent, comportament neschimbat
   useEffect(() => { fetchAnunturi() }, [fetchAnunturi])
 
   function openNew() {

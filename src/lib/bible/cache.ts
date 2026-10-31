@@ -17,6 +17,10 @@ export class TtlCache<V> {
     while (this.map.size > this.max) this.map.delete(this.map.keys().next().value as string)
   }
 
+  delete(key: string): void { this.map.delete(key) }
+
+  clear(): void { this.map.clear() }
+
   get size(): number { return this.map.size }
 
   /** Valoarea din cache sau `load()`; erorile NU se păstrează în cache. */

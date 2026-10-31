@@ -36,7 +36,8 @@ npm run bible:verify-live # după deploy: ≤ 130 de capitole de pe https://pari
 ```
 
 Opțiuni comune: `--source=<folder>`, `--data=<folder>` (pentru teste cu date de probă). `bible:import`:
-`--only=<slug,slug>`, `--replace-book=<slug>` (șterge și reimportă o carte), `--offline` (plan fără conexiune).
+`--only=<slug,slug>`, `--replace-book=<slug>` (șterge și reimportă o carte), `--force-overwrite-edits`, `--offline`
+(plan fără conexiune).
 `bible:extract`: `--verse-style=paragraph|inline|bracket`, `--bare-number-chapters`, `--force`.
 
 Importul citește `DIRECT_URL` (sesiune, nu pooler) sau `DATABASE_URL` prin `dotenv` și afișează **doar numele
@@ -45,10 +46,19 @@ Pe carte, într-o tranzacție (timeout 5 min): cartea (din `books.ts`), capitole
 `textSearch`; apoi verifică numerele din bază = JSON. O eroare anulează cartea respectivă și oprește importul.
 Cărțile care au deja capitole sunt omise (importul se poate rula din nou fără dubluri).
 
+### Protecția modificărilor din Admin
+
+`--replace-book=<slug>` **refuză**, și la dry-run, dacă în `BibleEdit` există rânduri pentru acea carte:
+„Cartea are modificări făcute în Admin; exportă-le în bible-data/ și rulează cu `--force-overwrite-edits`.”
+
+Ordinea corectă: descarci `/admin/biblia/export/<slug>`, pui fișierul în `bible-data/<slug>.json`, rulezi
+`bible:validate`, apoi importul cu `--force-overwrite-edits`. Reimportul șterge și bifele „Revizuit”. Jurnalul rămâne
+(legătura lui cu versetul devine NULL), deci orice reimport ulterior al cărții cere din nou flagul. `bible:wipe`
+afișează câte rânduri are jurnalul înainte de confirmare. Detalii: `docs/BIBLIA-ADMIN.md`.
+
 ## Normalizare (`normalizeVerseText`)
 
-NFC; ş ţ Ş Ţ (sedilă) → ș ț Ș Ț (virgulă); spațiu nerupt → spațiu; caractere de lățime zero și cratima moale
-scoase; spații multiple → unul; fără spații la capete. **Ortografia nu se schimbă** („sînt”/„sunt”, „î”/„â” rămân
+Caractere de lățime zero și cratima moale scoase (întâi); NFC; ş ţ Ş Ţ (sedilă) → ș ț Ș Ț (virgulă); spațiu nerupt → spațiu; spații multiple → unul; fără spații la capete. **Ortografia nu se schimbă** („sînt”/„sunt”, „î”/„â” rămân
 ca în sursă). Raportul de extragere numără sedilele transformate și ortografia găsită (sînt/cînd/pămînt față de
 sunt/când/pământ, „â” față de „î” în interiorul cuvintelor) — modernizarea ar fi altă decizie, alt PR.
 
@@ -121,6 +131,7 @@ Căutarea folosește `LIKE '%cuvânt%'` pe `textSearch` cu `LIMIT 25` (~35 000 d
   „Versete” (toate cuvintele, fără diacritice, 25 pe pagină, evidențiate, `nofollow`, `noindex`).
 - Sitemap: toate capitolele existente în bază (tabele goale → nicio intrare).
 - Cache în memorie: 1 h, 300 de intrări; rezultatele goale nu se păstrează (o carte importată apare imediat).
+  O scriere din Admin îl golește imediat în procesul curent și în cel mult 5 secunde în celelalte (`docs/BIBLIA-ADMIN.md`).
 - Galeria `/dev/biblia` (și `/dev/biblia/1..3`): doar în dezvoltare, doar text de probă; 404 în producție.
 
 Reparat pe drum: `CookieNotice` și `I18nProvider` accesau `localStorage` fără `try/catch` — cu datele de site

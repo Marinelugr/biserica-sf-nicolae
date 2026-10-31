@@ -109,11 +109,14 @@ export default function AdminVideoPage() {
     setLoading(false)
   }, [selectedCat])
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- tipar existent, comportament neschimbat
   useEffect(() => { fetchCategories() }, [fetchCategories])
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- tipar existent, comportament neschimbat
   useEffect(() => { setLoading(true); fetchVideos() }, [fetchVideos])
 
   // Parse URL as user types
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- tipar existent, comportament neschimbat
     setUrlParsed(form.url ? parseVideoUrl(form.url) : null)
   }, [form.url])
 
@@ -328,7 +331,7 @@ export default function AdminVideoPage() {
               ) : videos.length === 0 ? (
                 <div style={{ padding: '4rem', textAlign: 'center', color: '#5A4020', fontFamily: 'Georgia, serif' }}>
                   <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎬</div>
-                  <p>Niciun video. Apasă "Video nou" pentru a adăuga primul.</p>
+                  <p>Niciun video. Apasă &quot;Video nou&quot; pentru a adăuga primul.</p>
                 </div>
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '1rem' }}>
