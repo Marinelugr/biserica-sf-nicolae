@@ -44,6 +44,9 @@ const en: Translations = {
       versesTitle: 'Verses', versesFound: '{n} verses found', noVerseResults: 'No verse contains all of these words.',
       prevPage: '← Previous page', nextPage: 'Next page →', pageLabel: 'Page {n} of {total}',
       langNote: 'The text of the Bible is in Romanian.', metaSuffix: 'Orthodox Bible',
+      continueTitle: 'Continue reading', continueReading: 'Continue reading: {book} {chapter}, verse {verse}',
+      recentlyRead: 'Recently read', clearHistory: 'Clear history',
+      positionLocalNote: 'Your reading position is kept only in this browser.',
     },
   },
   calendar: {

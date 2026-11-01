@@ -44,6 +44,9 @@ const ru: Translations = {
       versesTitle: 'Стихи', versesFound: 'Найдено стихов: {n}', noVerseResults: 'Ни один стих не содержит все эти слова.',
       prevPage: '← Предыдущая страница', nextPage: 'Следующая страница →', pageLabel: 'Страница {n} из {total}',
       langNote: 'Текст Библии — на румынском языке.', metaSuffix: 'Православная Библия',
+      continueTitle: 'Продолжить чтение', continueReading: 'Продолжить чтение: {book} {chapter}, стих {verse}',
+      recentlyRead: 'Недавно прочитанное', clearHistory: 'Очистить историю',
+      positionLocalNote: 'Место чтения сохраняется только в этом браузере.',
     },
   },
   calendar: {

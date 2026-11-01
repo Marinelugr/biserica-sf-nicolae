@@ -12,6 +12,7 @@ import { getChapterCount, searchVerses, SEARCH_PAGE_SIZE } from '@/lib/bible/que
 import { fill } from '@/lib/bible/viewModel'
 import { localizedHref } from '@/lib/i18n/href'
 import VerseResults, { type VerseResultItem } from '@/components/bible/VerseResults'
+import ContinueReading from '@/components/bible/ContinueReading'
 
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
@@ -107,6 +108,8 @@ export default async function BibliePage({ searchParams }: { searchParams: Searc
           </p>
         )}
       </PageHead>
+
+      {!query && <ContinueReading />}
 
       {verseSearch && verseSearch.total > 0 && (
         <VerseResults

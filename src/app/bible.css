@@ -25,6 +25,12 @@
 
 .verse { display: block; padding: 3px 8px; margin: 0 -8px 4px; border-radius: 4px; scroll-margin-top: calc(var(--header-h) + 20px); }
 .verse:target { background: color-mix(in srgb, var(--sec-accent) 10%, transparent); box-shadow: inset 3px 0 0 var(--sec-accent); }
+/* versetul de reluare: evidențiat 2 s, apoi și :target se stinge */
+.verse[data-resume="on"] { background: color-mix(in srgb, var(--sec-accent) 10%, transparent); box-shadow: inset 3px 0 0 var(--sec-accent); }
+.verse[data-resume="off"]:target { background: transparent; box-shadow: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .verse[data-resume] { transition: background-color .4s ease, box-shadow .4s ease; }
+}
 /* numărul vine din data-n (::before): nu intră niciodată în textul copiat */
 .vnum { user-select: none; -webkit-user-select: none; font-size: 0.6em; font-weight: 600; color: var(--sec-accent-text); margin-right: 0.35em; vertical-align: super; line-height: 0; }
 .vnum::before { content: attr(data-n); }
@@ -53,6 +59,14 @@
 .chapter-picker .chapter-cell[aria-current="page"] { background: var(--gold); border-color: var(--gold); color: var(--bg); }
 
 .page-head nav a, .page-head nav [aria-current] { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* „Continuă lectura" pe /biblie */
+.continue-card { display: flex; flex-direction: column; gap: 14px; padding: 20px 24px; }
+.continue-link { width: 100%; min-height: 48px; white-space: normal; text-align: center; }
+.continue-recent ul { display: flex; flex-wrap: wrap; gap: 0 18px; margin-top: 2px; }
+.continue-recent a { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--serif); font-size: 19px; text-decoration: underline; text-underline-offset: 3px; }
+.continue-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.continue-foot p { flex: 1 1 220px; }
 
 .verse-hits { display: flex; flex-direction: column; }
 .verse-hits li { padding: 14px 0; display: flex; flex-direction: column; gap: 4px; }
