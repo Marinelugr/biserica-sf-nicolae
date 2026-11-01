@@ -30,6 +30,7 @@ export interface Translations {
       versesTitle: string; versesFound: string; noVerseResults: string
       prevPage: string; nextPage: string; pageLabel: string
       langNote: string; metaSuffix: string
+      continueTitle: string; continueReading: string; recentlyRead: string; clearHistory: string; positionLocalNote: string
     }
   }
   calendar: {
@@ -238,6 +239,9 @@ const ro: Translations = {
       versesTitle: 'Versete', versesFound: '{n} versete găsite', noVerseResults: 'Niciun verset nu conține toate aceste cuvinte.',
       prevPage: '← Pagina anterioară', nextPage: 'Pagina următoare →', pageLabel: 'Pagina {n} din {total}',
       langNote: 'Textul Bibliei este în limba română.', metaSuffix: 'Biblia Ortodoxă',
+      continueTitle: 'Continuă lectura', continueReading: 'Continuă lectura: {book} {chapter}, versetul {verse}',
+      recentlyRead: 'Citite recent', clearHistory: 'Șterge istoricul',
+      positionLocalNote: 'Poziția de lectură se păstrează doar în acest browser.',
     },
   },
   calendar: {
