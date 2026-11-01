@@ -62,6 +62,9 @@ const ru: Translations = {
         errorLimit: 'Вы отправили много сообщений за последний час. Попробуйте позже.',
         errorUnavailable: 'Сейчас мы не можем принимать сообщения.',
       },
+      continueTitle: 'Продолжить чтение', continueReading: 'Продолжить чтение: {book} {chapter}, стих {verse}',
+      recentlyRead: 'Недавно прочитанное', clearHistory: 'Очистить историю',
+      positionLocalNote: 'Место чтения сохраняется только в этом браузере.',
     },
   },
   calendar: {

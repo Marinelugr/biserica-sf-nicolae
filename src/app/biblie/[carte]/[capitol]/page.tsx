@@ -11,6 +11,7 @@ import { bibleCrumbs, bookMeta, chapterLabels } from '@/lib/bible/viewModel'
 import PageShell from '@/components/shell/PageShell'
 import BookView from '@/components/bible/BookView'
 import ChapterView from '@/components/bible/ChapterView'
+import ReadingTracker from '@/components/bible/ReadingTracker'
 
 export const dynamic = 'force-dynamic'
 
@@ -79,6 +80,7 @@ export default async function BibleChapterPage({ params }: { params: Params }) {
         reportSlug={book.slug}
         labels={chapterLabels(t)}
       />
+      <ReadingTracker carte={book.slug} capitol={n} />
     </PageShell>
   )
 }

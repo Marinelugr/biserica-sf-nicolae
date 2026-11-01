@@ -62,6 +62,9 @@ const en: Translations = {
         errorLimit: 'You have sent many reports in the last hour. Please try again later.',
         errorUnavailable: 'We cannot receive reports at the moment.',
       },
+      continueTitle: 'Continue reading', continueReading: 'Continue reading: {book} {chapter}, verse {verse}',
+      recentlyRead: 'Recently read', clearHistory: 'Clear history',
+      positionLocalNote: 'Your reading position is kept only in this browser.',
     },
   },
   calendar: {

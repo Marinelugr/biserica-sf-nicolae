@@ -31,6 +31,7 @@ export interface Translations {
       prevPage: string; nextPage: string; pageLabel: string
       langNote: string; metaSuffix: string
       report: { note: string; noteClose: string; action: string; verseLabel: string; title: string; question: string; submit: string; sending: string; cancel: string; close: string; thanks: string; errorInvalid: string; errorTooLong: string; errorUrl: string; errorLimit: string; errorUnavailable: string }
+      continueTitle: string; continueReading: string; recentlyRead: string; clearHistory: string; positionLocalNote: string
     }
   }
   calendar: {
@@ -257,6 +258,9 @@ const ro: Translations = {
         errorLimit: 'Ați trimis multe raportări în ultima oră. Încercați mai târziu.',
         errorUnavailable: 'Momentan nu putem primi raportări.',
       },
+      continueTitle: 'Continuă lectura', continueReading: 'Continuă lectura: {book} {chapter}, versetul {verse}',
+      recentlyRead: 'Citite recent', clearHistory: 'Șterge istoricul',
+      positionLocalNote: 'Poziția de lectură se păstrează doar în acest browser.',
     },
   },
   calendar: {
