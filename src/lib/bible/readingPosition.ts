@@ -1,15 +1,14 @@
 /**
- * „Continuă lectura": locul de lectură, doar în localStorage-ul acestui browser.
- * Fără cont, fără server, fără cookie-uri. Orice acces la stocare trece prin
- * try/catch: cu stocarea blocată, funcția dispare fără erori.
+ * „Continuă lectura" la Biblie, peste modulul comun din `src/lib/reading-position.ts`.
+ * Cheile vechi `biblia:pozitie` și `biblia:recente` se mută la prima citire.
  */
 import type { Locale } from '../i18n/context'
 import { localizedHref } from '../i18n/href'
+import { MAX_RECENT, createReadingStore, isPositiveInt, parseJson, parseRecentList, uniqueRecent } from '../reading-position'
 import { getBook } from './books'
 
-export const POSITION_KEY = 'biblia:pozitie'
-export const RECENT_KEY = 'biblia:recente'
-export const MAX_RECENT = 5
+export const LEGACY_POSITION_KEY = 'biblia:pozitie'
+export const LEGACY_RECENT_KEY = 'biblia:recente'
 /** Cardul arată poziția curentă, plus capitolele anterioare din listă. */
 export const MAX_RECENT_SHOWN = MAX_RECENT - 1
 
@@ -17,23 +16,7 @@ export interface RecentChapter { carte: string; capitol: number; ts: number }
 export interface ReadingPosition extends RecentChapter { verset: number }
 export interface ReadingHistory { position: ReadingPosition; recent: RecentChapter[] }
 
-// ─── Acces sigur la stocare ──────────────────────────────────────────────────
-
-function readRaw(key: string): string | null {
-  try { return window.localStorage.getItem(key) } catch { return null }
-}
-
-function writeRaw(key: string, value: string): void {
-  try { window.localStorage.setItem(key, value) } catch { /* blocat sau plin */ }
-}
-
-function removeRaw(key: string): void {
-  try { window.localStorage.removeItem(key) } catch { /* blocat */ }
-}
-
 // ─── Validare ────────────────────────────────────────────────────────────────
-
-const isPositiveInt = (v: unknown): v is number => Number.isSafeInteger(v) && (v as number) >= 1
 
 function toRecentChapter(value: unknown): RecentChapter | null {
   if (!value || typeof value !== 'object') return null
@@ -42,9 +25,7 @@ function toRecentChapter(value: unknown): RecentChapter | null {
   return { carte, capitol, ts }
 }
 
-function parseJson(raw: string): unknown {
-  try { return JSON.parse(raw) } catch { return null }
-}
+const sameChapter = (a: RecentChapter, b: RecentChapter) => a.carte === b.carte && a.capitol === b.capitol
 
 export function parsePosition(raw: string): ReadingPosition | null {
   const value = parseJson(raw)
@@ -55,72 +36,36 @@ export function parsePosition(raw: string): ReadingPosition | null {
 
 /** Null dacă lista sau oricare dintre intrări e invalidă; altfel fără dubluri și cel mult MAX_RECENT. */
 export function parseRecent(raw: string): RecentChapter[] | null {
-  const value = parseJson(raw)
-  if (!Array.isArray(value)) return null
-  const items = value.map(toRecentChapter)
-  if (items.some(item => item === null)) return null
-  return dedupe(items as RecentChapter[])
-}
-
-const sameChapter = (a: RecentChapter, b: RecentChapter) => a.carte === b.carte && a.capitol === b.capitol
-
-function dedupe(items: RecentChapter[]): RecentChapter[] {
-  return items.filter((item, i) => items.findIndex(other => sameChapter(other, item)) === i).slice(0, MAX_RECENT)
+  return parseRecentList(raw, toRecentChapter, sameChapter)
 }
 
 // ─── Citire și scriere ───────────────────────────────────────────────────────
 
-/** O valoare invalidă se șterge, ca să nu fie validată la nesfârșit. */
-function readValid<T>(key: string, parse: (raw: string) => T | null): T | null {
-  const raw = readRaw(key)
-  if (raw === null) return null
-  const parsed = parse(raw)
-  if (parsed === null) removeRaw(key)
-  return parsed
-}
+const store = createReadingStore<ReadingPosition, RecentChapter, ReadingHistory>({
+  tip: 'biblia',
+  parsePosition,
+  parseRecent,
+  legacy: { position: LEGACY_POSITION_KEY, recent: LEGACY_RECENT_KEY },
+  select: (position, recent) => position && {
+    position,
+    recent: recent.filter(item => !sameChapter(item, position)).slice(0, MAX_RECENT_SHOWN),
+  },
+})
 
-export const readPosition = () => readValid(POSITION_KEY, parsePosition)
-export const readRecent = () => readValid(RECENT_KEY, parseRecent) ?? []
+export const POSITION_KEY = store.positionKey
+export const RECENT_KEY = store.recentKey
+export const readPosition = store.readPosition
+export const readRecent = store.readRecent
+export const clearHistory = store.clear
+export const subscribeHistory = store.subscribe
+export const getHistorySnapshot = store.getSnapshot
 
 export function savePosition(carte: string, capitol: number, verset: number, now = Date.now()): void {
   const position = { carte, capitol, verset, ts: now }
-  const serialized = JSON.stringify(position)
-  if (!parsePosition(serialized)) return
-  writeRaw(POSITION_KEY, serialized)
-  const entry: RecentChapter = { carte, capitol, ts: now }
-  writeRaw(RECENT_KEY, JSON.stringify(dedupe([entry, ...readRecent()])))
-}
-
-// ─── Starea cardului (pentru useSyncExternalStore) ───────────────────────────
-
-const CHANGE_EVENT = 'biblia:istoric'
-
-export function clearHistory(): void {
-  removeRaw(POSITION_KEY)
-  removeRaw(RECENT_KEY)
-  try { window.dispatchEvent(new Event(CHANGE_EVENT)) } catch { /* fără window */ }
-}
-
-/** `pageshow`: revenirea cu „Înapoi" din capitol, din bfcache, trebuie să arate poziția nouă. */
-export function subscribeHistory(onChange: () => void): () => void {
-  const events = [CHANGE_EVENT, 'storage', 'pageshow']
-  events.forEach(e => window.addEventListener(e, onChange))
-  return () => events.forEach(e => window.removeEventListener(e, onChange))
-}
-
-const rawSnapshot = () => `${readRaw(POSITION_KEY)}\n${readRaw(RECENT_KEY)}`
-let cached: { raw: string; value: ReadingHistory | null } | null = null
-
-/** Același obiect cât timp stocarea nu s-a schimbat, cum cere useSyncExternalStore. */
-export function getHistorySnapshot(): ReadingHistory | null {
-  if (cached?.raw === rawSnapshot()) return cached.value
-  const position = readPosition()
-  const recent = readRecent()
-    .filter(item => !position || !sameChapter(item, position))
-    .slice(0, MAX_RECENT_SHOWN)
-  // citirea poate șterge valori invalide: cheia de cache se ia după ea
-  cached = { raw: rawSnapshot(), value: position ? { position, recent } : null }
-  return cached.value
+  if (!parsePosition(JSON.stringify(position))) return
+  const recent = uniqueRecent([{ carte, capitol, ts: now }, ...store.readRecent()], sameChapter)
+  store.writePosition(position)
+  store.writeRecent(recent)
 }
 
 // ─── Linkuri ─────────────────────────────────────────────────────────────────

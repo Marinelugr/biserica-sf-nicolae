@@ -67,6 +67,9 @@
 .continue-recent a { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--serif); font-size: 19px; text-decoration: underline; text-underline-offset: 3px; }
 .continue-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
 .continue-foot p { flex: 1 1 220px; }
+/* secțiunile unei cărți din Bibliotecă primesc clasa în client, ca să se oprească sub antet la reluare */
+.reading-section { scroll-margin-top: calc(var(--header-h) + 20px); }
+.continue-from { align-self: flex-start; white-space: normal; text-align: center; }
 
 .verse-hits { display: flex; flex-direction: column; }
 .verse-hits li { padding: 14px 0; display: flex; flex-direction: column; gap: 4px; }

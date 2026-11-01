@@ -105,6 +105,7 @@ const en: Translations = {
   },
   books: {
     subtitle: 'Sacred texts', title: 'Orthodox Library',
+    continueBook: 'Continue reading: {title}, {place}', continueFrom: 'Continue from {place}',
     searchPlaceholder: 'Search the library...', searchBtn: 'Search',
     inProgress: 'The library is being compiled.', comingSoon: 'Come back soon',
     recentlyAdded: 'Recently added', textSingular: 'text', textPlural: 'texts',

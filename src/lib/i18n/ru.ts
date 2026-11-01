@@ -105,6 +105,7 @@ const ru: Translations = {
   },
   books: {
     subtitle: 'Священные тексты', title: 'Православная библиотека',
+    continueBook: 'Продолжить чтение: {title}, {place}', continueFrom: 'Продолжить с места: {place}',
     searchPlaceholder: 'Поиск в библиотеке...', searchBtn: 'Искать',
     inProgress: 'Библиотека в процессе наполнения.', comingSoon: 'Заходите позже',
     recentlyAdded: 'Недавно добавленные', textSingular: 'текст', textPlural: 'текстов',

@@ -1,15 +1,70 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
-  POSITION_KEY, RECENT_KEY, chapterHref, clearHistory, getHistorySnapshot, isSearchReferrer, parsePosition, parseRecent,
+  LEGACY_POSITION_KEY, LEGACY_RECENT_KEY, POSITION_KEY, RECENT_KEY, chapterHref, clearHistory, getHistorySnapshot, isSearchReferrer, parsePosition, parseRecent,
   readPosition, readRecent, resumeHref, savePosition, topVerse, verseFromHash, waitsForScroll,
 } from './readingPosition'
 
 beforeEach(() => localStorage.clear())
 afterEach(() => vi.restoreAllMocks())
 
+describe('migrarea cheilor vechi', () => {
+  const position = { carte: 'ioan', capitol: 3, verset: 12, ts: 1000 }
+  const recent = [{ carte: 'ioan', capitol: 3, ts: 1000 }, { carte: 'matei', capitol: 5, ts: 900 }]
+
+  it('cheile au numele comune', () => {
+    expect(POSITION_KEY).toBe('lectura:biblia:poz')
+    expect(RECENT_KEY).toBe('lectura:biblia:recente')
+  })
+
+  it('mută poziția și recentele la prima citire, apoi șterge cheile vechi', () => {
+    localStorage.setItem(LEGACY_POSITION_KEY, JSON.stringify(position))
+    localStorage.setItem(LEGACY_RECENT_KEY, JSON.stringify(recent))
+    expect(getHistorySnapshot()).toEqual({ position, recent: [recent[1]] })
+    expect(JSON.parse(localStorage.getItem(POSITION_KEY)!)).toEqual(position)
+    expect(JSON.parse(localStorage.getItem(RECENT_KEY)!)).toEqual(recent)
+    expect(localStorage.getItem(LEGACY_POSITION_KEY)).toBeNull()
+    expect(localStorage.getItem(LEGACY_RECENT_KEY)).toBeNull()
+  })
+
+  it('o salvare înainte de orice citire nu pierde recentele vechi', () => {
+    localStorage.setItem(LEGACY_RECENT_KEY, JSON.stringify(recent))
+    savePosition('iuda', 1, 2, 2000)
+    expect(readRecent().map(r => r.carte)).toEqual(['iuda', 'ioan', 'matei'])
+  })
+
+  it('nu suprascrie o poziție nouă cu una veche', () => {
+    savePosition('iuda', 1, 2, 2000)
+    localStorage.setItem(LEGACY_POSITION_KEY, JSON.stringify(position))
+    expect(readPosition()?.carte).toBe('iuda')
+    expect(localStorage.getItem(LEGACY_POSITION_KEY)).toBeNull()
+  })
+
+  it('o valoare veche coruptă se șterge și nu ajunge în cheia nouă', () => {
+    localStorage.setItem(LEGACY_POSITION_KEY, '{stricat')
+    expect(readPosition()).toBeNull()
+    expect(localStorage.getItem(LEGACY_POSITION_KEY)).toBeNull()
+    expect(localStorage.getItem(POSITION_KEY)).toBeNull()
+  })
+
+  it('cu stocarea plină, cheia veche rămâne și poziția nu se pierde', () => {
+    localStorage.setItem(LEGACY_POSITION_KEY, JSON.stringify(position))
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => { throw new DOMException('plin', 'QuotaExceededError') })
+    expect(readPosition()).toBeNull()
+    expect(localStorage.getItem(LEGACY_POSITION_KEY)).not.toBeNull()
+    vi.restoreAllMocks()
+    expect(readPosition()).toEqual(position)
+  })
+
+  it('„Șterge istoricul" golește și cheile vechi', () => {
+    localStorage.setItem(LEGACY_POSITION_KEY, 'x')
+    clearHistory()
+    expect(localStorage.getItem(LEGACY_POSITION_KEY)).toBeNull()
+  })
+})
+
 describe('salvare și citire', () => {
-  it('păstrează {carte, capitol, verset, ts} în cheia biblia:pozitie', () => {
+  it('păstrează {carte, capitol, verset, ts} în cheia lectura:biblia:poz', () => {
     savePosition('ioan', 3, 12, 1000)
     expect(JSON.parse(localStorage.getItem(POSITION_KEY)!)).toEqual({ carte: 'ioan', capitol: 3, verset: 12, ts: 1000 })
     expect(readPosition()).toEqual({ carte: 'ioan', capitol: 3, verset: 12, ts: 1000 })
@@ -137,9 +192,9 @@ describe('starea cardului', () => {
   it('„Șterge istoricul" golește ambele chei și anunță abonații', () => {
     savePosition('ioan', 3, 2, 1)
     const listener = vi.fn()
-    window.addEventListener('biblia:istoric', listener)
+    window.addEventListener('lectura:biblia', listener)
     clearHistory()
-    window.removeEventListener('biblia:istoric', listener)
+    window.removeEventListener('lectura:biblia', listener)
     expect(localStorage.getItem(POSITION_KEY)).toBeNull()
     expect(localStorage.getItem(RECENT_KEY)).toBeNull()
     expect(listener).toHaveBeenCalledOnce()

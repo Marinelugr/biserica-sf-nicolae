@@ -6,8 +6,8 @@ import path from 'node:path'
 const { BASE_URL = 'http://127.0.0.1:3417', PLAYWRIGHT_DIR, CHROMIUM_PATH, SHOTS_DIR } = process.env
 const { chromium } = createRequire(path.join(PLAYWRIGHT_DIR ?? process.cwd(), 'noop.js'))('playwright-core')
 
-const POSITION = 'biblia:pozitie'
-const RECENT = 'biblia:recente'
+const POSITION = 'lectura:biblia:poz'
+const RECENT = 'lectura:biblia:recente'
 const SAVE_WAIT_MS = 1200
 const VIEWPORTS = [{ width: 390, height: 844 }, { width: 1280, height: 800 }]
 
@@ -168,6 +168,21 @@ for (const [prefix, chapterPath, text, href] of [
 }
 
 await withPage(phone, async page => {
+  await page.goto('/biblie')
+  await page.evaluate(() => {
+    localStorage.setItem('biblia:pozitie', JSON.stringify({ carte: 'ioan', capitol: 3, verset: 30, ts: 5 }))
+    localStorage.setItem('biblia:recente', JSON.stringify([{ carte: 'ioan', capitol: 3, ts: 5 }, { carte: 'matei', capitol: 5, ts: 4 }]))
+  })
+  await page.reload()
+  const link = page.locator('a.continue-link')
+  await link.waitFor()
+  check('migrare: cardul arată poziția din cheile vechi', (await link.getAttribute('href')) === '/biblie/ioan/3#v30')
+  check('migrare: recentele din cheile vechi', await page.locator('.continue-recent a').getAttribute('href') === '/biblie/matei/5')
+  check('migrare: cheile vechi s-au șters', await page.evaluate(() => localStorage.getItem('biblia:pozitie') === null && localStorage.getItem('biblia:recente') === null))
+  check('migrare: cheile noi au aceleași valori', (await stored(page))?.verset === 30)
+})
+
+await withPage(phone, async page => {
   await page.goto('/biblie/ioan/3')
   await scrollToVerse(page, 30)
   await page.waitForTimeout(SAVE_WAIT_MS)
@@ -180,8 +195,8 @@ await withPage(phone, async page => {
 
 await withPage(phone, async page => {
   await page.addInitScript(() => {
-    localStorage.setItem('biblia:pozitie', '{"carte":"nu-exista","capitol":-1}')
-    localStorage.setItem('biblia:recente', 'stricat')
+    localStorage.setItem('lectura:biblia:poz', '{"carte":"nu-exista","capitol":-1}')
+    localStorage.setItem('lectura:biblia:recente', 'stricat')
   })
   await page.goto('/biblie')
   await page.waitForTimeout(300)

@@ -63,6 +63,7 @@ export interface Translations {
   books: {
     subtitle: string; title: string; searchPlaceholder: string; searchBtn: string
     inProgress: string; comingSoon: string; recentlyAdded: string
+    continueBook: string; continueFrom: string
     textSingular: string; textPlural: string; noTextsInCategory: string
     categories: {
       ACATIST: string; CANON: string; RUGACIUNE: string; SLUJBA: string
@@ -301,6 +302,7 @@ const ro: Translations = {
   },
   books: {
     subtitle: 'Texte sacre', title: 'Bibliotecă Ortodoxă',
+    continueBook: 'Continuă lectura: {title}, {place}', continueFrom: 'Continuă de la {place}',
     searchPlaceholder: 'Caută în bibliotecă...', searchBtn: 'Caută',
     inProgress: 'Biblioteca este în curs de completare.', comingSoon: 'Reveniți curând',
     recentlyAdded: 'Adăugate recent', textSingular: 'text', textPlural: 'texte',
