@@ -5,6 +5,7 @@ import ContentCoverImage from '@/components/shared/ContentCoverImage'
 import PublicGallery from '@/components/PublicGallery'
 import ViewBadge from '@/components/ViewBadge'
 import ViewTracker from '@/components/ViewTracker'
+import BookReading from '@/components/carti/BookReading'
 import { getServerT, getServerLocale, pageUrl } from '@/lib/i18n/server'
 import { buildAlternates } from '@/lib/i18n/alternates'
 import { htmlToPlainText } from '@/lib/utils'
@@ -104,6 +105,8 @@ export default async function CartePage({ params }: Props) {
             <ViewBadge value={book.views} locale={locale} />
           </p>
         </PageHead>
+
+        <BookReading id={book.slug} />
 
         {book.imageUrl && (
           <ContentCoverImage src={book.imageUrl} alt={title} className="w-full overflow-hidden" sizes="(max-width: 1024px) 100vw, 760px" priority />

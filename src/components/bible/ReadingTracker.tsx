@@ -1,9 +1,9 @@
 'use client'
 
 import { useEffect } from 'react'
+import { createPositionSaver } from '@/lib/reading-position'
 import { isSearchReferrer, readPosition, savePosition, topVerse, verseFromHash, waitsForScroll } from '@/lib/bible/readingPosition'
 
-const SAVE_DEBOUNCE_MS = 800
 const HIGHLIGHT_MS = 2000
 /** Cât trebuie să se miște pagina față de locul de sosire ca să conteze drept derulare. */
 const SCROLL_THRESHOLD_PX = 48
@@ -55,21 +55,16 @@ export default function ReadingTracker({ carte, capitol }: { carte: string; capi
     let current: number | null = null
     let lastSaved: number | null = null
     let reading = !waitsForScroll({ hash, referrer, redirectCount: redirectCount() })
-    let saveTimer: ReturnType<typeof setTimeout> | undefined
 
-    const flush = () => {
-      clearTimeout(saveTimer)
+    const saver = createPositionSaver(() => {
       if (!reading) return
       // antet înalt pe telefon: la plecare, încă niciun verset în ecran înseamnă începutul capitolului
       const verse = current ?? 1
       if (verse === lastSaved) return
       lastSaved = verse
       savePosition(carte, capitol, verse)
-    }
-    const schedule = () => {
-      clearTimeout(saveTimer)
-      if (reading) saveTimer = setTimeout(flush, SAVE_DEBOUNCE_MS)
-    }
+    })
+    const schedule = () => { if (reading) saver.schedule() }
 
     const observer = new IntersectionObserver(entries => {
       for (const entry of entries) {
@@ -93,20 +88,15 @@ export default function ReadingTracker({ carte, capitol }: { carte: string; capi
     const settleTimer = setTimeout(() => { baseline = window.scrollY }, SCROLL_SETTLE_MS)
     if (!reading) window.addEventListener('scroll', onScroll, { passive: true })
 
-    const onVisibility = () => { if (document.visibilityState === 'hidden') flush() }
-    document.addEventListener('visibilitychange', onVisibility)
-    window.addEventListener('pagehide', flush)
     schedule()
 
     return () => {
       // navigare în aplicație: nu se pierde ultimul loc citit
-      if (current !== null) flush()
-      else clearTimeout(saveTimer)
+      if (current !== null) saver.flush()
+      saver.dispose()
       observer.disconnect()
       clearTimeout(settleTimer)
       window.removeEventListener('scroll', onScroll)
-      document.removeEventListener('visibilitychange', onVisibility)
-      window.removeEventListener('pagehide', flush)
       stopHighlight()
     }
   }, [carte, capitol])

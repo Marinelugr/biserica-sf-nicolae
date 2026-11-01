@@ -6,6 +6,7 @@ import { buildAlternates } from '@/lib/i18n/alternates'
 import PageShell from '@/components/shell/PageShell'
 import PageHead from '@/components/shell/PageHead'
 import SearchForm from '@/components/shell/SearchForm'
+import ContinueBooks from '@/components/carti/ContinueBooks'
 
 export const dynamic = 'force-dynamic'
 
@@ -44,21 +45,24 @@ async function getCounts(): Promise<Record<string, number>> {
   }
 }
 
-async function getRecentBooks() {
+const RECENTLY_ADDED_SHOWN = 6
+
+/** Toate cărțile, cele mai noi primele. Null = baza nu răspunde, nu „nicio carte". */
+async function getBooks() {
   try {
     const { prisma } = await import('@/lib/prisma')
     return await prisma.libraryBook.findMany({
       select: { slug: true, titleRo: true, type: true },
       orderBy: { createdAt: 'desc' },
-      take: 6,
     })
   } catch {
-    return []
+    return null
   }
 }
 
 export default async function CartiPage() {
-  const [counts, recentBooks, t] = await Promise.all([getCounts(), getRecentBooks(), getServerT()])
+  const [counts, books, t] = await Promise.all([getCounts(), getBooks(), getServerT()])
+  const recentBooks = (books ?? []).slice(0, RECENTLY_ADDED_SHOWN)
   const totalBooks = Object.values(counts).reduce((a, b) => a + b, 0)
 
   return (
@@ -68,6 +72,8 @@ export default async function CartiPage() {
           <SearchForm action="/cautare" id="library-search" placeholder={t.books.searchPlaceholder} button={t.books.searchBtn} />
         </div>
       </PageHead>
+
+      {books && books.length > 0 && <ContinueBooks books={books.map(({ slug, titleRo }) => ({ slug, titleRo }))} />}
 
       {totalBooks === 0 ? (
         <div className="card text-center">
