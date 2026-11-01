@@ -67,3 +67,38 @@
 /* butoanele de pe pergament: text închis, nu culoarea implicită (deschisă) a .btn */
 [data-sec="evanghelie"] .btn { color: var(--sec-ink); border-color: var(--sec-edge); }
 [data-sec="evanghelie"] .btn:hover { color: var(--sec-accent-text); background: color-mix(in srgb, var(--sec-accent) 8%, transparent); }
+
+/* Raportarea greșelilor: totul apare abia în browser (.report-on), peste HTML-ul de pe server. */
+.report-note {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; max-width: 68ch; margin: 0 auto 16px;
+  padding: 6px 6px 6px 12px; border-left: 2px solid var(--sec-edge, var(--line)); font-size: 16px; line-height: 1.45; color: var(--sec-mute, var(--mute));
+}
+.report-note p { margin: 6px 0; }
+.report-note-close { flex: none; min-width: 44px; min-height: 44px; background: transparent; border: 0; border-radius: 4px; cursor: pointer; font-size: 22px; line-height: 1; color: inherit; }
+.report-scope { position: relative; }
+.report-on .vnum { position: relative; cursor: pointer; border-radius: 3px; }
+.report-on .vnum:hover { text-decoration: underline; }
+.report-on .vnum:focus-visible { outline: 2px solid var(--sec-accent-text); outline-offset: 2px; }
+/* zona de atingere de 44 px în jurul numărului, doar pe ecrane tactile */
+@media (pointer: coarse) {
+  .report-on .vnum::after { content: ''; position: absolute; top: 50%; left: 50%; width: 44px; height: 44px; transform: translate(-50%, -50%); }
+}
+.report-action {
+  position: absolute; z-index: 5; min-height: 44px; min-width: 44px; padding: 0 14px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--sec-edge, var(--line)); background: #efe4cc; color: var(--sec-accent-text);
+  font-family: var(--body); font-size: 17px; line-height: 1; box-shadow: 0 2px 8px rgb(0 0 0 / 0.25);
+}
+.report-dialog {
+  width: min(92vw, 460px); padding: 20px; margin: auto; border-radius: 8px; border: 1px solid var(--sec-edge, var(--line));
+  background: var(--sec-bg, #efe4cc); color: var(--sec-ink, #2b1d12); font-family: var(--body);
+}
+.report-dialog::backdrop { background: rgb(0 0 0 / 0.55); }
+.report-title { margin: 0 0 12px; font-family: var(--serif); font-size: 21px; line-height: 1.25; color: inherit; }
+.report-label { display: block; margin-bottom: 6px; font-size: 17px; }
+.report-input { width: 100%; box-sizing: border-box; padding: 10px; border-radius: 6px; border: 1px solid var(--sec-edge, var(--line)); background: #fffdf7; color: #2b1d12; font: inherit; font-size: 17px; line-height: 1.4; resize: vertical; }
+.report-count { margin: 4px 0 0; font-size: 14px; text-align: right; color: var(--sec-mute, inherit); }
+.report-trap { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.report-error { margin: 8px 0 0; font-size: 16px; color: #8b1a1a; }
+.report-thanks { margin: 0; font-size: 18px; }
+.report-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 14px; }
+.report-actions .btn { min-height: 44px; }

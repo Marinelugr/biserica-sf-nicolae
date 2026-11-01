@@ -76,6 +76,7 @@ export default async function BibleChapterPage({ params }: { params: Params }) {
         nextHref={nav.next ? localizedHref(chapterPath(nav.next), locale) : null}
         sourceNote={BIBLE_SOURCE_NOTE}
         langNote={locale === 'ro' ? undefined : r.langNote}
+        reportSlug={book.slug}
         labels={chapterLabels(t)}
       />
     </PageShell>

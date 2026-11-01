@@ -1,6 +1,7 @@
 import PageHead from '@/components/shell/PageHead'
 import ChapterGrid from './ChapterGrid'
 import ReaderControls from './ReaderControls'
+import { ReportNote, VerseReportLayer } from './VerseReportLayer'
 
 export interface ChapterViewProps {
   bookTitle: string
@@ -14,6 +15,8 @@ export interface ChapterViewProps {
   sourceNote: string
   /** Pe ru/en: „Textul Bibliei este în limba română." */
   langNote?: string
+  /** Cartea, pentru raportarea greșelilor. Lipsește în galeria de dezvoltare, unde versetele sunt inventate. */
+  reportSlug?: string
   labels: {
     chapter: string; chapters: string; chooseChapter: string; prevChapter: string; nextChapter: string
     textSize: string; sizes: [string, string, string]
@@ -31,6 +34,16 @@ function ChapterNav({ prevHref, nextHref, labels, position }: Pick<ChapterViewPr
 
 /** Un capitol: pergament, versete numerotate (numărul nu intră la copiere), navigare. Prezentare pură. */
 export default function ChapterView(p: ChapterViewProps) {
+  const text = (
+    <div className="reader-text" lang="ro">
+      {p.verses.map(v => (
+        <span key={v.n} className="verse" id={`v${v.n}`} data-verse={v.n}>
+          <sup className="vnum" data-n={v.n} />
+          {v.text}
+        </span>
+      ))}
+    </div>
+  )
   return (
     <>
       <PageHead sec="evanghelie" crumbs={p.crumbs} eyebrow={p.bookTitle} title={`${p.labels.chapter} ${p.chapter}`} size="m">
@@ -43,15 +56,9 @@ export default function ChapterView(p: ChapterViewProps) {
       <ChapterNav prevHref={p.prevHref} nextHref={p.nextHref} labels={p.labels} position="sus" />
 
       <article className="card reader-card" data-sec="evanghelie" aria-label={`${p.bookTitle}, ${p.labels.chapter.toLowerCase()} ${p.chapter}`}>
+        {p.reportSlug && <ReportNote />}
         <ReaderControls label={p.labels.textSize} sizeLabels={p.labels.sizes}>
-          <div className="reader-text" lang="ro">
-            {p.verses.map(v => (
-              <span key={v.n} className="verse" id={`v${v.n}`} data-verse={v.n}>
-                <sup className="vnum" data-n={v.n} />
-                {v.text}
-              </span>
-            ))}
-          </div>
+          {p.reportSlug ? <VerseReportLayer slug={p.reportSlug} chapter={p.chapter}>{text}</VerseReportLayer> : text}
         </ReaderControls>
         <footer className="reader-foot">
           <p>{p.sourceNote}</p>

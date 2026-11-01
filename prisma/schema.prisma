@@ -88,6 +88,8 @@ model BibleVerse {
   /// Ultima modificare din Admin (null = neatins). Cititorul public nu citește coloana.
   editedAt  DateTime?
   edits     BibleEdit[]
+  /// Doar relație, fără coloană. Cititorul public nu o citește.
+  reviewItems BibleReviewItem[]
 
   @@unique([chapterId, verseNum])
 }
@@ -110,6 +112,53 @@ model BibleEdit {
   createdAt  DateTime    @default(now())
 
   @@index([bookSlug, chapterNum, verseNum])
+  @@index([createdAt])
+}
+
+/// Coada de revizuire: semnalări din audit și raportări de la cititori (docs/BIBLIA-REVIZUIRE.md).
+/// Unicitatea pentru audit e un index parțial pe (verseId, detector, fragment, source) WHERE source = 'audit',
+/// numai în SQL (backups/biblie-revizuire-schema-*.sql): Prisma nu poate descrie indexuri parțiale și le ignoră.
+/// Raportările de cititor au toate fragment gol, deci pe același verset pot fi mai multe.
+model BibleReviewItem {
+  id         String     @id @default(cuid())
+  verseId    String
+  verse      BibleVerse @relation(fields: [verseId], references: [id], onDelete: Cascade)
+  bookSlug   String
+  chapterNum Int
+  verseNum   Int
+  /// A–H din audit; R = cititor
+  detector   String
+  /// Audit: „context[[țintă]]context”, ca în CSV. Cititor: gol.
+  fragment   String     @db.Text
+  /// Alternativele sunt despărțite prin „ | ”.
+  suggestion String?    @db.Text
+  reason     String?    @db.Text
+  /// medie | mica | cititor
+  confidence String
+  /// audit | cititor
+  source     String
+  /// Doar la cititor
+  message    String?    @db.VarChar(500)
+  /// PENDING | APPLIED | EDITED | IGNORED | STALE
+  status     String     @default("PENDING")
+  /// Emailul administratorului sau „import”
+  resolvedBy String?
+  resolvedAt DateTime?
+  createdAt  DateTime   @default(now())
+
+  @@index([status, detector])
+  @@index([status, bookSlug, chapterNum])
+  @@index([status, source])
+  @@index([verseId])
+}
+
+/// Limitarea raportărilor. `keyHash` = HMAC cu sare peste IP + user-agent, niciodată IP în clar. Curățare după 24 h.
+model BibleReportThrottle {
+  id        String   @id @default(cuid())
+  keyHash   String
+  createdAt DateTime @default(now())
+
+  @@index([keyHash, createdAt])
   @@index([createdAt])
 }
 

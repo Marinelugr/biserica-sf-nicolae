@@ -1,6 +1,5 @@
 'use server'
 
-import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
@@ -8,7 +7,7 @@ import { getBook } from '@/lib/bible/books'
 import { requireBibleAdmin } from '@/lib/bible/adminAuth'
 import { checkReplaceInput, isValidNewVerseNumber, planReplace, prepareVerseText, type ReplaceInput, type ReplaceSample } from '@/lib/bible/adminCore'
 import { loadReplaceRows } from '@/lib/bible/adminQueries'
-import { invalidateChapterCache, READER_CACHE_VERSION_KEY } from '@/lib/bible/queries'
+import { bumpReaderCache, logDbError, refreshReader, TX_SHORT, writeVerseEdit } from '@/lib/bible/adminWrite'
 import { prisma } from '@/lib/prisma'
 
 export type SaveResult =
@@ -27,7 +26,6 @@ const UNAUTHORIZED = 'Nu ai acces la această acțiune.'
 const CONFLICT = 'Versetul a fost modificat de altcineva.'
 const BAD_INPUT = 'Date invalide.'
 const DB_ERROR = 'Salvarea nu a reușit; încearcă din nou.'
-const TX_SHORT = { timeout: 15_000, maxWait: 10_000 }
 const TX_BULK = { timeout: 120_000, maxWait: 10_000 }
 const PREVIEW_INVALID = 20
 
@@ -44,25 +42,6 @@ const applySchema = replaceSchema.extend({ token: z.string().length(64), confirm
 
 const seenDate = (seen: string | null) => (seen ? new Date(seen) : null)
 const iso = (d: Date | null) => d?.toISOString() ?? null
-
-/** Se scrie în aceeași tranzacție și ultima, ca rândul să rămână blocat cât mai puțin. */
-function bumpReaderCache(tx: Prisma.TransactionClient) {
-  const value = randomUUID()
-  return tx.setting.upsert({ where: { key: READER_CACHE_VERSION_KEY }, update: { value }, create: { key: READER_CACHE_VERSION_KEY, value } })
-}
-
-function refreshReader(slug: string, chapters: Iterable<number>) {
-  for (const chapter of new Set(chapters)) {
-    invalidateChapterCache(slug, chapter)
-    revalidatePath(`/biblie/${slug}/${chapter}`)
-  }
-}
-
-/** Doar codul erorii: mesajele Prisma pot conține textul versetului. */
-function logDbError(where: string, err: unknown) {
-  const code = err instanceof Prisma.PrismaClientKnownRequestError ? err.code : err instanceof Error ? err.name : 'necunoscută'
-  console.error(`[biblia-admin] ${where}: ${code}`)
-}
 
 export async function saveVerseAction(input: unknown): Promise<SaveResult> {
   const admin = await requireBibleAdmin()
@@ -83,30 +62,10 @@ export async function saveVerseAction(input: unknown): Promise<SaveResult> {
       if (!verse) return { kind: 'missing' as const }
       if (verse.textRo === prepared.text) return { kind: 'unchanged' as const, editedAt: verse.editedAt }
 
-      const now = new Date()
-      // Comparare atomică: două salvări simultane nu pot trece amândouă.
-      const { count } = await tx.bibleVerse.updateMany({
-        where: { id: verseId, editedAt: seen },
-        data: { textRo: prepared.text, textSearch: prepared.textSearch, editedAt: now },
-      })
-      if (count !== 1) {
-        const current = await tx.bibleVerse.findUnique({ where: { id: verseId }, select: { textRo: true, editedAt: true } })
-        return { kind: 'conflict' as const, text: current?.textRo ?? verse.textRo, editedAt: current?.editedAt ?? verse.editedAt }
-      }
-      await tx.bibleEdit.create({
-        data: {
-          verseId,
-          bookSlug: verse.chapter.book.slug,
-          chapterNum: verse.chapter.chapterNum,
-          verseNum: verse.verseNum,
-          action: 'EDIT',
-          oldText: verse.textRo,
-          newText: prepared.text,
-          editor: admin.email,
-        },
-      })
+      const written = await writeVerseEdit(tx, { id: verseId, textRo: verse.textRo, verseNum: verse.verseNum, slug: verse.chapter.book.slug, chapterNum: verse.chapter.chapterNum }, prepared, seen, admin.email)
+      if (written.kind === 'conflict') return written
       await bumpReaderCache(tx)
-      return { kind: 'saved' as const, editedAt: now, slug: verse.chapter.book.slug, chapter: verse.chapter.chapterNum }
+      return { kind: 'saved' as const, editedAt: written.editedAt, slug: verse.chapter.book.slug, chapter: verse.chapter.chapterNum }
     }, TX_SHORT)
 
     switch (outcome.kind) {

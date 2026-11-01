@@ -19,6 +19,7 @@ Fără niciun verset în acest fișier. Testele și proba din browser au folosit
 | `/admin/biblia/cauta` | căutare în text, cu link direct la verset în editor |
 | `/admin/biblia/inlocuieste` | găsește și înlocuiește pe o carte, cu previzualizare și confirmare |
 | `/admin/biblia/jurnal` | ultimele modificări, 50 pe pagină |
+| `/admin/biblia/revizuire` | coada de revizuire: audit și raportări de la cititori (`docs/BIBLIA-REVIZUIRE.md`) |
 | `/admin/biblia/export/[carte]`, `/export/toate` | JSON în formatul `bible-data`, `Cache-Control: no-store` |
 
 Accesul se verifică în fiecare pagină, acțiune și export (`src/lib/bible/adminAuth.ts`), nu doar în `src/proxy.ts`.

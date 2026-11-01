@@ -14,7 +14,7 @@ vi.mock('../prisma', () => ({
 
 const queries = await import('./queries')
 
-const NEW_FIELDS = /\b(reviewed|editedAt|bibleEdit|BibleEdit|edits)\b/
+const NEW_FIELDS = /\b(reviewed|editedAt|bibleEdit|BibleEdit|edits|bibleReviewItem|BibleReviewItem|bibleReportThrottle|BibleReportThrottle|reviewItems)\b/
 const ROOT = process.cwd()
 
 function sourceFiles(dir: string): string[] {
@@ -57,6 +57,14 @@ describe('cititorul public nu depinde de schema nouă', () => {
   it('nu importă nimic din Admin', () => {
     const offenders = [...importGraph(publicEntries)].filter(f => /admin/i.test(f))
     expect(offenders).toEqual([])
+  })
+
+  it('formularul și acțiunea de raportare se încarcă doar la interacțiune, nu cu pagina', () => {
+    const graph = importGraph(publicEntries)
+    expect(graph.has('src/components/bible/VerseReportLayer.tsx')).toBe(true)
+    expect(graph.has('src/components/bible/VerseReportForm.tsx')).toBe(false)
+    expect(graph.has('src/lib/bible/reportAction.ts')).toBe(false)
+    expect(fs.readFileSync(path.join(ROOT, 'src/components/bible/VerseReportLayer.tsx'), 'utf8')).toContain("dynamic(() => import('./VerseReportForm'), { ssr: false })")
   })
 
   it('interogarea capitolului selectează exact verseNum și textRo', async () => {
