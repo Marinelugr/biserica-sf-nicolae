@@ -30,6 +30,7 @@ export interface Translations {
       versesTitle: string; versesFound: string; noVerseResults: string
       prevPage: string; nextPage: string; pageLabel: string
       langNote: string; metaSuffix: string
+      report: { note: string; noteClose: string; action: string; verseLabel: string; title: string; question: string; submit: string; sending: string; cancel: string; close: string; thanks: string; errorInvalid: string; errorTooLong: string; errorUrl: string; errorLimit: string; errorUnavailable: string }
       continueTitle: string; continueReading: string; recentlyRead: string; clearHistory: string; positionLocalNote: string
     }
   }
@@ -239,6 +240,24 @@ const ro: Translations = {
       versesTitle: 'Versete', versesFound: '{n} versete găsite', noVerseResults: 'Niciun verset nu conține toate aceste cuvinte.',
       prevPage: '← Pagina anterioară', nextPage: 'Pagina următoare →', pageLabel: 'Pagina {n} din {total}',
       langNote: 'Textul Bibliei este în limba română.', metaSuffix: 'Biblia Ortodoxă',
+      report: {
+        note: 'Textul este în curs de verificare. Dacă observați o greșeală, o puteți raporta apăsând pe numărul versetului.',
+        noteClose: 'Închide nota',
+        action: 'Raportează',
+        verseLabel: 'Versetul {n}: raportează o greșeală',
+        title: 'Raportați o greșeală la versetul {n}',
+        question: 'Ce nu e corect? (opțional)',
+        submit: 'Trimite',
+        sending: 'Se trimite…',
+        cancel: 'Renunță',
+        close: 'Închide',
+        thanks: 'Mulțumim! Vom verifica.',
+        errorInvalid: 'Raportarea nu a putut fi trimisă. Reîncărcați pagina și încercați din nou.',
+        errorTooLong: 'Mesajul poate avea cel mult 300 de caractere.',
+        errorUrl: 'Mesajul nu poate conține adrese web.',
+        errorLimit: 'Ați trimis multe raportări în ultima oră. Încercați mai târziu.',
+        errorUnavailable: 'Momentan nu putem primi raportări.',
+      },
       continueTitle: 'Continuă lectura', continueReading: 'Continuă lectura: {book} {chapter}, versetul {verse}',
       recentlyRead: 'Citite recent', clearHistory: 'Șterge istoricul',
       positionLocalNote: 'Poziția de lectură se păstrează doar în acest browser.',

@@ -3,6 +3,7 @@ import { BIBLE_BOOKS } from '@/lib/bible/books'
 import { requireBibleAdminPage } from '@/lib/bible/adminAuth'
 import { gapLabel } from '@/lib/bible/adminCore'
 import { chapterStats, reviewedPercent, sumStats, type ChapterStats } from '@/lib/bible/adminQueries'
+import { pendingReviewCount } from '@/lib/bible/reviewQueries'
 import { normalizeForSearch } from '@/lib/bible/search'
 import { BibliaHeader, ui } from '@/components/admin/biblia/ui'
 
@@ -16,6 +17,7 @@ export default async function AdminBibliaPage({ searchParams }: { searchParams: 
   const query = (Array.isArray(q) ? q[0] : q ?? '').slice(0, 100).trim()
   const needle = normalizeForSearch(query).trim()
 
+  const pending = await pendingReviewCount()
   const byBook = new Map<string, ChapterStats[]>()
   for (const row of await chapterStats()) {
     const list = byBook.get(row.slug)
@@ -35,6 +37,12 @@ export default async function AdminBibliaPage({ searchParams }: { searchParams: 
       <p style={ui.muted}>
         {totals.verses} versete în {totals.chapters} capitole · {reviewedPercent(totals.reviewed, totals.verses)}% revizuite · {gapLabel(totals.gaps)} · {totals.edited} editate
       </p>
+      {pending !== null && (
+        <Link href="/admin/biblia/revizuire" data-testid="card-revizuire" style={{ ...ui.card, display: 'block', margin: '1rem 0', maxWidth: '520px', boxSizing: 'border-box' }}>
+          <span style={{ ...ui.text, display: 'block' }}>Coada de revizuire</span>
+          <span style={{ ...ui.muted, display: 'block' }}>{pending} {pending === 1 ? 'element' : 'elemente'} în așteptare</span>
+        </Link>
+      )}
       <form method="get" role="search" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', margin: '1rem 0', maxWidth: '520px' }}>
         <div style={{ flex: '1 1 200px' }}>
           <label htmlFor="q" style={ui.label}>Caută cartea după nume</label>

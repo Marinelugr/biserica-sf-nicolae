@@ -32,6 +32,7 @@ const pages: [string, () => Promise<{ default: Page }>, unknown][] = [
   ['/admin/biblia/cauta', () => import('./cauta/page'), { searchParams: Promise.resolve({ q: 'cuvant' }) }],
   ['/admin/biblia/inlocuieste', () => import('./inlocuieste/page'), {}],
   ['/admin/biblia/jurnal', () => import('./jurnal/page'), noParams],
+  ['/admin/biblia/revizuire', () => import('./revizuire/page'), noParams],
 ]
 
 const exports_: [string, () => Promise<Response>][] = [
@@ -98,6 +99,37 @@ describe.each(actionNames)('acțiunea %s', name => {
     expect(await run()).toMatchObject({ ok: false, error: 'Nu ai acces la această acțiune.' })
     expect(touched.count).toBe(0)
   })
+})
+
+const reviewPayload = {
+  applyReviewItemAction: { itemId: 'i1', seenEditedAt: null, option: 0 },
+  editReviewItemAction: { itemId: 'i1', seenEditedAt: null, text: 'text de probă' },
+  ignoreReviewItemAction: { itemId: 'i1' },
+  previewIgnoreAllAction: { itemId: 'i1' },
+  ignoreAllAction: { itemId: 'i1', confirmed: true },
+}
+const reviewActionNames = Object.keys(reviewPayload) as (keyof typeof reviewPayload)[]
+
+describe.each(reviewActionNames)('acțiunea din coadă %s', name => {
+  const run = async () => {
+    const actions = await import('./revizuire/actions')
+    return (actions[name] as (input: unknown) => Promise<{ ok: boolean; error?: string }>)(reviewPayload[name])
+  }
+  it('neautentificat: respins, fără bază', async () => {
+    auth.mockResolvedValue(null)
+    expect(await run()).toMatchObject({ ok: false, error: 'Nu ai acces la această acțiune.' })
+    expect(touched.count).toBe(0)
+  })
+  it.each(NON_ADMINS)('%s: respins, fără bază', async (_n, session) => {
+    auth.mockResolvedValue(session)
+    expect(await run()).toMatchObject({ ok: false, error: 'Nu ai acces la această acțiune.' })
+    expect(touched.count).toBe(0)
+  })
+})
+
+it('acțiunile din coadă testate sunt toate cele exportate', async () => {
+  const actions = await import('./revizuire/actions')
+  expect(Object.keys(actions).sort()).toEqual([...reviewActionNames].sort())
 })
 
 it('acțiunile testate sunt toate cele exportate', async () => {

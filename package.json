@@ -20,6 +20,7 @@
     "bible:extract": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/extract.ts",
     "bible:validate": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/validate.ts",
     "bible:import": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/import.ts",
+    "bible:review-import": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/review-import.ts",
     "bible:wipe": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/wipe.ts",
     "bible:verify-live": "ts-node --compiler-options '{\"module\":\"CommonJS\"}' prisma/bible/verify-live.ts"
   },

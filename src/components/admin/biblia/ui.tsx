@@ -28,6 +28,7 @@ export function BibliaHeader({ crumbs }: { crumbs: Crumb[] }) {
     { href: '/admin/biblia/cauta', label: 'Caută' },
     { href: '/admin/biblia/inlocuieste', label: 'Înlocuiește' },
     { href: '/admin/biblia/jurnal', label: 'Jurnal' },
+    { href: '/admin/biblia/revizuire', label: 'Revizuire' },
   ]
   return (
     <div style={{ marginBottom: '1.25rem' }}>
